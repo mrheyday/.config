@@ -99,9 +99,6 @@ HIST_STAMPS="yyyy-mm-dd"
 # Would you like to use another custom folder than $ZSH/custom?
 # ZSH_CUSTOM=/path/to/new-custom-folder
 
-ZSH_AUTOSUGGEST_MANUAL_REBIND="true"
-ZSH_AUTOSUGGEST_STRATEGY=(history)
-
 # Which plugins would you like to load?
 # Standard plugins can be found in ~/.oh-my-zsh/plugins/*
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
@@ -110,12 +107,16 @@ ZSH_AUTOSUGGEST_STRATEGY=(history)
 plugins=(
   common-aliases
   colored-man-pages
+  dirpersist
   git-auto-fetch
   pipenv
   zsh-autosuggestions
   zsh-navigation-tools
   zsh-syntax-highlighting
 )
+
+ZSH_AUTOSUGGEST_MANUAL_REBIND="true"
+ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -145,9 +146,15 @@ fi
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-alias git="colored git"
+alias gs="git status"
+
+bindkey -s "^G" "git "
+bindkey -s "^H" "help "
+
+bindkey '^I' autosuggest-accept
 
 zle -N znt-cd-widget
-bindkey "^A" znt-cd-widget
+bindkey "^B" znt-cd-widget
+
 
 eval "$(pyenv init -)"
