@@ -46,6 +46,14 @@ SPACESHIP_PROMPT_ORDER=(
   char          # Prompt character
 )
 
+SPACESHIP_GIT_STATUS_MODIFIED="M"
+SPACESHIP_GIT_STATUS_ADDED="A"
+SPACESHIP_GIT_STATUS_DELETED="D"
+SPACESHIP_GIT_STATUS_RENAMED="R"
+SPACESHIP_GIT_STATUS_COPIED="C"
+SPACESHIP_GIT_STATUS_UNMERGED="U"
+SPACESHIP_GIT_STATUS_UNTRACKED="??"
+
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
 # a theme from this variable instead of looking in ~/.oh-my-zsh/themes/
@@ -109,14 +117,16 @@ plugins=(
   colored-man-pages
   dirpersist
   git-auto-fetch
+  history-substring-search
   pipenv
   zsh-autosuggestions
   zsh-navigation-tools
+  zsh_reload
   zsh-syntax-highlighting
 )
 
 ZSH_AUTOSUGGEST_MANUAL_REBIND="true"
-ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+ZSH_AUTOSUGGEST_STRATEGY=( history )
 
 source $ZSH/oh-my-zsh.sh
 
@@ -146,15 +156,13 @@ fi
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-alias gs="git status"
-
-bindkey -s "^G" "git "
-bindkey -s "^H" "help "
-
-bindkey '^I' autosuggest-accept
-
 zle -N znt-cd-widget
-bindkey "^B" znt-cd-widget
-
+bindkey "^S" znt-cd-widget
+# bindkey -s "^[p" "git pull^J"
+# bindkey -s "^[r" "git remote -v^J"
+# bindkey -s "^[4" "git stash list^J"
+bindkey -s "^[g" "git status -s^J"
+bindkey -s "^[." "cd .^J"
+# bindkey -s "^[z" "src^J"
 
 eval "$(pyenv init -)"
