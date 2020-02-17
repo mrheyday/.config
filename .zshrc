@@ -16,10 +16,6 @@ alias infocmp-csv="infocmp-csv -1"
 alias bindkey-csv='bindkey -L | sed -E "s/(^.+\") /\1,/" | sed "s/bindkey \"/,\"/" | sed -E "s/(bindkey )(-.)( )(\")/\2,\4/"'
 
 # Environment
-export BROWSER='open'
-export EDITOR='Atom'
-export VISUAL='Atom'
-export PAGER='less'
 export LANG='en_US.UTF-8'
 export LESS='-g -i -M -R -S -w -z-4'
 autoload -Uz bracketed-paste-url-magic
@@ -33,7 +29,7 @@ zinit light sindresorhus/pure
 zinit light MichaelAquilina/zsh-autoswitch-virtualenv
 zinit light sindresorhus/pure # workaround to fix the prompt
 
-# Key bindings
+# Keyboard behavior
 WORDCHARS='*?[]~=&;!#$%^(){}<>' # what punctuation is considered part of a word
 stty -ixon <$TTY >$TTY  # enable ^Q and ^S
 HELPDIR="/usr/share/zsh/5.7.1/help"
@@ -52,8 +48,6 @@ function expand-all {
   zle magic-space
 }
 zle -N expand-all
-bindkey "^[[Z" reverse-menu-complete  # shift-tab
-bindkey " " magic-space
 bindkey "^[K" backward-kill-line # ctrl-backspace
 bindkey "^[(" kill-word # alt-delete
 bindkey "^W" kill-region
@@ -62,16 +56,16 @@ bindkey "^[^_" copy-prev-shell-word
 bindkey "^[-" redo
 bindkey "^[ " expand-all  # alt-space
 bindkey "^[e" expand-cmd-path
+bindkey "^[[Z" reverse-menu-complete  # shift-tab
+bindkey " " magic-space
 
 # Colors
-alias dircolors='gdircolors'
-alias grep="grep --color=auto"
 function ls { gls $@ | less }
 alias ls="ls --color=always --group-directories-first -AFhXl"
-zinit ice atclone"dircolors -b LS_COLORS > clrs.zsh" atpull'%atclone' pick"clrs.zsh" ocompile'!' \
+alias grep="grep --color=auto"
+zinit ice atclone"gdircolors -b LS_COLORS > clrs.zsh" atpull'%atclone' pick"clrs.zsh" ocompile'!' \
     atload'zstyle ":completion:*" list-colors "${(s.:.)LS_COLORS}"'
 zinit light trapd00r/LS_COLORS
-zstyle ':completion:*:default' list-colors "${(s.:.)LS_COLORS}"
 
 # Completions
 zinit ice blockf atpull'zinit creinstall -q .'
@@ -80,27 +74,33 @@ zinit snippet PZT::modules/completion/init.zsh
 setopt GLOB_DOTS  # Do not require a leading ‘.’ in a filename to be matched explicitly.
 zstyle ':completion:*' completer _complete _correct _approximate _match
 zstyle ':completion:*' matcher-list 'm:{[:lower:]-}={[:upper:]_} l:|=* r:|[[:upper:][:punct:]]=**'
-zstyle ':completion:*' show-completer true
+# zstyle ':completion:*' show-completer true
 zstyle ':completion:*' sort match
 
-# Must be AFTER anything that affects syntax highlighting
+# Command-line syntax highlighting
+# Must be AFTER anything that affects it (colors, completions).
 zinit ice atinit"zpcompinit; zpcdreplay"
 zinit light zsh-users/zsh-syntax-highlighting
 
 # Everything above this line we want immediately when the prompt shows.
 # Everything below this line can wait so we can start faster.
 
-# Must be AFTER syntax highlighting
+# History
+# zsh-history-substring-search be AFTER zsh-syntax-highlighting.
 zinit ice wait lucid \
-    atload"bindkey '${key[Up]}' history-substring-search-up;bindkey '${key[Down]}' history-substring-search-down"
+    atload"bindkey '^[[A' history-substring-search-up;bindkey '^[[B' history-substring-search-down"
 zinit light zsh-users/zsh-history-substring-search
 HISTORY_SUBSTRING_SEARCH_FUZZY=1
+HISTSIZE=10000
+SAVEHIST=10000
 setopt EXTENDED_HISTORY
 setopt SHARE_HISTORY
 
+# Better `cd` command
 zinit ice wait lucid atload"zinit cclear" atpull'!git checkout -- .' run-atpull
 zinit light b4b4r07/enhancd
 
+# Better history for zsh-autosuggestions
 zinit ice wait lucid atload"add-zsh-hook precmd histdb-update-outcome" src"sqlite-history.zsh"
 zinit light larkery/zsh-histdb
 HISTDB_TABULATE_CMD=(sed -e $'s/\x1f/\t/g') # macOS compatibility workaround
@@ -115,7 +115,8 @@ order by places.dir != '$(sql_escape $PWD)', count(*) desc limit 1"
     suggestion=$(_histdb_query "$query")
 }
 
-# Must be last
+# Automatic suggestions while you type
+# Must be LAST.
 zinit ice wait lucid atload"_zsh_autosuggest_start"
 zinit light zsh-users/zsh-autosuggestions
 ZSH_AUTOSUGGEST_ACCEPT_WIDGETS=( end-of-line )
