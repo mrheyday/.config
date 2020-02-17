@@ -1,3 +1,4 @@
 automatic_backups
 complex_modifications
+*.csv
 *.db
