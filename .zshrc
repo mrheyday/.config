@@ -1,168 +1,140 @@
-# If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:/usr/local/bin:$PATH
-
-# Path to your oh-my-zsh installation.
-export ZSH="/Users/marlon/.oh-my-zsh"
-
-# Set name of the theme to load --- if set to "random", it will
-# load a random theme each time oh-my-zsh is loaded, in which case,
-# to know which specific one was loaded, run: echo $RANDOM_THEME
-# See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="spaceship"
-
-SPACESHIP_PROMPT_ORDER=(
-  time          # Time stamps section
-  user          # Username section
-  dir           # Current directory section
-  host          # Hostname section
-  git           # Git section (git_branch + git_status)
-  # hg            # Mercurial section (hg_branch  + hg_status)
-  package       # Package version
-  node          # Node.js section
-  # ruby          # Ruby section
-  # elixir        # Elixir section
-  # xcode         # Xcode section
-  # swift         # Swift section
-  # golang        # Go section
-  # php           # PHP section
-  # rust          # Rust section
-  # haskell       # Haskell Stack section
-  # julia         # Julia section
-  # docker        # Docker section
-  # aws           # Amazon Web Services section
-  venv          # virtualenv section
-  # conda         # conda virtualenv section
-  pyenv         # Pyenv section
-  # dotnet        # .NET section
-  # ember         # Ember.js section
-  # kubecontext   # Kubectl context section
-  # terraform     # Terraform workspace section
-  exec_time     # Execution time
-  line_sep      # Line break
-  # battery       # Battery level and status
-  # vi_mode       # Vi-mode indicator
-  jobs          # Background jobs indicator
-  exit_code     # Exit code section
-  char          # Prompt character
-)
-
-SPACESHIP_GIT_STATUS_MODIFIED="M"
-SPACESHIP_GIT_STATUS_ADDED="A"
-SPACESHIP_GIT_STATUS_DELETED="D"
-SPACESHIP_GIT_STATUS_RENAMED="R"
-SPACESHIP_GIT_STATUS_COPIED="C"
-SPACESHIP_GIT_STATUS_UNMERGED="U"
-SPACESHIP_GIT_STATUS_UNTRACKED="??"
-
-# Set list of themes to pick from when loading at random
-# Setting this variable when ZSH_THEME=random will cause zsh to load
-# a theme from this variable instead of looking in ~/.oh-my-zsh/themes/
-# If set to an empty array, this variable will have no effect.
-# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
-
-# Uncomment the following line to use case-sensitive completion.
-# CASE_SENSITIVE="true"
-
-# Uncomment the following line to use hyphen-insensitive completion.
-# Case-sensitive completion must be off. _ and - will be interchangeable.
-HYPHEN_INSENSITIVE="true"
-
-# Uncomment the following line to disable bi-weekly auto-update checks.
-# DISABLE_AUTO_UPDATE="true"
-
-# Uncomment the following line to automatically update without prompting.
-# DISABLE_UPDATE_PROMPT="true"
-
-# Uncomment the following line to change how often to auto-update (in days).
-# export UPDATE_ZSH_DAYS=13
-
-# Uncomment the following line if pasting URLs and other text is messed up.
-# DISABLE_MAGIC_FUNCTIONS=true
-
-# Uncomment the following line to disable colors in ls.
-# DISABLE_LS_COLORS="true"
-
-# Uncomment the following line to disable auto-setting terminal title.
-DISABLE_AUTO_TITLE="true"
-
-# Uncomment the following line to enable command auto-correction.
-# ENABLE_CORRECTION="true"
-
-# Uncomment the following line to display red dots whilst waiting for completion.
-# COMPLETION_WAITING_DOTS="true"
-
-# Uncomment the following line if you want to disable marking untracked files
-# under VCS as dirty. This makes repository status check for large repositories
-# much, much faster.
-# DISABLE_UNTRACKED_FILES_DIRTY="true"
-
-# Uncomment the following line if you want to change the command execution time
-# stamp shown in the history command output.
-# You can set one of the optional three formats:
-# "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
-# or set a custom format using the strftime function format specifications,
-# see 'man strftime' for details.
-HIST_STAMPS="yyyy-mm-dd"
-
-# Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=/path/to/new-custom-folder
-
-# Which plugins would you like to load?
-# Standard plugins can be found in ~/.oh-my-zsh/plugins/*
-# Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
-# Add wisely, as too many plugins slow down shell startup.
-plugins=(
-  common-aliases
-  colored-man-pages
-  dirpersist
-  git-auto-fetch
-  history-substring-search
-  pipenv
-  zsh-autosuggestions
-  zsh-navigation-tools
-  zsh_reload
-  zsh-syntax-highlighting
-)
-
-ZSH_AUTOSUGGEST_MANUAL_REBIND="true"
-ZSH_AUTOSUGGEST_STRATEGY=( history )
-
-source $ZSH/oh-my-zsh.sh
-
-# User configuration
-
-# export MANPATH="/usr/local/man:$MANPATH"
-
-# You may need to manually set your language environment
-export LANG=en_US.UTF-8
-export LC_ALL=en_US.UTF-8
-
-# Preferred editor for local and remote sessions
-if [[ -n $SSH_CONNECTION ]]; then
-  export EDITOR='nano'
-else
-  export EDITOR='Atom'
+### Added by Zinit's installer
+if [[ ! -f $HOME/.zinit/bin/zinit.zsh ]]; then
+    print -P "%F{33}▓▒░ %F{220}Installing DHARMA Initiative Plugin Manager (zdharma/zinit)…%f"
+    command mkdir -p "$HOME/.zinit" && command chmod g-rwX "$HOME/.zinit"
+    command git clone https://github.com/zdharma/zinit "$HOME/.zinit/bin" && \
+        print -P "%F{33}▓▒░ %F{34}Installation successful.%f" || \
+        print -P "%F{160}▓▒░ The clone has failed.%f"
 fi
+source "$HOME/.zinit/bin/zinit.zsh"
+autoload -Uz _zinit
+(( ${+_comps} )) && _comps[zinit]=_zinit
+### End of Zinit installer's chunk
 
-# Compilation flags
-# export ARCHFLAGS="-arch x86_64"
+function infocmp-csv { infocmp $@ | sed $'s/=/,/' | sed $'s/\t//' | sed -E $'s/\\\\\\E/^[/g' }
+alias infocmp-csv="infocmp-csv -1"
+alias bindkey-csv='bindkey -L | sed -E "s/(^.+\") /\1,/" | sed "s/bindkey \"/,\"/" | sed -E "s/(bindkey )(-.)( )(\")/\2,\4/"'
 
-# Set personal aliases, overriding those provided by oh-my-zsh libs,
-# plugins, and themes. Aliases can be placed here, though oh-my-zsh
-# users are encouraged to define aliases within the ZSH_CUSTOM folder.
-# For a full list of active aliases, run `alias`.
-#
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
-zle -N znt-cd-widget
-bindkey "^S" znt-cd-widget
-# bindkey -s "^[p" "git pull^J"
-# bindkey -s "^[r" "git remote -v^J"
-# bindkey -s "^[4" "git stash list^J"
-bindkey -s "^[g" "git status -s^J"
-bindkey -s "^[." "cd .^J"
-# bindkey -s "^[z" "src^J"
+# Environment
+export BROWSER='open'
+export EDITOR='Atom'
+export VISUAL='Atom'
+export PAGER='less'
+export LANG='en_US.UTF-8'
+export LESS='-g -i -M -R -S -w -z-4'
+autoload -Uz bracketed-paste-url-magic
+zle -N bracketed-paste bracketed-paste-url-magic
+autoload -Uz url-quote-magic
+zle -N self-insert url-quote-magic
 
-eval "$(pyenv init -)"
+# Prompt
+zinit light mafredri/zsh-async
+zinit light sindresorhus/pure
+zinit light MichaelAquilina/zsh-autoswitch-virtualenv
+zinit light sindresorhus/pure # workaround to fix the prompt
+
+# Key bindings
+WORDCHARS='*?[]~=&;!#$%^(){}<>' # what punctuation is considered part of a word
+stty -ixon <$TTY >$TTY  # enable ^Q and ^S
+HELPDIR="/usr/share/zsh/5.7.1/help"
+unalias run-help
+autoload -Uz run-help
+autoload -Uz run-help-git
+autoload -Uz run-help-ip
+autoload -Uz run-help-openssl
+autoload -Uz run-help-p4
+autoload -Uz run-help-sudo
+autoload -Uz run-help-svk
+autoload -Uz run-help-svn
+function expand-all {
+  zle _expand_alias
+  zle expand-word
+  zle magic-space
+}
+zle -N expand-all
+bindkey "^[[Z" reverse-menu-complete  # shift-tab
+bindkey " " magic-space
+bindkey "^[K" backward-kill-line # ctrl-backspace
+bindkey "^[(" kill-word # alt-delete
+bindkey "^W" kill-region
+bindkey "^Q" push-line-or-edit
+bindkey "^[^_" copy-prev-shell-word
+bindkey "^[-" redo
+bindkey "^[ " expand-all  # alt-space
+bindkey "^[e" expand-cmd-path
+
+# Colors
+alias dircolors='gdircolors'
+alias grep="grep --color=auto"
+function ls { gls $@ | less }
+alias ls="ls --color=always --group-directories-first -AFhXl"
+zinit ice atclone"dircolors -b LS_COLORS > clrs.zsh" atpull'%atclone' pick"clrs.zsh" ocompile'!' \
+    atload'zstyle ":completion:*" list-colors "${(s.:.)LS_COLORS}"'
+zinit light trapd00r/LS_COLORS
+zstyle ':completion:*:default' list-colors "${(s.:.)LS_COLORS}"
+
+# Completions
+zinit ice blockf atpull'zinit creinstall -q .'
+zinit light zsh-users/zsh-completions
+zinit snippet PZT::modules/completion/init.zsh
+setopt GLOB_DOTS  # Do not require a leading ‘.’ in a filename to be matched explicitly.
+zstyle ':completion:*' completer _complete _correct _approximate _match
+zstyle ':completion:*' matcher-list 'm:{[:lower:]-}={[:upper:]_} l:|=* r:|[[:upper:][:punct:]]=**'
+zstyle ':completion:*' show-completer true
+zstyle ':completion:*' sort match
+
+# Must be AFTER anything that affects syntax highlighting
+zinit ice atinit"zpcompinit; zpcdreplay"
+zinit light zsh-users/zsh-syntax-highlighting
+
+# Everything above this line we want immediately when the prompt shows.
+# Everything below this line can wait so we can start faster.
+
+# Must be AFTER syntax highlighting
+zinit ice wait lucid \
+    atload"bindkey '${key[Up]}' history-substring-search-up;bindkey '${key[Down]}' history-substring-search-down"
+zinit light zsh-users/zsh-history-substring-search
+HISTORY_SUBSTRING_SEARCH_FUZZY=1
+setopt EXTENDED_HISTORY
+setopt SHARE_HISTORY
+
+zinit ice wait lucid atload"zinit cclear" atpull'!git checkout -- .' run-atpull
+zinit light b4b4r07/enhancd
+
+zinit ice wait lucid atload"add-zsh-hook precmd histdb-update-outcome" src"sqlite-history.zsh"
+zinit light larkery/zsh-histdb
+HISTDB_TABULATE_CMD=(sed -e $'s/\x1f/\t/g') # macOS compatibility workaround
+ZSH_AUTOSUGGEST_STRATEGY=( histdb_top completion )
+_zsh_autosuggest_strategy_histdb_top() {
+    local query="select commands.argv from
+history left join commands on history.command_id = commands.rowid
+left join places on history.place_id = places.rowid
+where commands.argv LIKE '$(sql_escape $1)%'
+group by commands.argv
+order by places.dir != '$(sql_escape $PWD)', count(*) desc limit 1"
+    suggestion=$(_histdb_query "$query")
+}
+
+# Must be last
+zinit ice wait lucid atload"_zsh_autosuggest_start"
+zinit light zsh-users/zsh-autosuggestions
+ZSH_AUTOSUGGEST_ACCEPT_WIDGETS=( end-of-line )
+ZSH_AUTOSUGGEST_CLEAR_WIDGETS=(
+	history-search-forward
+	history-search-backward
+	history-beginning-search-forward
+	history-beginning-search-backward
+	history-substring-search-up
+	history-substring-search-down
+	up-line-or-beginning-search
+	down-line-or-beginning-search
+	up-line-or-history
+	down-line-or-history
+	accept-line
+	copy-previous-word
+  copy-previous-shell-word
+)
+ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS=(
+		forward-word
+    forward-char
+)
