@@ -82,6 +82,11 @@ zstyle ':completion:*' sort match
 zinit ice atinit"zpcompinit; zpcdreplay"
 zinit light zsh-users/zsh-syntax-highlighting
 
+eval "$(brew command-not-found-init)"
+eval "$(pyenv init -)"
+eval "$(ssh-agent -s)"
+
+
 # Everything above this line we want immediately when the prompt shows.
 # Everything below this line can wait so we can start faster.
 
