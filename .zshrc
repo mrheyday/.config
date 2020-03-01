@@ -85,7 +85,7 @@ zinit light zsh-users/zsh-syntax-highlighting
 
 eval "$(brew command-not-found-init)"
 eval "$(pyenv init -)"
-eval "$(ssh-agent -s)"
+ssh-add -A
 
 
 # Everything above this line we want immediately when the prompt shows.
