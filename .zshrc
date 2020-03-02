@@ -16,7 +16,7 @@ alias infocmp-csv="infocmp-csv -1"
 alias bindkey-csv='bindkey -L | sed -E "s/(^.+\") /\1,/" | sed "s/bindkey \"/,\"/" | sed -E "s/(bindkey )(-.)( )(\")/\2,\4/"'
 
 # Environment
-export PATH="/usr/local/opt/ncurses/bin:/usr/local/bin:$PATH"
+export PATH="/usr/local/opt/ncurses/bin:/usr/local/bin:/usr/local/sbin:$PATH"
 export LANG='en_US.UTF-8'
 export LESS='-g -i -M -R -S -w -z-4'
 autoload -Uz bracketed-paste-url-magic
@@ -33,7 +33,7 @@ zinit light sindresorhus/pure # workaround to fix the prompt
 # Keyboard behavior
 WORDCHARS='*?[]~=&;!#$%^(){}<>' # what punctuation is considered part of a word
 stty -ixon <$TTY >$TTY  # enable ^Q and ^S
-HELPDIR="/usr/local/Cellar/zsh/5.8/share/zsh/help"
+HELPDIR="/usr/local/Cellar/zsh/$ZSH_VERSION/share/zsh/help"
 unalias run-help
 autoload -Uz run-help
 autoload -Uz run-help-git
