@@ -14,7 +14,7 @@ autoload -Uz _zinit
 # Prompt
 zinit light-mode for mafredri/zsh-async sindresorhus/pure
 
-# Automatic Pipenv
+# Automatic Pipenv shell
 zinit light MichaelAquilina/zsh-autoswitch-virtualenv
 
 # Workaround: Redraw the prompt
