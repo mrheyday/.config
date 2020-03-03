@@ -1,0 +1,23 @@
+[user]
+	name = Marlon Richert
+[push]
+	default = upstream
+[core]
+	autocrlf = false
+	excludesfile = /Users/marlon/.gitignore_global
+	editor = atom --wait
+[branch]
+	autosetuprebase = always
+[diff]
+	tool = opendiff
+	noprefix = true
+[difftool "opendiff"]
+	cmd = /usr/bin/opendiff \"$LOCAL\" \"$REMOTE\" -merge \"$MERGED\" 2>/dev/null | cat
+[color]
+	ui = always
+[commit]
+	template = /Users/marlon/.stCommitMsg
+[alias]
+	opendiff = difftool --no-prompt --tool opendiff --dir-diff
+[merge]
+	tool = opendiff
