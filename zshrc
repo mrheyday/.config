@@ -101,7 +101,7 @@ zinit for atclone"gdircolors -b LS_COLORS > clrs.zsh" atpull'%atclone' pick"clrs
 # Fuzzy search
 # Requires `brew install fzf`.
 export FZF_DEFAULT_OPTS="--height 40% --reverse"
-source ~/.fzf.zsh
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 export FZF_COMPLETION_TRIGGER=''
 
 # Everything ABOVE this line we want immediately when the prompt shows.
