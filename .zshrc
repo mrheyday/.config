@@ -11,29 +11,44 @@ autoload -Uz _zinit
 (( ${+_comps} )) && _comps[zinit]=_zinit
 ### End of Zinit installer's chunk
 
-function infocmp-csv { infocmp $@ | sed $'s/=/,/' | sed $'s/\t//' | sed -E $'s/\\\\\\E/^[/g' }
-alias infocmp-csv="infocmp-csv -1"
-alias bindkey-csv='bindkey -L | sed -E "s/(^.+\") /\1,/" | sed "s/bindkey \"/,\"/" | sed -E "s/(bindkey )(-.)( )(\")/\2,\4/"'
-
-# Environment
-export PATH="/usr/local/opt/ncurses/bin:/usr/local/bin:/usr/local/sbin:$PATH"
-export LANG='en_US.UTF-8'
-export LESS='-g -i -M -R -S -w -z-4'
-autoload -Uz bracketed-paste-url-magic
-zle -N bracketed-paste bracketed-paste-url-magic
-autoload -Uz url-quote-magic
-zle -N self-insert url-quote-magic
-
 # Prompt
-zinit light mafredri/zsh-async
-zinit light sindresorhus/pure
-zinit light MichaelAquilina/zsh-autoswitch-virtualenv
-zinit light sindresorhus/pure # workaround to fix the prompt
+zinit light-mode for mafredri/zsh-async sindresorhus/pure
 
-# Keyboard behavior
-WORDCHARS='*?[]~=&;!#$%^(){}<>' # what punctuation is considered part of a word
-stty -ixon <$TTY >$TTY  # enable ^Q and ^S
-HELPDIR="/usr/local/Cellar/zsh/$ZSH_VERSION/share/zsh/help"
+# Automatic Pipenv
+zinit light MichaelAquilina/zsh-autoswitch-virtualenv
+
+# Workaround: Redraw the prompt
+zinit light sindresorhus/pure
+
+# Sensible defaults
+zinit for \
+  https://github.com/sorin-ionescu/prezto/blob/master/modules/environment/init.zsh \
+  https://github.com/sorin-ionescu/prezto/blob/master/modules/editor/init.zsh \
+  https://github.com/sorin-ionescu/prezto/blob/master/modules/completion/init.zsh \
+  https://github.com/zimfw/environment/blob/master/init.zsh \
+  https://github.com/zimfw/utility/blob/master/init.zsh
+
+# Environment variables
+path=(
+  /usr/local/opt/ncurses/bin
+  /usr/local/{bin,sbin}
+  $path
+)
+export LANG='en_US.UTF-8'
+export VISUAL='atom'
+export EDITOR='nano'
+export PAGER='less'
+export LESS='-g -i -M -R -S -w -z-4'
+export READNULLCMD=$PAGER
+WORDCHARS="*?[]~&;!#$%^(){}<>:|"
+
+# Options
+setopt CORRECT
+setopt GLOB_DOTS
+setopt MENU_COMPLETE
+
+# Set up alt-h help function
+HELPDIR="/usr/local/Cellar/zsh/$ZSH_VERSION/share/man/man1"
 unalias run-help
 autoload -Uz run-help
 autoload -Uz run-help-git
@@ -43,73 +58,88 @@ autoload -Uz run-help-p4
 autoload -Uz run-help-sudo
 autoload -Uz run-help-svk
 autoload -Uz run-help-svn
-function expand-all {
-  zle _expand_alias
-  zle expand-word
-  zle magic-space
+
+# Aliases and functions
+function infocmp-csv {
+  infocmp $@ | sed $'s/=/,/' | sed $'s/\t//' | sed -E $'s/\\\\\\E/^[/g'
 }
-zle -N expand-all
-bindkey "^[K" backward-kill-line # ctrl-backspace
-bindkey "^[(" kill-word # alt-delete
-bindkey "^W" kill-region
-bindkey "^Q" push-line-or-edit
-bindkey "^[^_" copy-prev-shell-word
-bindkey "^[-" redo
-bindkey "^[ " expand-all  # alt-space
-bindkey "^[e" expand-cmd-path
-bindkey "^[[Z" reverse-menu-complete  # shift-tab
-bindkey " " magic-space
+alias infocmp-csv="infocmp-csv -1"
+alias bindkey-csv='bindkey -L | sed -E "s/(^.+\") /\1,/" | sed "s/bindkey \"/,\"/" | \
+  sed -E "s/(bindkey )(-.)( )(\")/\2,\4/"'
+function print-key {
+   print -r -- ${(qqqq)key[$@]}
+}
+function print-all-keys {
+  for k v in ${(kv)key}; do
+    print -r -- "$k -> ${(qqqq)v}"
+  done
+}
+function print-terminfo {
+   print -r -- ${(qqqq)terminfo[$@]}
+}
+alias grep="grep --color=always"
+
+# Requires `brew install exa`.
+function ls {
+  exa -lFaghm@ --color=always --color-scale --sort=extension --group-directories-first \
+    --time-style=long-iso --git $@ | $PAGER
+}
+alias tree="ls -T"
+
+# Requires `brew install fd`.
+function find {
+  fd -HI --max-depth=5 --color=always $@ | $PAGER
+}
 
 # Colors
-function ls { gls $@ | less }
-alias ls="ls --color=always --group-directories-first -AFhXl"
-alias grep="grep --color=auto"
-zinit ice atclone"gdircolors -b LS_COLORS > clrs.zsh" atpull'%atclone' pick"clrs.zsh" ocompile'!' \
-    atload'zstyle ":completion:*" list-colors "${(s.:.)LS_COLORS}"'
-zinit light trapd00r/LS_COLORS
+# Requires `brew install coreutils`.
+# Compile with dircolors only when we update.
+zinit for atclone"gdircolors -b LS_COLORS > clrs.zsh" atpull'%atclone' pick"clrs.zsh" \
+  nocompile'!' atload'zstyle ":completion:*" list-colors “${(s.:.)LS_COLORS}”' light-mode \
+  trapd00r/LS_COLORS
 
-# Completions
-zinit ice blockf atpull'zinit creinstall -q .'
-zinit light zsh-users/zsh-completions
-zinit snippet PZT::modules/completion/init.zsh
-setopt GLOB_DOTS  # Do not require a leading ‘.’ in a filename to be matched explicitly.
-zstyle ':completion:*' completer _complete _correct _approximate _match
-zstyle ':completion:*' matcher-list 'm:{[:lower:]-}={[:upper:]_} l:|=* r:|[[:upper:][:punct:]]=**'
-# zstyle ':completion:*' show-completer true
-zstyle ':completion:*' sort match
+# Fuzzy search
+# Requires `brew install fzf`.
+export FZF_DEFAULT_OPTS="--height 40% --reverse"
+source ~/.fzf.zsh
+export FZF_COMPLETION_TRIGGER=''
+
+# Everything ABOVE this line we want immediately when the prompt shows.
+# Everything BELOW this line can wait so we can start faster.
+
+# Additional completions
+zinit wait lucid blockf atpull'zinit creinstall -q .' for light-mode zsh-users/zsh-completions
+
+# Better `cd` command
+
+# Undo file deletions, so we can git rebase.
+unsetopt PUSHD_IGNORE_DUPS
+zinit wait lucid for atload"
+  zinit cclear # Discard included Fish completions.
+  bindkey '^I' fzf-completion" \
+  atpull'!git checkout -- .' run-atpull light-mode b4b4r07/enhancd
+
+# Faster brew command-not-found
+# Requires `brew tap homebrew/command-not-found`.
+zinit wait lucid for light-mode Tireg/zsh-macos-command-not-found
 
 # Command-line syntax highlighting
 # Must be AFTER anything that affects it (colors, completions).
-zinit ice atinit"zpcompinit; zpcdreplay"
-zinit light zsh-users/zsh-syntax-highlighting
+zinit wait lucid for atinit"zpcompinit; zpcdreplay" light-mode zsh-users/zsh-syntax-highlighting
 
-eval "$(brew command-not-found-init)"
-eval "$(pyenv init -)"
-ssh-add -A
+# Better history search
+# Must be AFTER zsh-syntax-highlighting.
+# Requires `brew install fzy`.
+zinit wait lucid atload"
+  bindkey '^[OA' history-substring-search-up
+  bindkey '^[OB' history-substring-search-down" \
+  for light-mode zsh-users/zsh-history-substring-search
 
-
-# Everything above this line we want immediately when the prompt shows.
-# Everything below this line can wait so we can start faster.
-
-# History
-# zsh-history-substring-search be AFTER zsh-syntax-highlighting.
-zinit ice wait lucid \
-    atload"bindkey '^[[A' history-substring-search-up;bindkey '^[[B' history-substring-search-down"
-zinit light zsh-users/zsh-history-substring-search
-HISTORY_SUBSTRING_SEARCH_FUZZY=1
-HISTSIZE=10000
-SAVEHIST=10000
-setopt EXTENDED_HISTORY
-setopt SHARE_HISTORY
-
-# Better `cd` command
-zinit ice wait lucid atload"zinit cclear" atpull'!git checkout -- .' run-atpull
-zinit light b4b4r07/enhancd
-
-# Better history for zsh-autosuggestions
-zinit ice wait lucid atload"add-zsh-hook precmd histdb-update-outcome" src"sqlite-history.zsh"
-zinit light larkery/zsh-histdb
-HISTDB_TABULATE_CMD=(sed -e $'s/\x1f/\t/g') # macOS compatibility workaround
+# Automatic suggestions while you type, based on frequent occurences in history.
+# Must be LAST.
+unsetopt HIST_IGNORE_DUPS
+HISTDB_TABULATE_CMD=(sed -e $'s/\x1f/\t/g') # Workaround: macOS compatibility
+ZSH_AUTOSUGGEST_ACCEPT_WIDGETS=( end-of-line )
 ZSH_AUTOSUGGEST_STRATEGY=( histdb_top completion )
 _zsh_autosuggest_strategy_histdb_top() {
     local query="select commands.argv from
@@ -120,28 +150,7 @@ group by commands.argv
 order by places.dir != '$(sql_escape $PWD)', count(*) desc limit 1"
     suggestion=$(_histdb_query "$query")
 }
-
-# Automatic suggestions while you type
-# Must be LAST.
-zinit ice wait lucid atload"_zsh_autosuggest_start"
-zinit light zsh-users/zsh-autosuggestions
-ZSH_AUTOSUGGEST_ACCEPT_WIDGETS=( end-of-line )
-ZSH_AUTOSUGGEST_CLEAR_WIDGETS=(
-	history-search-forward
-	history-search-backward
-	history-beginning-search-forward
-	history-beginning-search-backward
-	history-substring-search-up
-	history-substring-search-down
-	up-line-or-beginning-search
-	down-line-or-beginning-search
-	up-line-or-history
-	down-line-or-history
-	accept-line
-	copy-previous-word
-  copy-previous-shell-word
-)
-ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS=(
-		forward-word
-    forward-char
-)
+zinit wait lucid for \
+  atload"add-zsh-hook precmd histdb-update-outcome" src"sqlite-history.zsh" \
+    light-mode larkery/zsh-histdb \
+  atload"_zsh_autosuggest_start" light-mode zsh-users/zsh-autosuggestions
