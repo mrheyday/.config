@@ -13,9 +13,9 @@ For SSH connections:
 
 For [Git](https://git-scm.com):
 * Colored output
-* Use FileMerge for diffs and merges.
-* Use Atom for editing commit messages.
 * Automatically rebase when you pull.
+* Use [Xcode](https://apps.apple.com/fi/app/xcode/id497799835?mt=12)'s FileMerge for diffs and merges.
+* Use [Atom](https://atom.io) for editing commit messages.
 
 For [Terminal.app](https://support.apple.com/guide/terminal/welcome/mac):
 * Proper settings for getting the most out of the Z Shell (see below).
