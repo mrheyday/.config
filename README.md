@@ -5,36 +5,42 @@ Fast & powerful configs (dotfiles) for Zsh, Git, SSH, Terminal.app and Karabiner
 
 ### Features
 
-For [Karabiner-Elements](https://pqrs.org/osx/karabiner/):
-* [Ergoemacs mode level 1 and 2](http://ergoemacs.github.io/gradual-adoption.html) for faster and more ergonomic text editing (developed by yours truly.)
-
 For SSH connections:
-* Automatic loading of keys from [Keychain](https://support.apple.com/guide/keychain-access/welcome/mac) into SSH agent. No need to enter your password anymore for every SSH connection.
+* Automatic loading of keys from
+[Keychain](https://support.apple.com/guide/keychain-access/welcome/mac) into SSH agent. No need to
+enter your password anymore for every SSH connection.
+
+For [Karabiner-Elements](https://pqrs.org/osx/karabiner/):
+* Enables [Ergoemacs mode](http://ergoemacs.github.io/gradual-adoption.html), so you can edit text faster
+and more ergonomically.
+* Makes ⌘Z and ⌘⇧Z shortcuts for undo and redo work in terminal apps.
+
+For [Terminal.app](https://support.apple.com/guide/terminal/welcome/mac):
+* Custom, translucent dark mode theme that uses colors from macOS's own palette
+* Proper settings for using the Z Shell (see below)
+* [Programing ligatures and Powerline symbols](/tonsky/FiraCode)
 
 For [Git](https://git-scm.com):
 * Colored output
-* Automatically rebase when you pull.
-* Use [Xcode](https://apps.apple.com/fi/app/xcode/id497799835?mt=12)'s FileMerge for diffs and merges.
+* Automatic rebase when you pull
+* Use [Xcode](https://apps.apple.com/fi/app/xcode/id497799835?mt=12)'s FileMerge for diffs and
+merges.
 * Use [Atom](https://atom.io) for editing commit messages.
 
-For [Terminal.app](https://support.apple.com/guide/terminal/welcome/mac):
-* Proper settings for getting the most out of the Z Shell (see below).
-* A nice, hand-crafted theme with pleasant colors and transparency (designed by yours truly)
-* [Programing ligatures and Powerline symbols](/tonsky/FiraCode)
-
 For the [Z Shell](http://zsh.sourceforge.net):
-* Starts up **fast** (thanks to [Zinit](/zdharma/zinit) and [Pure](sindresorhus/pure)).
-* Uses **sensible defaults** (based on [Prezto](/sorin-ionescu/prezto) and [Zimfw](/zimfw)).
+* **[Starts up fast](https://github.com/zdharma/zinit)**
+* [**Asynchronously updating** prompt](https://github.com/sindresorhus/pure)
+* Comes with **[sensible](https://github.com/sorin-ionescu/prezto) [defaults](https://github.com/zimfw)**.
 * Activates the **built-in help function**, so you can press ⌥H on any command for online help.
-* **[Colored output](/trapd00r/LS_COLORS)** and **[syntax highlighting](/zsh-users/zsh-syntax-highlighting)**
-* Enhanced **tab completions** (thanks to Prezto and [zsh-syntax-highlighting](/zsh-users/zsh-syntax-highlighting))
-* [Automatic **completion suggestions** while you type](/zsh-users/zsh-autosuggestions), [based on your command history](/zsh-users/zsh-autosuggestions)
-* [Automatic **insertion of closing brackets and quotes**](/hlissner/zsh-autopair)
-* **Improved functionality** for [`cd`](/b4b4r07/enhancd), [`ls`](/ogham/exa), [`find`, and `tree`](/sharkdp/fd)
-* **[Fuzzy search](/junegunn/fzf)**
-* Better **[history search](zsh-users/zsh-history-substring-search)** when you press the ↑ key
-* [Automatic **Pipenv shell**](MichaelAquilina/zsh-autoswitch-virtualenv)
-* [Automatic **Homebrew installation suggestions** for missing commands](/Homebrew/homebrew-command-not-found)
+* **[Colored output](https://github.com/trapd00r/LS_COLORS)** and **[syntax](https://github.com/zsh-users/zsh-syntax-highlighting) [highlighting](https://github.com/sharkdp/bat)**
+* Enhanced **[tab completions](https://github.com/zsh-users/zsh-completions)**.
+* [Automatic **completion suggestions** while you type](https://github.com/zsh-users/zsh-autosuggestions), [based on your command history](https://github.com/zsh-users/zsh-autosuggestions)
+* [Automatic **matching of brackets and quotes**](https://github.com/hlissner/zsh-autopair)
+* **Upgraded commands** for [`cd`](https://github.com/b4b4r07/enhancd), [`ls`](https://github.com/ogham/exa), [`find`, `tree`](https://github.com/sharkdp/fd) and [`tail`](https://github.com/flok99/multitail)
+* **[Fuzzy search](https://github.com/junegunn/fzf)**
+* Better **[history search](https://github.com/zsh-users/zsh-history-substring-search)** when you press the ↑ key
+* [Automatic **Pipenv shell**](https://github.com/MichaelAquilina/zsh-autoswitch-virtualenv)
+* [Automatic **Homebrew installation suggestions** for missing commands](https://github.com/Homebrew/homebrew-command-not-found)
 
 
 ### Requirements
@@ -74,18 +80,19 @@ For the [Z Shell](http://zsh.sourceforge.net):
    ```
 1. Back up your existing config files (if any):
    ```
-   mv -iv .zshrc .zshrc.bak
-   mv -iv .gitconfig .gitconfig.bak
    mv -iv .config/ .config.bak
+   mv -iv .gitconfig .gitconfig.bak
+   mv -iv .ssh/config .ssh/config.bak
+   mv -iv .zshrc .zshrc.bak
    ```
-1. [Git clone your fork](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository) into your home folder. You will now have a new `~/.config` folder.
+1. [Git clone your fork](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository) into your home folder. You will now have a new `~/.config/` folder.
 1. Go into the new `.config` folder and run `make`:
    ```
    cd .config/
    make
    ```
-   You will now have new `~/.zshrc` and `~/.gitconfig` files.
-1. Merge back anything you'd like to keep from your old config files into your new ones.
+   You will now have new `~/.gitconfig`, `~/.ssh/config` and `~/.zshrc` files.
+1. Merge anything you'd like to keep from your old config files back into your new ones.
 1. Import the theme `~/.config/zsh.terminal` into Terminal.app
 1. Restart your terminal.
 
