@@ -16,8 +16,6 @@
 	cmd = /usr/bin/opendiff \"$LOCAL\" \"$REMOTE\" -merge \"$MERGED\" 2>/dev/null | cat
 [color]
 	ui = always
-[commit]
-	template = /Users/marlon/.stCommitMsg
 [alias]
 	opendiff = difftool --no-prompt --tool opendiff --dir-diff
 [merge]
