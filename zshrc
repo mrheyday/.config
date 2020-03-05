@@ -11,13 +11,14 @@ autoload -Uz _zinit
 (( ${+_comps} )) && _comps[zinit]=_zinit
 ### End of Zinit installer's chunk
 
-# Prompt
+# Fast, asynchronous prompt
 zinit light-mode for mafredri/zsh-async sindresorhus/pure
 
 # Automatic Pipenv shell
 zinit light MichaelAquilina/zsh-autoswitch-virtualenv
 
-# Workaround: Redraw the prompt
+# We need to draw the prompt before and after zsh-autoswitch-virtualenv.
+# Otherwise, starting a shell inside a Python folder messes up the prompt.
 zinit light sindresorhus/pure
 
 # Sensible defaults
@@ -39,8 +40,7 @@ export VISUAL='atom'
 export EDITOR='nano'
 export PAGER='less'
 export LESS='-g -i -M -R -S -w -z-4'
-export READNULLCMD='bat'
-WORDCHARS="*?[]~&;!#$%^(){}<>:|"
+WORDCHARS="*?[]~&;!#$%^(){}<>:|."
 
 # Options
 setopt CORRECT
@@ -79,11 +79,7 @@ function print-terminfo {
 }
 alias grep="grep --color=always"
 
-# Requires `brew install bat`
-function cat {
-  bat --color=always $@ | $PAGER
-}
-
+# Better ls
 # Requires `brew install exa`.
 function ls {
   exa -lFaghm@ --color=always --color-scale --sort=extension --group-directories-first \
@@ -91,9 +87,10 @@ function ls {
 }
 alias tree="ls -T"
 
+# Better find and tree
 # Requires `brew install fd`.
 function find {
-  fd -HI --color=always $@
+  fd -HI $@
 }
 
 # Colors
@@ -115,7 +112,6 @@ export FZF_DEFAULT_OPTS="--tiebreak=length,begin,end --height 40% --reverse"
 zinit wait lucid blockf atpull'zinit creinstall -q .' for light-mode zsh-users/zsh-completions
 
 # Better `cd` command
-
 # Undo file deletions, so we can git rebase.
 unsetopt PUSHD_IGNORE_DUPS
 zinit wait lucid for atload"
@@ -131,7 +127,7 @@ zinit wait lucid for light-mode Tireg/zsh-macos-command-not-found
 # Must be AFTER anything that affects it (colors, completions).
 zinit wait lucid for atinit"zpcompinit; zpcdreplay" light-mode zsh-users/zsh-syntax-highlighting
 
-# Automatic closing brackets and quotes
+# Automatic insertion of closing brackets and quotes
 # Must be AFTER compinit.
 zinit wait lucid for hlissner/zsh-autopair
 
