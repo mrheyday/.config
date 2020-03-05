@@ -39,7 +39,7 @@ export VISUAL='atom'
 export EDITOR='nano'
 export PAGER='less'
 export LESS='-g -i -M -R -S -w -z-4'
-export READNULLCMD=$PAGER
+export READNULLCMD='bat'
 WORDCHARS="*?[]~&;!#$%^(){}<>:|"
 
 # Options
@@ -79,6 +79,11 @@ function print-terminfo {
 }
 alias grep="grep --color=always"
 
+# Requires `brew install bat`
+function cat {
+  bat --color=always $@ | $PAGER
+}
+
 # Requires `brew install exa`.
 function ls {
   exa -lFaghm@ --color=always --color-scale --sort=extension --group-directories-first \
@@ -88,21 +93,20 @@ alias tree="ls -T"
 
 # Requires `brew install fd`.
 function find {
-  fd -HI --max-depth=5 --color=always $@ | $PAGER
+  fd -HI --color=always $@
 }
 
 # Colors
 # Requires `brew install coreutils`.
-# Compile with dircolors only when we update.
+# Compile with dircolors, but only when we update.
 zinit for atclone"gdircolors -b LS_COLORS > clrs.zsh" atpull'%atclone' pick"clrs.zsh" \
   nocompile'!' atload'zstyle ":completion:*" list-colors “${(s.:.)LS_COLORS}”' light-mode \
   trapd00r/LS_COLORS
 
 # Fuzzy search
 # Requires `brew install fzf`.
-export FZF_DEFAULT_OPTS="--height 40% --reverse"
+export FZF_DEFAULT_OPTS="--tiebreak=length,begin,end --height 40% --reverse"
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-export FZF_COMPLETION_TRIGGER=''
 
 # Everything ABOVE this line we want immediately when the prompt shows.
 # Everything BELOW this line can wait so we can start faster.
@@ -126,6 +130,10 @@ zinit wait lucid for light-mode Tireg/zsh-macos-command-not-found
 # Command-line syntax highlighting
 # Must be AFTER anything that affects it (colors, completions).
 zinit wait lucid for atinit"zpcompinit; zpcdreplay" light-mode zsh-users/zsh-syntax-highlighting
+
+# Automatic closing brackets and quotes
+# Must be AFTER compinit.
+zinit wait lucid for hlissner/zsh-autopair
 
 # Better history search
 # Must be AFTER zsh-syntax-highlighting.

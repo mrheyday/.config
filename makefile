@@ -6,9 +6,10 @@ install: install-brew install-ln
 install-brew:
 	brew install zsh
 	brew install coreutils
-	brew install fzf
+	brew install bat
 	brew install exa
 	brew install fd
+	brew install fzf
 	brew tap homebrew/command-not-found
 	brew tap homebrew/cask-fonts
 	brew cask install font-fira-code
