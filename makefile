@@ -4,6 +4,7 @@ make-dir := $(dir $(make-file))
 install: install-brew install-ln
 
 install-brew:
+	brew upgrade
 	brew install bat
 	brew install coreutils
 	brew install exa
