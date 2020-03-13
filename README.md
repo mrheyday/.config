@@ -10,6 +10,9 @@ For SSH connections:
 [Keychain](https://support.apple.com/guide/keychain-access/welcome/mac) into SSH agent. No need to
 enter your password anymore for every SSH connection.
 
+For Safari:
+* User style sheet that enables [programming ligatures](/tonsky/FiraCode) in all code
+
 For [Karabiner-Elements](https://pqrs.org/osx/karabiner/):
 * Enables [Ergoemacs mode](http://ergoemacs.github.io/gradual-adoption.html), so you can edit text faster
 and more ergonomically.
