@@ -1,0 +1,34 @@
+"*":
+  "atom-ide-ui":
+    "atom-ide-code-format":
+      formatOnSave: true
+  core:
+    debugLSP: true
+    telemetryConsent: "limited"
+  editor:
+    fontFamily: "Fira Code"
+    fontSize: 13
+    preferredLineLength: 99
+  "exception-reporting":
+    userId: ""
+  github:
+    automaticCommitMessageWrapping: false
+  "ide-python":
+    pylsPlugins:
+      flake8:
+        enabled: true
+        maxLineLength: 99
+      pycodestyle:
+        maxLineLength: 99
+      pylint:
+        args: [
+          "--ignore-patterns=\"test_*\""
+        ]
+        enabled: true
+    python: "$PIPENV_PATH/bin/python"
+  "markdown-preview":
+    useGitHubStyle: true
+  "one-dark-ui":
+    tabCloseButton: "Left"
+  welcome:
+    showOnStartup: false
