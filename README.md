@@ -63,7 +63,7 @@ Atom config:
 ## Requirements
 
 * These dotfiles were written for **macOS**. If you are using some other (Unix-based) OS, they might need some editing before you can use them. I have not tested them on anything else than macOS.
-* You need to have **[Homebrew](https://brew.sh)** installed, which is available for both macOS and Linux. (Or you need to modify the `install-brew` target in the [makefile](/marlonrichert/.config/blob/master/git/makefile) to use another package manager of your choosing.)
+* You need to have **[Homebrew](https://brew.sh)** installed, which is available for both macOS and Linux. (Or you need to modify the `brew` target in the [makefile](/marlonrichert/.config/blob/master/git/makefile) to use another package manager of your choosing.)
 * To benefit from the Z Shell part, you obviously need to be running `zsh` as your shell —which I highly recommend. Here's the best way to install the latest version:
   1. Open Terminal.app (or whatever terminal you like to use) and use **Homebrew** (see above) to
      install the latest version of `zsh`:

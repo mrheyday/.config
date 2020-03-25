@@ -1,42 +1,30 @@
-makefile-dir := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
+install: brew clean backup symlink
+
+repos := homebrew/cask-fonts homebrew/command-not-found
+formulas := bat coreutils exa fd fzf multitail pyenv pipenv trash
+casks := atom font-fira-code karabiner-elements
+no-update := HOMEBREW_NO_AUTO_UPDATE=1
+brew:
+	brew upgrade
+	$(foreach r, $(repos), $(no-update) brew tap $(r); )
+	$(foreach f, $(formulas), $(no-update) brew install $(f) 2> /dev/null; )
+	$(foreach c, $(casks), $(no-update) brew cask install $(c) 2> /dev/null; )
+
 atom-config := ~/.atom/config.cson
 git-config := ~/.gitconfig
 ssh-config := ~/.ssh/config
 zsh-config := ~/.zshrc
-
-install: brew-install backup symlink
-
-brew-install:
-	brew upgrade
-	brew install bat
-	brew install coreutils
-	brew install exa
-	brew install fd
-	brew install fzf
-	brew install multitail
-	brew install pyenv
-	brew install pipenv
-	brew install trash
-	brew tap homebrew/cask-fonts
-	brew tap homebrew/command-not-found
-	brew cask install atom
-	brew cask install font-fira-code
-	brew cask install karabiner-elements
-
-backup:
-	mv -iv $(atom-config) $(atom-config)\~
-	mv -iv $(git-config) $(git-config)\~
-	mv -iv $(ssh-config) $(ssh-config)\~
-	mv -iv $(zsh-config) $(zsh-config)\~
-
-symlink:
-	ln -is $(makefile-dir)atom/config.cson $(atom-config)
-	ln -is $(makefile-dir)git/.gitconfig $(git-config)
-	ln -is $(makefile-dir)ssh/config $(ssh-config)
-	ln -is $(makefile-dir)zsh/.zshrc $(zsh-config)
+configs := $(atom-config) $(git-config) $(ssh-config) $(zsh-config)
 
 clean:
-	trash $(atom-config)\~
-	trash $(git-config)\~
-	trash $(ssh-config)\~
-	trash $(zsh-config)\~
+	trash -F $(foreach c, $(configs), $(wildcard $(c)~))
+
+backup:
+	$(foreach c, $(configs), mv -iv $(c) $(c)~; )
+
+makefile-dir := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
+symlink:
+	ln -isv $(makefile-dir)atom/config.cson $(atom-config)
+	ln -isv $(makefile-dir)git/.gitconfig $(git-config)
+	ln -isv $(makefile-dir)ssh/config $(ssh-config)
+	ln -isv $(makefile-dir)zsh/.zshrc $(zsh-config)
