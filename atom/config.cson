@@ -7,7 +7,6 @@
     telemetryConsent: "limited"
   editor:
     fontFamily: "Fira Code"
-    fontSize: 13
     preferredLineLength: 99
   "exception-reporting":
     userId: ""
