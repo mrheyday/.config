@@ -1,3 +1,10 @@
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
 ### Added by Zinit's installer
 if [[ ! -f $HOME/.zinit/bin/zinit.zsh ]]; then
     print -P "%F{33}▓▒░ %F{220}Installing DHARMA Initiative Plugin Manager (zdharma/zinit)…%f"
@@ -11,6 +18,13 @@ autoload -Uz _zinit
 (( ${+_comps} )) && _comps[zinit]=_zinit
 ### End of Zinit installer's chunk
 
+# Lazy `pyenv init`
+# Requires `brew install pyenv`.
+zinit light-mode for davidparsson/zsh-pyenv-lazy
+
+# Automatic `pipenv shell`
+# Requires `brew install pipenv`.
+zinit light-mode for MichaelAquilina/zsh-autoswitch-virtualenv
 
 # Sensible defaults
 zstyle ":prezto:*:*" color "yes"
@@ -77,14 +91,6 @@ alias tail="multitail -Cs --follow-all"
 # Requires `brew install trash`.
 alias trash="trash -F"
 
-# Fast, asynchronous prompt
-zinit light-mode for sindresorhus/pure
-
-# Automatic Pyenv init and Pipenv shell
-# Requires `brew install pyenv` and `brew install pipenv`
-zinit light-mode for \
-  davidparsson/zsh-pyenv-lazy \
-  atload'prompt_pure_setup' MichaelAquilina/zsh-autoswitch-virtualenv
 
 
 # Everything ABOVE this line we want immediately when the prompt shows.
@@ -134,3 +140,6 @@ zinit wait lucid light-mode for \
 zinit wait lucid light-mode for \
   atload'add-zsh-hook precmd histdb-update-outcome' src"sqlite-history.zsh" larkery/zsh-histdb \
   atload'_zsh_autosuggest_start' zsh-users/zsh-autosuggestions
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+zinit light-mode for atload'source ~/.p10k.zsh' romkatv/powerlevel10k

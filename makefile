@@ -12,9 +12,10 @@ brew:
 
 atom-config := ~/.atom/config.cson
 git-config := ~/.gitconfig
+p10k-config := ~/.p10k.zsh
 ssh-config := ~/.ssh/config
 zsh-config := ~/.zshrc
-configs := $(atom-config) $(git-config) $(ssh-config) $(zsh-config)
+configs := $(atom-config) $(git-config) $(p10k-config) $(ssh-config) $(zsh-config)
 
 clean:
 	trash -F $(foreach c, $(configs), $(wildcard $(c)~))
@@ -27,4 +28,5 @@ symlink:
 	ln -isv $(makefile-dir)atom/config.cson $(atom-config)
 	ln -isv $(makefile-dir)git/.gitconfig $(git-config)
 	ln -isv $(makefile-dir)ssh/config $(ssh-config)
+	ln -isv $(makefile-dir)zsh/.p10k.zsh $(p10k-config)
 	ln -isv $(makefile-dir)zsh/.zshrc $(zsh-config)
