@@ -1,6 +1,6 @@
 install: brew clean backup symlink
 
-repos := homebrew/cask-fonts homebrew/command-not-found
+repos := homebrew/cask-fonts
 formulas := bat coreutils exa fd fzf multitail pyenv pipenv trash
 casks := atom font-fira-code karabiner-elements
 no-update := HOMEBREW_NO_AUTO_UPDATE=1
