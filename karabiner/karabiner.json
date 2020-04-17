@@ -4222,6 +4222,246 @@
                         ]
                     },
                     {
+                        "description": "Left ⌘ to Enter if pressed alone",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "left_gui",
+                                    "modifiers": {
+                                        "optional": [
+                                            "any"
+                                        ]
+                                    }
+                                },
+                                "parameters": {
+                                    "basic.to_if_alone_timeout_milliseconds": 1000,
+                                    "basic.to_if_held_down_threshold_milliseconds": 0
+                                },
+                                "to_if_alone": [
+                                    {
+                                        "key_code": "return_or_enter"
+                                    }
+                                ],
+                                "to_if_held_down": [
+                                    {
+                                        "key_code": "left_gui"
+                                    }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "Right ⌘ to - if pressed alone",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "right_gui",
+                                    "modifiers": {
+                                        "optional": [
+                                            "any"
+                                        ]
+                                    }
+                                },
+                                "parameters": {
+                                    "basic.to_if_alone_timeout_milliseconds": 1000,
+                                    "basic.to_if_held_down_threshold_milliseconds": 0
+                                },
+                                "to_if_alone": [
+                                    {
+                                        "key_code": "hyphen"
+                                    }
+                                ],
+                                "to_if_held_down": [
+                                    {
+                                        "key_code": "right_gui"
+                                    }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "Left ⌥ to Escape if pressed alone",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "left_alt",
+                                    "modifiers": {
+                                        "optional": [
+                                            "any"
+                                        ]
+                                    }
+                                },
+                                "parameters": {
+                                    "basic.to_if_alone_timeout_milliseconds": 1000,
+                                    "basic.to_if_held_down_threshold_milliseconds": 0
+                                },
+                                "to_if_alone": [
+                                    {
+                                        "key_code": "escape"
+                                    }
+                                ],
+                                "to_if_held_down": [
+                                    {
+                                        "key_code": "left_alt"
+                                    }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "Right ⌥ to = if pressed alone",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "right_alt",
+                                    "modifiers": {
+                                        "optional": [
+                                            "any"
+                                        ]
+                                    }
+                                },
+                                "parameters": {
+                                    "basic.to_if_alone_timeout_milliseconds": 1000,
+                                    "basic.to_if_held_down_threshold_milliseconds": 0
+                                },
+                                "to_if_alone": [
+                                    {
+                                        "key_code": "equal_sign"
+                                    }
+                                ],
+                                "to_if_held_down": [
+                                    {
+                                        "key_code": "right_alt"
+                                    }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "Left ⇧ to ` if pressed alone",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "left_shift",
+                                    "modifiers": {
+                                        "optional": [
+                                            "any"
+                                        ]
+                                    }
+                                },
+                                "parameters": {
+                                    "basic.to_if_alone_timeout_milliseconds": 1000,
+                                    "basic.to_if_held_down_threshold_milliseconds": 0
+                                },
+                                "to_if_alone": [
+                                    {
+                                        "key_code": "grave_accent_and_tilde"
+                                    }
+                                ],
+                                "to_if_held_down": [
+                                    {
+                                        "key_code": "left_shift"
+                                    }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "Right ⇧ to ' if pressed alone",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "right_shift",
+                                    "modifiers": {
+                                        "optional": [
+                                            "any"
+                                        ]
+                                    }
+                                },
+                                "parameters": {
+                                    "basic.to_if_alone_timeout_milliseconds": 1000,
+                                    "basic.to_if_held_down_threshold_milliseconds": 0
+                                },
+                                "to_if_alone": [
+                                    {
+                                        "key_code": "quote"
+                                    }
+                                ],
+                                "to_if_held_down": [
+                                    {
+                                        "key_code": "right_shift"
+                                    }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "Left ⌃ to [ if pressed alone",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "left_control",
+                                    "modifiers": {
+                                        "optional": [
+                                            "any"
+                                        ]
+                                    }
+                                },
+                                "parameters": {
+                                    "basic.to_if_alone_timeout_milliseconds": 1000,
+                                    "basic.to_if_held_down_threshold_milliseconds": 0
+                                },
+                                "to_if_alone": [
+                                    {
+                                        "key_code": "open_bracket"
+                                    }
+                                ],
+                                "to_if_held_down": [
+                                    {
+                                        "key_code": "left_control"
+                                    }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "Right ⌃ to ] if pressed alone",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "right_control",
+                                    "modifiers": {
+                                        "optional": [
+                                            "any"
+                                        ]
+                                    }
+                                },
+                                "parameters": {
+                                    "basic.to_if_alone_timeout_milliseconds": 1000,
+                                    "basic.to_if_held_down_threshold_milliseconds": 0
+                                },
+                                "to_if_alone": [
+                                    {
+                                        "key_code": "close_bracket"
+                                    }
+                                ],
+                                "to_if_held_down": [
+                                    {
+                                        "key_code": "right_control"
+                                    }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
                         "description": "⌘Z to Undo",
                         "manipulators": [
                             {
