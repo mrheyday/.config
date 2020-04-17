@@ -46,35 +46,22 @@ setopt HIST_FCNTL_LOCK
 
 # Environment variables
 export LANG='en_US.UTF-8'
-export WORDCHARS='*()|<>[]?^#'
+export WORDCHARS='*?'
 export VISUAL='atom'
 export EDITOR='nano'
 export PAGER='less'
 export LESS='-g -i -M -R -S -w -z-4'
 
-# Enable alt-h help function.
-export HELPDIR=$MANPATH
-unalias run-help
-autoload -Uz  run-help    run-help-git  run-help-ip   run-help-openssl \
-              run-help-p4 run-help-sudo run-help-svk  run-help-svn
-
-# Auto-suggest how to install missing commands.
-zinit light-mode for is-snippet \
-  https://github.com/Homebrew/homebrew-command-not-found/blob/master/handler.sh
-
 # Better `cd`
 # Duplicates must be saved for this to work correctly.
 unsetopt PUSHD_IGNORE_DUPS
-zinit light-mode for \
-  id-as'zoxide/init' atclone'zoxide init zsh > zoxide-init.zsh' atpull'!%atclone' run-atpull \
-    src'zoxide-init.zsh' zdharma/null
+zinit light-mode for id-as'zoxide/init' atclone'zoxide init zsh > zoxide-init.zsh' \
+  atpull'!%atclone' run-atpull src'zoxide-init.zsh' zdharma/null
 alias cd='z'
 
 # Better `find`
 # Requires `brew install fd`.
-find() {
-  fd -HI -E='.git' -c=always $@
-}
+alias find='fd -HI -E=".git" -c=always $@'
 
 # Color `grep`
 alias grep='grep --color=always'
@@ -85,11 +72,11 @@ alias less='bat --pager "$PAGER $LESS" --style=snip,header --color=always'
 
 # Better `ls` and `tree`
 # Requires `brew install exa`.
-alias ls='exa --color=always --color-scale -s=extension --group-directories-first --git -Fa'
+alias ls='exa -aF --git --color=always --color-scale -s=extension --group-directories-first'
 ll() {
-  ls --time-style=long-iso -lghm $@ | $PAGER
+  ls -ghlm --time-style=long-iso $@ | $PAGER
 }
-alias tree='ll -T -I=".git"'
+alias tree='ll -T -L=2'
 
 # Log file highlighting in `tail`
 # Requires `brew install multitail`.
@@ -113,22 +100,31 @@ source ~/.config/zsh/fzf.zsh
 zinit light-mode for https://github.com/junegunn/fzf/blob/master/shell/completion.zsh \
                      https://github.com/junegunn/fzf/blob/master/shell/key-bindings.zsh
 
+# Enable alt-h help function.
+export HELPDIR=$MANPATH
+unalias run-help
+autoload -Uz  run-help    run-help-git  run-help-ip   run-help-openssl \
+              run-help-p4 run-help-sudo run-help-svk  run-help-svn
+
+# Auto-suggest how to install missing commands.
+zinit light-mode for is-snippet \
+  https://github.com/Homebrew/homebrew-command-not-found/blob/master/handler.sh
+
 # Colors for 'ls' and completions
 # Requires `brew install coreutils`.
-zinit light-mode for \
-  atclone'gdircolors -b LS_COLORS > clrs.zsh' atpull'%atclone' pick'clrs.zsh' nocompile'!' \
-  atload'zstyle ":completion:*" list-colors "${(s.:.)LS_COLORS}"' \
-    trapd00r/LS_COLORS
+zinit light-mode for atclone'gdircolors -b LS_COLORS > clrs.zsh' atpull'%atclone' pick'clrs.zsh' \
+  nocompile'!' atload'zstyle ":completion:*" list-colors "${(s.:.)LS_COLORS}"' trapd00r/LS_COLORS
 
 # Automatic insertion of closing brackets and quotes
 # Must be AFTER calls to `compdef`.
 zinit light-mode for hlissner/zsh-autopair
 
-source ~/.config/zsh/completion.zsh
-source ~/.config/zsh/bindkey.zsh
+# Keybindings and auto-completion
+# Must be AFTER all plugins that assign new keybindings.
+source ~/.config/zsh/zle.zsh
 
 # Command-line syntax highlighting
-# Must be AFTER after calls to `compdef` and `zle -N` or `zle -C`.
+# Must be AFTER after all calls to `compdef`, `zle -N` or `zle -C`.
 export ZSH_HIGHLIGHT_HIGHLIGHTERS=( main brackets )
 zinit light-mode for zsh-users/zsh-syntax-highlighting
 

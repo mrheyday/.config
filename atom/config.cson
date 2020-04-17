@@ -10,8 +10,7 @@
     preferredLineLength: 99
   "exception-reporting":
     userId: ""
-  github:
-    automaticCommitMessageWrapping: false
+  github: {}
   "ide-python":
     pylsPlugins:
       flake8:
