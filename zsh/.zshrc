@@ -52,6 +52,20 @@ export EDITOR='nano'
 export PAGER='less'
 export LESS='-g -i -M -R -S -w -z-4'
 
+# Bash/Readline compatibility
+# zsh's default kills the whole line.
+bindkey '^U' backward-kill-line
+
+# Prezto/Emacs-undo-tree compatibility
+# zsh does not have a default keybinding for this.
+bindkey '^[_' redo
+
+# Enable alt-h help function.
+export HELPDIR=$MANPATH
+unalias run-help
+autoload -Uz  run-help    run-help-git  run-help-ip   run-help-openssl \
+              run-help-p4 run-help-sudo run-help-svk  run-help-svn
+
 # Better `cd`
 # Duplicates must be saved for this to work correctly.
 unsetopt PUSHD_IGNORE_DUPS
@@ -59,9 +73,12 @@ zinit light-mode for id-as'zoxide/init' atclone'zoxide init zsh > zoxide-init.zs
   atpull'!%atclone' run-atpull src'zoxide-init.zsh' zdharma/null
 alias cd='z'
 
-# Better `find`
-# Requires `brew install fd`.
-alias find='fd -HI -E=".git" -c=always $@'
+# Fuzzy find
+# Requires `brew install fd` and `brew install fzf`.
+export FZF_DEFAULT_COMMAND='fd -HI -E=".git"'
+zinit light-mode for https://github.com/junegunn/fzf/blob/master/shell/completion.zsh \
+                     https://github.com/junegunn/fzf/blob/master/shell/key-bindings.zsh
+alias find='fzf'
 
 # Color `grep`
 alias grep='grep --color=always'
@@ -88,52 +105,26 @@ alias trash='trash -F'
 
 # Additional completions
 # Does not include calls to `compdef`.
-zmodload -i zsh/complist
+rm -f ~/.zcompdump
 zinit light-mode for blockf atpull'zinit creinstall -q .' zsh-users/zsh-completions
-ZINIT[COMPINIT_OPTS]=-C
-zicompinit
-zicdreplay
-
-# Fuzzy search
-# Requires `brew install fzf`.
-source ~/.config/zsh/fzf.zsh
-zinit light-mode for https://github.com/junegunn/fzf/blob/master/shell/completion.zsh \
-                     https://github.com/junegunn/fzf/blob/master/shell/key-bindings.zsh
-
-# Enable alt-h help function.
-export HELPDIR=$MANPATH
-unalias run-help
-autoload -Uz  run-help    run-help-git  run-help-ip   run-help-openssl \
-              run-help-p4 run-help-sudo run-help-svk  run-help-svn
-
-# Auto-suggest how to install missing commands.
-zinit light-mode for is-snippet \
-  https://github.com/Homebrew/homebrew-command-not-found/blob/master/handler.sh
-
-# Colors for 'ls' and completions
-# Requires `brew install coreutils`.
-zinit light-mode for atclone'gdircolors -b LS_COLORS > clrs.zsh' atpull'%atclone' pick'clrs.zsh' \
-  nocompile'!' atload'zstyle ":completion:*" list-colors "${(s.:.)LS_COLORS}"' trapd00r/LS_COLORS
-
-# Automatic insertion of closing brackets and quotes
-# Must be AFTER calls to `compdef`.
-zinit light-mode for hlissner/zsh-autopair
 
 # Keybindings and auto-completion
-# Must be AFTER all plugins that assign new keybindings.
-source ~/.config/zsh/zle.zsh
+autoload compinit && compinit
+zinit light-mode for marlonrichert/zsh-autocomplete
 
 # Command-line syntax highlighting
 # Must be AFTER after all calls to `compdef`, `zle -N` or `zle -C`.
 export ZSH_HIGHLIGHT_HIGHLIGHTERS=( main brackets )
 zinit light-mode for zsh-users/zsh-syntax-highlighting
 
-# Automatic suggestions while you type, based on occurence frequency in history.
-# Must be AFTER syntax highlighting.
-source ~/.config/zsh/autosuggest.zsh
-zinit light-mode for \
-  pick'sqlite-history.zsh' atload'add-zsh-hook precmd histdb-update-outcome' larkery/zsh-histdb \
-  atload'_zsh_autosuggest_start' zsh-users/zsh-autosuggestions
+# Colors for 'ls' and completions
+# Requires `brew install coreutils`.
+zinit light-mode for atclone'gdircolors -b LS_COLORS > clrs.zsh' atpull'%atclone' pick'clrs.zsh' \
+  nocompile'!' atload'zstyle ":completion:*" list-colors "${(s.:.)LS_COLORS}"' trapd00r/LS_COLORS
+
+# Auto-suggest how to install missing commands.
+zinit light-mode for is-snippet \
+  https://github.com/Homebrew/homebrew-command-not-found/blob/master/handler.sh
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 zinit light-mode for atload'source ~/.p10k.zsh' romkatv/powerlevel10k
