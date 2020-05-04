@@ -10,7 +10,8 @@
     preferredLineLength: 99
   "exception-reporting":
     userId: ""
-  github: {}
+  github:
+    remoteFetchProtocol: "ssh"
   "ide-python":
     pylsPlugins:
       flake8:

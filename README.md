@@ -1,6 +1,6 @@
 # .config
 
-Fast, powerful & friendly configs ("dotfiles") for Zsh, Git, SSH, Terminal.app, Karabiner-Element and your web browser on macOS
+Fast, powerful & friendly configs ("dotfiles") for Zsh, Git, SSH, Terminal.app, Karabiner-Elements and your web browser on macOS
 
 ![screenshot](screenshot.png)
 

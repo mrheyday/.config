@@ -1,4 +1,5 @@
 automatic_backups
 complex_modifications
+install-id
 *.csv
 *.db

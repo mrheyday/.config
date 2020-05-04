@@ -1979,7 +1979,7 @@
                                 },
                                 "parameters": {
                                     "basic.to_delayed_action_delay_milliseconds": 0,
-                                    "basic.to_if_alone_timeout_milliseconds": 1000,
+                                    "basic.to_if_alone_timeout_milliseconds": 300,
                                     "basic.to_if_held_down_threshold_milliseconds": 0
                                 },
                                 "to": [
@@ -4082,7 +4082,7 @@
                                 },
                                 "parameters": {
                                     "basic.to_delayed_action_delay_milliseconds": 0,
-                                    "basic.to_if_alone_timeout_milliseconds": 1000,
+                                    "basic.to_if_alone_timeout_milliseconds": 300,
                                     "basic.to_if_held_down_threshold_milliseconds": 0
                                 },
                                 "to": [
@@ -4234,7 +4234,7 @@
                                     }
                                 },
                                 "parameters": {
-                                    "basic.to_if_alone_timeout_milliseconds": 1000,
+                                    "basic.to_if_alone_timeout_milliseconds": 300,
                                     "basic.to_if_held_down_threshold_milliseconds": 0
                                 },
                                 "to_if_alone": [
@@ -4245,6 +4245,36 @@
                                 "to_if_held_down": [
                                     {
                                         "key_code": "left_gui"
+                                    }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "Left ⌃ to Escape if pressed alone",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "left_control",
+                                    "modifiers": {
+                                        "optional": [
+                                            "any"
+                                        ]
+                                    }
+                                },
+                                "parameters": {
+                                    "basic.to_if_alone_timeout_milliseconds": 300,
+                                    "basic.to_if_held_down_threshold_milliseconds": 0
+                                },
+                                "to_if_alone": [
+                                    {
+                                        "key_code": "escape"
+                                    }
+                                ],
+                                "to_if_held_down": [
+                                    {
+                                        "key_code": "left_control"
                                     }
                                 ],
                                 "type": "basic"
@@ -4264,7 +4294,7 @@
                                     }
                                 },
                                 "parameters": {
-                                    "basic.to_if_alone_timeout_milliseconds": 1000,
+                                    "basic.to_if_alone_timeout_milliseconds": 300,
                                     "basic.to_if_held_down_threshold_milliseconds": 0
                                 },
                                 "to_if_alone": [
@@ -4282,11 +4312,11 @@
                         ]
                     },
                     {
-                        "description": "Left ⌥ to Escape if pressed alone",
+                        "description": "Right ⌃ to = if pressed alone",
                         "manipulators": [
                             {
                                 "from": {
-                                    "key_code": "left_alt",
+                                    "key_code": "right_control",
                                     "modifiers": {
                                         "optional": [
                                             "any"
@@ -4294,37 +4324,7 @@
                                     }
                                 },
                                 "parameters": {
-                                    "basic.to_if_alone_timeout_milliseconds": 1000,
-                                    "basic.to_if_held_down_threshold_milliseconds": 0
-                                },
-                                "to_if_alone": [
-                                    {
-                                        "key_code": "escape"
-                                    }
-                                ],
-                                "to_if_held_down": [
-                                    {
-                                        "key_code": "left_alt"
-                                    }
-                                ],
-                                "type": "basic"
-                            }
-                        ]
-                    },
-                    {
-                        "description": "Right ⌥ to = if pressed alone",
-                        "manipulators": [
-                            {
-                                "from": {
-                                    "key_code": "right_alt",
-                                    "modifiers": {
-                                        "optional": [
-                                            "any"
-                                        ]
-                                    }
-                                },
-                                "parameters": {
-                                    "basic.to_if_alone_timeout_milliseconds": 1000,
+                                    "basic.to_if_alone_timeout_milliseconds": 300,
                                     "basic.to_if_held_down_threshold_milliseconds": 0
                                 },
                                 "to_if_alone": [
@@ -4334,7 +4334,7 @@
                                 ],
                                 "to_if_held_down": [
                                     {
-                                        "key_code": "right_alt"
+                                        "key_code": "right_control"
                                     }
                                 ],
                                 "type": "basic"
@@ -4342,7 +4342,7 @@
                         ]
                     },
                     {
-                        "description": "Left ⇧ to ` if pressed alone",
+                        "description": "Left ⇧ to [ if pressed alone",
                         "manipulators": [
                             {
                                 "from": {
@@ -4354,12 +4354,12 @@
                                     }
                                 },
                                 "parameters": {
-                                    "basic.to_if_alone_timeout_milliseconds": 1000,
+                                    "basic.to_if_alone_timeout_milliseconds": 300,
                                     "basic.to_if_held_down_threshold_milliseconds": 0
                                 },
                                 "to_if_alone": [
                                     {
-                                        "key_code": "grave_accent_and_tilde"
+                                        "key_code": "open_bracket"
                                     }
                                 ],
                                 "to_if_held_down": [
@@ -4372,7 +4372,7 @@
                         ]
                     },
                     {
-                        "description": "Right ⇧ to ' if pressed alone",
+                        "description": "Right ⇧ to ] if pressed alone",
                         "manipulators": [
                             {
                                 "from": {
@@ -4384,67 +4384,7 @@
                                     }
                                 },
                                 "parameters": {
-                                    "basic.to_if_alone_timeout_milliseconds": 1000,
-                                    "basic.to_if_held_down_threshold_milliseconds": 0
-                                },
-                                "to_if_alone": [
-                                    {
-                                        "key_code": "quote"
-                                    }
-                                ],
-                                "to_if_held_down": [
-                                    {
-                                        "key_code": "right_shift"
-                                    }
-                                ],
-                                "type": "basic"
-                            }
-                        ]
-                    },
-                    {
-                        "description": "Left ⌃ to [ if pressed alone",
-                        "manipulators": [
-                            {
-                                "from": {
-                                    "key_code": "left_control",
-                                    "modifiers": {
-                                        "optional": [
-                                            "any"
-                                        ]
-                                    }
-                                },
-                                "parameters": {
-                                    "basic.to_if_alone_timeout_milliseconds": 1000,
-                                    "basic.to_if_held_down_threshold_milliseconds": 0
-                                },
-                                "to_if_alone": [
-                                    {
-                                        "key_code": "open_bracket"
-                                    }
-                                ],
-                                "to_if_held_down": [
-                                    {
-                                        "key_code": "left_control"
-                                    }
-                                ],
-                                "type": "basic"
-                            }
-                        ]
-                    },
-                    {
-                        "description": "Right ⌃ to ] if pressed alone",
-                        "manipulators": [
-                            {
-                                "from": {
-                                    "key_code": "right_control",
-                                    "modifiers": {
-                                        "optional": [
-                                            "any"
-                                        ]
-                                    }
-                                },
-                                "parameters": {
-                                    "basic.to_if_alone_timeout_milliseconds": 1000,
+                                    "basic.to_if_alone_timeout_milliseconds": 300,
                                     "basic.to_if_held_down_threshold_milliseconds": 0
                                 },
                                 "to_if_alone": [
@@ -4454,7 +4394,7 @@
                                 ],
                                 "to_if_held_down": [
                                     {
-                                        "key_code": "right_control"
+                                        "key_code": "right_shift"
                                     }
                                 ],
                                 "type": "basic"
@@ -4476,6 +4416,14 @@
                                             "^net\\.kovidgoyal\\.kitty$"
                                         ],
                                         "type": "frontmost_application_if"
+                                    },
+                                    {
+                                        "input_sources": [
+                                            {
+                                                "language": "en"
+                                            }
+                                        ],
+                                        "type": "input_source_if"
                                     }
                                 ],
                                 "from": {
@@ -4489,6 +4437,46 @@
                                 "to": [
                                     {
                                         "key_code": "hyphen",
+                                        "modifiers": [
+                                            "left_control"
+                                        ]
+                                    }
+                                ],
+                                "type": "basic"
+                            },
+                            {
+                                "conditions": [
+                                    {
+                                        "bundle_identifiers": [
+                                            "^com\\.apple\\.Terminal$",
+                                            "^com\\.googlecode\\.iterm2$",
+                                            "^co\\.zeit\\.hyperterm$",
+                                            "^co\\.zeit\\.hyper$",
+                                            "^io\\.alacritty$",
+                                            "^net\\.kovidgoyal\\.kitty$"
+                                        ],
+                                        "type": "frontmost_application_if"
+                                    },
+                                    {
+                                        "input_sources": [
+                                            {
+                                                "language": "fi"
+                                            }
+                                        ],
+                                        "type": "input_source_if"
+                                    }
+                                ],
+                                "from": {
+                                    "key_code": "z",
+                                    "modifiers": {
+                                        "mandatory": [
+                                            "command"
+                                        ]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "slash",
                                         "modifiers": [
                                             "left_control"
                                         ]
@@ -4513,6 +4501,14 @@
                                             "^net\\.kovidgoyal\\.kitty$"
                                         ],
                                         "type": "frontmost_application_if"
+                                    },
+                                    {
+                                        "input_sources": [
+                                            {
+                                                "language": "en"
+                                            }
+                                        ],
+                                        "type": "input_source_if"
                                     }
                                 ],
                                 "from": {
@@ -4530,6 +4526,50 @@
                                     },
                                     {
                                         "key_code": "hyphen",
+                                        "modifiers": [
+                                            "left_shift"
+                                        ]
+                                    }
+                                ],
+                                "type": "basic"
+                            },
+                            {
+                                "conditions": [
+                                    {
+                                        "bundle_identifiers": [
+                                            "^com\\.apple\\.Terminal$",
+                                            "^com\\.googlecode\\.iterm2$",
+                                            "^co\\.zeit\\.hyperterm$",
+                                            "^co\\.zeit\\.hyper$",
+                                            "^io\\.alacritty$",
+                                            "^net\\.kovidgoyal\\.kitty$"
+                                        ],
+                                        "type": "frontmost_application_if"
+                                    },
+                                    {
+                                        "input_sources": [
+                                            {
+                                                "language": "fi"
+                                            }
+                                        ],
+                                        "type": "input_source_if"
+                                    }
+                                ],
+                                "from": {
+                                    "key_code": "z",
+                                    "modifiers": {
+                                        "mandatory": [
+                                            "command",
+                                            "shift"
+                                        ]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "escape"
+                                    },
+                                    {
+                                        "key_code": "slash",
                                         "modifiers": [
                                             "left_shift"
                                         ]
@@ -4925,56 +4965,7 @@
                     },
                     "ignore": false,
                     "manipulate_caps_lock_led": false,
-                    "simple_modifications": [
-                        {
-                            "from": {
-                                "key_code": "application"
-                            },
-                            "to": {
-                                "key_code": "right_option"
-                            }
-                        },
-                        {
-                            "from": {
-                                "key_code": "insert"
-                            },
-                            "to": {
-                                "key_code": "keypad_slash"
-                            }
-                        },
-                        {
-                            "from": {
-                                "key_code": "left_command"
-                            },
-                            "to": {
-                                "key_code": "left_option"
-                            }
-                        },
-                        {
-                            "from": {
-                                "key_code": "left_option"
-                            },
-                            "to": {
-                                "key_code": "left_command"
-                            }
-                        },
-                        {
-                            "from": {
-                                "key_code": "pause"
-                            },
-                            "to": {
-                                "key_code": "power"
-                            }
-                        },
-                        {
-                            "from": {
-                                "key_code": "right_option"
-                            },
-                            "to": {
-                                "key_code": "right_command"
-                            }
-                        }
-                    ]
+                    "simple_modifications": []
                 },
                 {
                     "disable_built_in_keyboard_if_exists": false,
