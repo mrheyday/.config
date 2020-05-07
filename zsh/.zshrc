@@ -60,6 +60,11 @@ bindkey '^U' backward-kill-line
 # zsh does not have a default keybinding for this.
 bindkey '^[_' redo
 
+# Auto-completion
+rm -f ~/.zcompdump
+unsetopt AUTO_CD
+source ~/.zinit/plugins/marlonrichert---zsh-autocomplete/zsh-autocomplete.plugin.zsh
+
 # Enable alt-h help function.
 export HELPDIR=$MANPATH
 unalias run-help
@@ -102,15 +107,6 @@ alias tail='multitail -Cs --follow-all'
 # Safer alternative to `rm`
 # Requires `brew install trash`.
 alias trash='trash -F'
-
-# Additional completions
-# Does not include calls to `compdef`.
-rm -f ~/.zcompdump
-zinit light-mode for blockf atpull'zinit creinstall -q .' zsh-users/zsh-completions
-
-# Keybindings and auto-completion
-autoload compinit && compinit
-zinit light-mode for marlonrichert/zsh-autocomplete
 
 # Command-line syntax highlighting
 # Must be AFTER after all calls to `compdef`, `zle -N` or `zle -C`.

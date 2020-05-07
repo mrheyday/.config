@@ -4,6 +4,9 @@
       formatOnSave: true
   core:
     debugLSP: true
+    disabledPackages: [
+      "spell-check"
+    ]
     telemetryConsent: "limited"
   editor:
     fontFamily: "Fira Code"
