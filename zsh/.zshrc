@@ -24,21 +24,25 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-# Lazy `pyenv init`
-# Requires `brew install pyenv`.
-zinit light-mode for davidparsson/zsh-pyenv-lazy
-
 # Automatic `pipenv shell`
-# Must come AFTER initializing the prompt, but as soon as possible.
+# Must come AFTER initializing the prompt.
 # Requires `brew install pipenv`.
 zinit light-mode for MichaelAquilina/zsh-autoswitch-virtualenv
+
+# Advanced auto-completion
+zinit light-mode for marlonrichert/zsh-autocomplete
 
 # Sensible defaults
 zstyle ':prezto:*:*' color 'yes'
 zinit light-mode for \
-  https://github.com/sorin-ionescu/prezto/blob/master/modules/environment/init.zsh \
-  https://github.com/sorin-ionescu/prezto/blob/master/modules/history/init.zsh \
-  https://github.com/sorin-ionescu/prezto/blob/master/modules/directory/init.zsh
+  id-as'prezto/environment' \
+    https://github.com/sorin-ionescu/prezto/blob/master/modules/environment/init.zsh \
+  id-as'prezto/history' \
+    https://github.com/sorin-ionescu/prezto/blob/master/modules/history/init.zsh \
+  id-as'prezto/directory' \
+    https://github.com/sorin-ionescu/prezto/blob/master/modules/directory/init.zsh
+HISTSIZE=200000
+SAVEHIST=100000
 
 # Performance optimization
 setopt HIST_FCNTL_LOCK
@@ -59,14 +63,9 @@ bindkey '^U' backward-kill-line
 # zsh does not have a default keybinding for this.
 bindkey '^[_' redo
 
-# Auto-completion
-rm -f ~/.zcompdump
-unsetopt AUTO_CD
-source ~/.zinit/plugins/marlonrichert---zsh-autocomplete/zsh-autocomplete.plugin.zsh
-
 # Enable alt-h help function.
 export HELPDIR=$MANPATH
-unalias run-help
+alias -L run-help > /dev/null && unalias run-help
 autoload -Uz  run-help    run-help-git  run-help-ip   run-help-openssl \
               run-help-p4 run-help-sudo run-help-svk  run-help-svn
 
@@ -97,13 +96,12 @@ alias grep='grep --color=always'
 # Requires `brew install bat`.
 alias less='bat --pager "$PAGER $LESS" --style=snip,header --color=always'
 
-# Better `ls` and `tree`
+# Better `ls`
 # Requires `brew install exa`.
 alias ls='exa -aF --git --color=always --color-scale -s=extension --group-directories-first'
 ll() {
   ls -ghlm --time-style=long-iso $@ | $PAGER
 }
-alias tree='ll -T -L=2'
 
 # Log file highlighting in `tail`
 # Requires `brew install multitail`.
@@ -113,19 +111,22 @@ alias tail='multitail -Cs --follow-all'
 # Requires `brew install trash`.
 alias trash='trash -F'
 
+# Lazy `pyenv init`
+# Requires `brew install pyenv`.
+zinit light-mode for davidparsson/zsh-pyenv-lazy
+
+# Auto-suggest how to install missing commands.
+zinit light-mode for id-as'brew/command-not-found' \
+  https://github.com/Homebrew/homebrew-command-not-found/blob/master/handler.sh
+
 # Command-line syntax highlighting
 # Must be AFTER after all calls to `compdef`, `zle -N` or `zle -C`.
-export ZSH_HIGHLIGHT_HIGHLIGHTERS=( main brackets )
 zinit light-mode for zsh-users/zsh-syntax-highlighting
 
 # Colors for 'ls' and completions
 # Requires `brew install coreutils`.
 zinit light-mode for atclone'gdircolors -b LS_COLORS > clrs.zsh' atpull'%atclone' pick'clrs.zsh' \
   nocompile'!' atload'zstyle ":completion:*" list-colors "${(s.:.)LS_COLORS}"' trapd00r/LS_COLORS
-
-# Auto-suggest how to install missing commands.
-zinit light-mode for is-snippet \
-  https://github.com/Homebrew/homebrew-command-not-found/blob/master/handler.sh
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 zinit light-mode for atload'source ~/.p10k.zsh' romkatv/powerlevel10k
