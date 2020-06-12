@@ -15,8 +15,6 @@ autoload -Uz _zinit
 path=( /usr/local/opt/tomcat@8/bin /usr/local/opt/ncurses/bin $path )
 zinit light-mode for id-as'brew/shellenv' atclone'brew shellenv > brew-shellenv.zsh' \
   atpull'!%atclone' run-atpull src'brew-shellenv.zsh' zdharma/null
-zinit light-mode for id-as'zoxide/program' from'gh-r' as'program' mv'zoxide* -> zoxide' \
-  pick'zoxide' nocompile'!' ajeetdsouza/zoxide
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
@@ -73,6 +71,7 @@ autoload -Uz  run-help    run-help-git  run-help-ip   run-help-openssl \
 
 # Better `cd`
 # Duplicates must be saved for this to work correctly.
+# Requires `brew tap ajeetdsouza/zoxide` and `brew install zoxide`
 unsetopt PUSHD_IGNORE_DUPS
 zinit light-mode for id-as'zoxide/init' atclone'zoxide init zsh > zoxide-init.zsh' \
   atpull'!%atclone' run-atpull src'zoxide-init.zsh' zdharma/null
