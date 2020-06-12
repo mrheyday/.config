@@ -45,7 +45,7 @@ setopt HIST_FCNTL_LOCK
 # Environment variables
 export LANG='en_US.UTF-8'
 export WORDCHARS='*?'
-export VISUAL='atom'
+export VISUAL='code'
 export EDITOR='nano'
 export PAGER='less'
 export LESS='-g -i -M -R -S -w -z-4'
