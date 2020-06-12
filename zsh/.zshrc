@@ -78,12 +78,17 @@ zinit light-mode for id-as'zoxide/init' atclone'zoxide init zsh > zoxide-init.zs
   atpull'!%atclone' run-atpull src'zoxide-init.zsh' zdharma/null
 alias cd='z'
 
-# Fuzzy find
-# Requires `brew install fd` and `brew install fzf`.
-export FZF_DEFAULT_COMMAND='fd -HI -E=".git"'
-zinit light-mode for https://github.com/junegunn/fzf/blob/master/shell/completion.zsh \
-                     https://github.com/junegunn/fzf/blob/master/shell/key-bindings.zsh
-alias find='fzf'
+# Fuzzy search
+# Requires `brew install fd`, `brew install fzf` and `brew install ripgrep`
+export FZF_DEFAULT_COMMAND='fd -HI -E=".git" --color=always'
+zinit light-mode for \
+  id-as'fzf/completion' https://github.com/junegunn/fzf/blob/master/shell/completion.zsh \
+  id-as'fzf/key-bindings' https://github.com/junegunn/fzf/blob/master/shell/key-bindings.zsh
+alias find='fd -HI -E=".git" --color=always'
+alias fzf='fzf --ansi --exact --multi --no-sort'
+alias rg='rg --color=always --hidden --glob !.git --ignore-case \
+             --line-number --no-heading --sort=path'
+alias tree='rg "" | fzf'
 
 # Color `grep`
 alias grep='grep --color=always'
