@@ -4222,7 +4222,7 @@
                         ]
                     },
                     {
-                        "description": "Left ⌘ to Enter if pressed alone",
+                        "description": "Left ⌘ to ↩︎ if pressed alone",
                         "manipulators": [
                             {
                                 "from": {
@@ -4252,7 +4252,7 @@
                         ]
                     },
                     {
-                        "description": "Left ⌃ to Escape if pressed alone",
+                        "description": "Left ⌃ to ⎋ if pressed alone",
                         "manipulators": [
                             {
                                 "from": {
@@ -4342,11 +4342,71 @@
                         ]
                     },
                     {
-                        "description": "Left ⇧ to [ if pressed alone",
+                        "description": "Left ⇧ to ` if pressed alone",
                         "manipulators": [
                             {
                                 "from": {
                                     "key_code": "left_shift",
+                                    "modifiers": {
+                                        "optional": [
+                                            "any"
+                                        ]
+                                    }
+                                },
+                                "parameters": {
+                                    "basic.to_if_alone_timeout_milliseconds": 300,
+                                    "basic.to_if_held_down_threshold_milliseconds": 0
+                                },
+                                "to_if_alone": [
+                                    {
+                                        "key_code": "grave_accent_and_tilde"
+                                    }
+                                ],
+                                "to_if_held_down": [
+                                    {
+                                        "key_code": "left_shift"
+                                    }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "Right ⇧ to ' if pressed alone",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "right_shift",
+                                    "modifiers": {
+                                        "optional": [
+                                            "any"
+                                        ]
+                                    }
+                                },
+                                "parameters": {
+                                    "basic.to_if_alone_timeout_milliseconds": 300,
+                                    "basic.to_if_held_down_threshold_milliseconds": 0
+                                },
+                                "to_if_alone": [
+                                    {
+                                        "key_code": "quote"
+                                    }
+                                ],
+                                "to_if_held_down": [
+                                    {
+                                        "key_code": "right_shift"
+                                    }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "Left ⌥ to [ if pressed alone",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "left_alt",
                                     "modifiers": {
                                         "optional": [
                                             "any"
@@ -4364,7 +4424,7 @@
                                 ],
                                 "to_if_held_down": [
                                     {
-                                        "key_code": "left_shift"
+                                        "key_code": "left_alt"
                                     }
                                 ],
                                 "type": "basic"
@@ -4372,11 +4432,11 @@
                         ]
                     },
                     {
-                        "description": "Right ⇧ to ] if pressed alone",
+                        "description": "Right ⌥ to ] if pressed alone",
                         "manipulators": [
                             {
                                 "from": {
-                                    "key_code": "right_shift",
+                                    "key_code": "right_alt",
                                     "modifiers": {
                                         "optional": [
                                             "any"
@@ -4394,7 +4454,7 @@
                                 ],
                                 "to_if_held_down": [
                                     {
-                                        "key_code": "right_shift"
+                                        "key_code": "right_alt"
                                     }
                                 ],
                                 "type": "basic"
@@ -4728,7 +4788,7 @@
                         ]
                     },
                     {
-                        "description": "⌥ + ⌫ | Delete one word",
+                        "description": "⌥ + ⌫ | Delete one word behind",
                         "manipulators": [
                             {
                                 "conditions": [
@@ -4765,7 +4825,7 @@
                         ]
                     },
                     {
-                        "description": "⌥ + fn + ⌫ | Delete one word ahead [laptop w/out ⌦ key]",
+                        "description": "⌥ + ⌦ | Delete one word ahead",
                         "manipulators": [
                             {
                                 "conditions": [
@@ -4799,12 +4859,7 @@
                                     }
                                 ],
                                 "type": "basic"
-                            }
-                        ]
-                    },
-                    {
-                        "description": "⌥ + ⌦ | Delete one word ahead [keyboard w/ ⌦ key]",
-                        "manipulators": [
+                            },
                             {
                                 "conditions": [
                                     {
@@ -4877,7 +4932,7 @@
                         ]
                     },
                     {
-                        "description": "⌘ + fn + ⌫ | Delete to line end [laptop w/out ⌦ key]",
+                        "description": "⌘ + ⌦ | Delete to line end",
                         "manipulators": [
                             {
                                 "conditions": [
@@ -4911,12 +4966,7 @@
                                     }
                                 ],
                                 "type": "basic"
-                            }
-                        ]
-                    },
-                    {
-                        "description": "⌘ + ⌦ | Delete to line end [keyboard w/ ⌦ key]",
-                        "manipulators": [
+                            },
                             {
                                 "conditions": [
                                     {
@@ -4978,7 +5028,88 @@
                     },
                     "ignore": false,
                     "manipulate_caps_lock_led": true,
-                    "simple_modifications": []
+                    "simple_modifications": [
+                        {
+                            "from": {
+                                "key_code": "caps_lock"
+                            },
+                            "to": {
+                                "key_code": "grave_accent_and_tilde"
+                            }
+                        },
+                        {
+                            "from": {
+                                "key_code": "grave_accent_and_tilde"
+                            },
+                            "to": {
+                                "key_code": "backslash"
+                            }
+                        },
+                        {
+                            "from": {
+                                "key_code": "left_arrow"
+                            },
+                            "to": {
+                                "key_code": "right_control"
+                            }
+                        },
+                        {
+                            "from": {
+                                "key_code": "left_command"
+                            },
+                            "to": {
+                                "key_code": "left_shift"
+                            }
+                        },
+                        {
+                            "from": {
+                                "key_code": "left_option"
+                            },
+                            "to": {
+                                "key_code": "left_command"
+                            }
+                        },
+                        {
+                            "from": {
+                                "key_code": "left_shift"
+                            },
+                            "to": {
+                                "key_code": "left_option"
+                            }
+                        },
+                        {
+                            "from": {
+                                "key_code": "right_arrow"
+                            },
+                            "to": {
+                                "key_code": "fn"
+                            }
+                        },
+                        {
+                            "from": {
+                                "key_code": "right_command"
+                            },
+                            "to": {
+                                "key_code": "right_shift"
+                            }
+                        },
+                        {
+                            "from": {
+                                "key_code": "right_option"
+                            },
+                            "to": {
+                                "key_code": "right_command"
+                            }
+                        },
+                        {
+                            "from": {
+                                "key_code": "right_shift"
+                            },
+                            "to": {
+                                "key_code": "right_option"
+                            }
+                        }
+                    ]
                 },
                 {
                     "disable_built_in_keyboard_if_exists": false,
