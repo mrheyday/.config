@@ -12,7 +12,8 @@ autoload -Uz _zinit
 ### End of Zinit installer's chunk
 
 # Things that change the path must come BEFORE p10k instant prompt.
-path=( /usr/local/opt/tomcat@8/bin /usr/local/opt/ncurses/bin $path )
+typeset -U PATH path
+path=( /Users/marlon/Applications/apache-tomcat-8.5.55/bin /usr/local/opt/ncurses/bin $path )
 zinit light-mode for id-as'brew/shellenv' atclone'brew shellenv > brew-shellenv.zsh' \
   atpull'!%atclone' run-atpull src'brew-shellenv.zsh' zdharma/null
 
