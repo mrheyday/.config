@@ -5,6 +5,7 @@ code *,
 pre,
 pre *,
 .line_holder,
+#linenos,
 .blob-code,
 .blob-num
 {
@@ -18,6 +19,7 @@ pre *,
   pre,
   pre *,
   .line_holder,
+  #linenos,
   .blob-code,
   .blob-num
     {
