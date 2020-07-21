@@ -69,13 +69,6 @@ alias -L run-help > /dev/null && unalias run-help
 autoload -Uz  run-help    run-help-git  run-help-ip   run-help-openssl \
               run-help-p4 run-help-sudo run-help-svk  run-help-svn
 
-# Better `cd`
-# Duplicates must be saved for this to work correctly.
-# Requires `brew tap ajeetdsouza/zoxide` and `brew install zoxide`
-unsetopt PUSHD_IGNORE_DUPS
-zinit light-mode for id-as'zoxide/init' atclone'zoxide init zsh > zoxide-init.zsh' \
-  atpull'!%atclone' run-atpull src'zoxide-init.zsh' zdharma/null
-alias cd='z'
 
 # Fuzzy search
 # Requires `brew install fd`, `brew install fzf` and `brew install ripgrep`
