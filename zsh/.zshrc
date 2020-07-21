@@ -76,6 +76,11 @@ unalias run-help
 autoload -Uz  run-help    run-help-git  run-help-ip   run-help-openssl \
               run-help-p4 run-help-sudo run-help-svk  run-help-svn
 
+# File name globbing support for `cp`, `ln` and `mv`
+autoload -Uz zmv
+alias cp='zmv -Civ'
+alias ln='zmv -Liv'
+alias mv='zmv -Miv'
 
 # Safer alternative to `rm`
 # Requires `brew install trash`.
