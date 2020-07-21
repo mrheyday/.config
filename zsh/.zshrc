@@ -13,7 +13,12 @@ autoload -Uz _zinit
 
 # Things that change the path must come BEFORE p10k instant prompt.
 typeset -U PATH path
-path=( /Users/marlon/Applications/apache-tomcat-8.5.55/bin /usr/local/opt/ncurses/bin $path )
+path=(
+  ~/Applications/apache-tomcat-8.5.55/bin
+  /usr/local/opt/ncurses/bin
+  $path
+  .
+)
 zinit light-mode for id-as'brew/shellenv' atclone'brew shellenv > brew-shellenv.zsh' \
   atpull'!%atclone' run-atpull src'brew-shellenv.zsh' zdharma/null
 
@@ -24,13 +29,16 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
+# Advanced auto-completion
+zinit light-mode for marlonrichert/zsh-autocomplete
+
 # Automatic `pipenv shell`
 # Must come AFTER initializing the prompt.
 # Requires `brew install pipenv`.
 zinit light-mode for MichaelAquilina/zsh-autoswitch-virtualenv
-
-# Advanced auto-completion
-zinit light-mode for marlonrichert/zsh-autocomplete
+zinit light-mode for id-as'pipenv/completion' \
+  atclone'pipenv --completion > pipenv-completion.zsh' atpull'!%atclone' run-atpull \
+  src'pipenv-completion.zsh' zdharma/null
 
 # Sensible defaults
 zstyle ':prezto:*:*' color 'yes'
@@ -49,38 +57,53 @@ setopt HIST_FCNTL_LOCK
 
 # Environment variables
 export LANG='en_US.UTF-8'
-export WORDCHARS='*?'
+export WORDCHARS='*?~&|;!#$%^'
 export VISUAL='code'
 export EDITOR='nano'
 export PAGER='less'
 export LESS='-g -i -M -R -S -w -z-4'
 
 # Bash/Readline compatibility
-# zsh's default kills the whole line.
+# Zsh's default kills the whole line.
 bindkey '^U' backward-kill-line
 
 # Prezto/Emacs-undo-tree compatibility
-# zsh does not have a default keybinding for this.
+# Zsh does not have a default keybinding for this.
 bindkey '^[_' redo
 
 # Enable alt-h help function.
-export HELPDIR=$MANPATH
-alias -L run-help > /dev/null && unalias run-help
+unalias run-help
 autoload -Uz  run-help    run-help-git  run-help-ip   run-help-openssl \
               run-help-p4 run-help-sudo run-help-svk  run-help-svn
 
 
+# Safer alternative to `rm`
+# Requires `brew install trash`.
+alias trash='trash -F'
+
 # Fuzzy search
 # Requires `brew install fd`, `brew install fzf` and `brew install ripgrep`
-export FZF_DEFAULT_COMMAND='fd -HI -E=".git" --color=always'
+export FZF_DEFAULT_COMMAND='fd -HI --color=always'
 zinit light-mode for \
   id-as'fzf/completion' https://github.com/junegunn/fzf/blob/master/shell/completion.zsh \
   id-as'fzf/key-bindings' https://github.com/junegunn/fzf/blob/master/shell/key-bindings.zsh
 alias find='fd -HI -E=".git" --color=always'
 alias fzf='fzf --ansi --exact --multi --no-sort'
-alias rg='rg --color=always --hidden --glob !.git --ignore-case \
-             --line-number --no-heading --sort=path'
-alias tree='rg "" | fzf'
+alias rg='rg --color=always --hidden --glob !.git --ignore-case --line-number --no-heading --sort=path'
+
+# Better `ls`
+# Requires `brew install exa`.
+alias ls='exa -aF --git --color=always --color-scale -s=extension --group-directories-first'
+ll() {
+  ls -ghlm --time-style=long-iso $@ | $PAGER
+}
+alias tree='ll -T -L=3'
+compdef _ls ll ll=ls
+
+# Colors for 'ls' and completions
+# Requires `brew install coreutils`.
+zinit light-mode for atclone'gdircolors -b LS_COLORS > clrs.zsh' atpull'%atclone' pick'clrs.zsh' \
+  nocompile'!' atload'zstyle ":completion:*" list-colors "${(s.:.)LS_COLORS}"' trapd00r/LS_COLORS
 
 # Color `grep`
 alias grep='grep --color=always'
@@ -89,20 +112,13 @@ alias grep='grep --color=always'
 # Requires `brew install bat`.
 alias less='bat --pager "$PAGER $LESS" --style=snip,header --color=always'
 
-# Better `ls`
-# Requires `brew install exa`.
-alias ls='exa -aF --git --color=always --color-scale -s=extension --group-directories-first'
-ll() {
-  ls -ghlm --time-style=long-iso $@ | $PAGER
-}
-
 # Log file highlighting in `tail`
 # Requires `brew install multitail`.
 alias tail='multitail -Cs --follow-all'
 
-# Safer alternative to `rm`
-# Requires `brew install trash`.
-alias trash='trash -F'
+# Command-line syntax highlighting
+# Must be AFTER after all calls to `compdef`, `zle -N` or `zle -C`.
+zinit light-mode for zdharma/fast-syntax-highlighting
 
 # Lazy `pyenv init`
 # Requires `brew install pyenv`.
@@ -112,14 +128,6 @@ zinit light-mode for davidparsson/zsh-pyenv-lazy
 zinit light-mode for id-as'brew/command-not-found' \
   https://github.com/Homebrew/homebrew-command-not-found/blob/master/handler.sh
 
-# Command-line syntax highlighting
-# Must be AFTER after all calls to `compdef`, `zle -N` or `zle -C`.
-zinit light-mode for zsh-users/zsh-syntax-highlighting
-
-# Colors for 'ls' and completions
-# Requires `brew install coreutils`.
-zinit light-mode for atclone'gdircolors -b LS_COLORS > clrs.zsh' atpull'%atclone' pick'clrs.zsh' \
-  nocompile'!' atload'zstyle ":completion:*" list-colors "${(s.:.)LS_COLORS}"' trapd00r/LS_COLORS
 # Table of Contents generator for GitHub Markdown
 zinit light-mode for as'program' pick'gh-md-toc' ekalinin/github-markdown-toc
 
