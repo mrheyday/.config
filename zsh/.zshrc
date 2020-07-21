@@ -127,6 +127,8 @@ zinit light-mode for zsh-users/zsh-syntax-highlighting
 # Requires `brew install coreutils`.
 zinit light-mode for atclone'gdircolors -b LS_COLORS > clrs.zsh' atpull'%atclone' pick'clrs.zsh' \
   nocompile'!' atload'zstyle ":completion:*" list-colors "${(s.:.)LS_COLORS}"' trapd00r/LS_COLORS
+# Table of Contents generator for GitHub Markdown
+zinit light-mode for as'program' pick'gh-md-toc' ekalinin/github-markdown-toc
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 zinit light-mode for atload'source ~/.p10k.zsh' romkatv/powerlevel10k
