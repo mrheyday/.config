@@ -100,7 +100,7 @@ alias rg='rg --color=always --hidden --glob !.git --ignore-case --line-number --
 # Requires `brew install exa`.
 alias ls='exa -aF --git --color=always --color-scale -s=extension --group-directories-first'
 ll() {
-  ls -ghlm --time-style=long-iso $@ | $PAGER
+  ls -ghlmu --time-style=long-iso $@ | $PAGER
 }
 alias tree='ll -T -L=3'
 compdef _ls ll ll=ls
