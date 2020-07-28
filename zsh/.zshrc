@@ -9,7 +9,7 @@ fi
 source "$HOME/.zinit/bin/zinit.zsh"
 autoload -Uz _zinit
 (( ${+_comps} )) && _comps[zinit]=_zinit
-### End of Zinit installer's chunk
+### End of Zinit's installer chunk
 
 # Things that change the path must come BEFORE p10k instant prompt.
 typeset -U PATH path
