@@ -12,8 +12,7 @@ autoload -Uz _zinit
 ### End of Zinit's installer chunk
 
 # Things that change the path must come BEFORE p10k instant prompt.
-typeset -U PATH path
-path=(
+typeset -gU PATH path=(
   ~/Applications/apache-tomcat-8.5.55/bin
   /usr/local/opt/ncurses/bin
   $path
@@ -76,11 +75,12 @@ unalias run-help
 autoload -Uz  run-help    run-help-git  run-help-ip   run-help-openssl \
               run-help-p4 run-help-sudo run-help-svk  run-help-svn
 
-# File name globbing support for `cp`, `ln` and `mv`
+# Pattern matching support for `cp`, `ln` and `mv`
+# See http://zsh.sourceforge.net/Doc/Release/User-Contributions.html#index-zmv
 autoload -Uz zmv
-alias cp='zmv -Civ'
-alias ln='zmv -Liv'
-alias mv='zmv -Miv'
+alias zcp='zmv -Civ'
+alias zln='zmv -Liv'
+alias zmv='zmv -Miv'
 
 # Safer alternative to `rm`
 # Requires `brew install trash`.
