@@ -30,6 +30,7 @@ fi
 
 # Advanced auto-completion
 zinit light-mode for marlonrichert/zsh-autocomplete
+# source ~/.zinit/plugins/marlonrichert---zsh-autocomplete/zsh-autocomplete.plugin.zsh
 
 # Automatic `pipenv shell`
 # Must come AFTER initializing the prompt.
@@ -121,9 +122,13 @@ alias less='bat --pager "$PAGER $LESS" --style=snip,header --color=always'
 # Requires `brew install multitail`.
 alias tail='multitail -Cs --follow-all'
 
+# zinit light-mode for zsh-users/zsh-autosuggestions
+
 # Command-line syntax highlighting
 # Must be AFTER after all calls to `compdef`, `zle -N` or `zle -C`.
-zinit light-mode for zdharma/fast-syntax-highlighting
+export ZSH_HIGHLIGHT_HIGHLIGHTERS=( main brackets )
+# zinit light-mode for zdharma/fast-syntax-highlighting
+zinit light-mode for zsh-users/zsh-syntax-highlighting
 
 # Lazy `pyenv init`
 # Requires `brew install pyenv`.
