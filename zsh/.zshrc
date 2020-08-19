@@ -52,8 +52,17 @@ zinit light-mode for \
 HISTSIZE=200000
 SAVEHIST=100000
 
-# Performance optimization
-setopt HIST_FCNTL_LOCK
+setopt histfcntllock
+setopt histreduceblanks
+zshaddhistory() {
+ [[ $1 != 'dc '* ]]
+}
+dc () {
+  local HISTORY_IGNORE="${(b)$(fc -ln $1 $1)}"
+  fc -W
+  fc -p $HISTFILE $HISTSIZE $SAVEHIST
+  print "Deleted '$HISTORY_IGNORE' from history."
+}
 
 # Environment variables
 export LANG='en_US.UTF-8'
