@@ -29,6 +29,7 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
 fi
 
 # Advanced auto-completion
+# zstyle ':autocomplete:*' groups always
 zinit light-mode for marlonrichert/zsh-autocomplete
 # source ~/.zinit/plugins/marlonrichert---zsh-autocomplete/zsh-autocomplete.plugin.zsh
 
@@ -52,18 +53,6 @@ zinit light-mode for \
 HISTSIZE=200000
 SAVEHIST=100000
 
-setopt histfcntllock
-setopt histreduceblanks
-zshaddhistory() {
- [[ $1 != 'dc '* ]]
-}
-dc () {
-  local HISTORY_IGNORE="${(b)$(fc -ln $1 $1)}"
-  fc -W
-  fc -p $HISTFILE $HISTSIZE $SAVEHIST
-  print "Deleted '$HISTORY_IGNORE' from history."
-}
-
 # Environment variables
 export LANG='en_US.UTF-8'
 export WORDCHARS='*?~&|;!#$%^'
@@ -71,6 +60,12 @@ export VISUAL='code'
 export EDITOR='nano'
 export PAGER='less'
 export LESS='-g -i -M -R -S -w -z-4'
+
+# History settings
+setopt histfcntllock histreduceblanks NO_histignorespace
+
+# History editing tools
+zinit light-mode for marlonrichert/zsh-hist
 
 # Bash/Readline compatibility
 # Zsh's default kills the whole line.
