@@ -1,0 +1,33 @@
+{
+    "editor.suggestSelection": "first",
+    "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+    "files.exclude": {
+        "**/.classpath": true,
+        "**/.project": true,
+        "**/.settings": true,
+        "**/.factorypath": true
+    },
+    "java.semanticHighlighting.enabled": true,
+    "editor.rulers": [
+    99
+    ],
+    "diffEditor.ignoreTrimWhitespace": false,
+    "java.autobuild.enabled": false,
+    "diffEditor.renderSideBySide": false,
+    "workbench.editor.tabCloseButton": "left",
+    "files.trimTrailingWhitespace": true,
+    "git.autofetch": true,
+    "window.zoomLevel": 0,
+    "files.defaultLanguage": "shellscript",
+    "files.associations": {
+        "[._]*": "shellscript",
+        "^((?![.]).)*$": "shellscript",
+        "*.zsh": "shellscript"
+    },
+    "shebang.associations": [
+        {
+            "pattern": "^#!/bin/*$",
+            "language": "shellscript"
+        }
+    ]
+}
