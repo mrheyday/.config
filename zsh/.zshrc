@@ -65,6 +65,8 @@ export LESS='-g -i -M -R -S -w -z-4'
 setopt histfcntllock histreduceblanks NO_histignorespace
 
 # History editing tools
+local key_codes=( '^Q' '^[Q' '^[q' )
+eval 'bindkey '${(b)^key_codes}' push-line-or-edit; '
 zinit light-mode for marlonrichert/zsh-hist
 
 # Bash/Readline compatibility
