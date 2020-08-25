@@ -29,5 +29,11 @@
             "pattern": "^#!/bin/*$",
             "language": "shellscript"
         }
-    ]
+    ],
+    "workbench.editor.limit.enabled": true,
+    "workbench.editor.limit.value": 4,
+    "editor.fontSize": 13,
+    "editor.dragAndDrop": false,
+    "css.validate": false,
+    "csscomb.preset": ".csscomb.json"
 }
