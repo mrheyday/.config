@@ -1,5 +1,6 @@
-automatic_backups
-complex_modifications
-install-id
+automatic_backups/
+complex_modifications/
+configstore/
 *.csv
 *.db
+install-id
