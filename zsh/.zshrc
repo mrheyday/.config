@@ -1,73 +1,33 @@
-### Added by Zinit's installer
-if [[ ! -f $HOME/.zinit/bin/zinit.zsh ]]; then
-  print -P "%F{33}▓▒░ %F{220}Installing DHARMA Initiative Plugin Manager (zdharma/zinit)…%f"
-  command mkdir -p "$HOME/.zinit" && command chmod g-rwX "$HOME/.zinit"
-  command git clone https://github.com/zdharma/zinit "$HOME/.zinit/bin" && \
-  print -P "%F{33}▓▒░ %F{34}Installation successful.%f" || \
-  print -P "%F{160}▓▒░ The clone has failed.%f"
-fi
-source "$HOME/.zinit/bin/zinit.zsh"
-autoload -Uz _zinit
-(( ${+_comps} )) && _comps[zinit]=_zinit
-### End of Zinit's installer chunk
+# Environment variables
+PS4='+%N:%I> '
+export LANG='en_US.UTF-8'
+export WORDCHARS='~&|;!#$%^'
+export EDITOR='code'
+export VISUAL='code'
 
-# Things that change the path must come BEFORE p10k instant prompt.
-typeset -gU PATH path=(
-  ~/Applications/apache-tomcat-8.5.55/bin
-  /usr/local/opt/ncurses/bin
-  $path
-  .
-)
-zinit light-mode for id-as'brew/shellenv' atclone'brew shellenv > brew-shellenv.zsh' \
-  atpull'!%atclone' run-atpull src'brew-shellenv.zsh' zdharma/null
+# Options
+setopt autocd autopushd cdsilent chaselinks pushdignoredups pushdsilent
+setopt NO_caseglob extendedglob globdots globstarshort nullglob numericglobsort
+setopt histfcntllock histignorealldups histreduceblanks histsavenodups sharehistory
+setopt NO_flowcontrol interactivecomments
+setopt NO_shortloops
 
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
+# Znap! The lightweight plugin manager that's easy to grok.
+# Get it from https://github.com/marlonrichert/zsh-snap
+source ~/.zsh-plugins/zsh-snap/znap.plugin.zsh
+
+# Advanced auto-completion
+znap source zsh-autocomplete
+# znap source zsh-autosuggestions
+
+# Enable Powerlevel10k instant prompt.
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-# Advanced auto-completion
-# zstyle ':autocomplete:*' groups always
-zinit light-mode for marlonrichert/zsh-autocomplete
-# source ~/.zinit/plugins/marlonrichert---zsh-autocomplete/zsh-autocomplete.plugin.zsh
-
-# Automatic `pipenv shell`
-# Must come AFTER initializing the prompt.
-# Requires `brew install pipenv`.
-zinit light-mode for MichaelAquilina/zsh-autoswitch-virtualenv
-zinit light-mode for id-as'pipenv/completion' \
-  atclone'pipenv --completion > pipenv-completion.zsh' atpull'!%atclone' run-atpull \
-  src'pipenv-completion.zsh' zdharma/null
-
-# Sensible defaults
-zstyle ':prezto:*:*' color 'yes'
-zinit light-mode for \
-  id-as'prezto/environment' \
-    https://github.com/sorin-ionescu/prezto/blob/master/modules/environment/init.zsh \
-  id-as'prezto/history' \
-    https://github.com/sorin-ionescu/prezto/blob/master/modules/history/init.zsh \
-  id-as'prezto/directory' \
-    https://github.com/sorin-ionescu/prezto/blob/master/modules/directory/init.zsh
-HISTSIZE=200000
-SAVEHIST=100000
-
-# Environment variables
-export LANG='en_US.UTF-8'
-export WORDCHARS='*?~&|;!#$%^'
-export VISUAL='code'
-export EDITOR='nano'
-export PAGER='less'
-export LESS='-g -i -M -R -S -w -z-4'
-
-# History settings
-setopt histfcntllock histreduceblanks NO_histignorespace
-
 # History editing tools
-local key_codes=( '^Q' '^[Q' '^[q' )
-eval 'bindkey '${(b)^key_codes}' push-line-or-edit; '
-zinit light-mode for marlonrichert/zsh-hist
+bindkey '^[Q' push-line-or-edit
+znap source zsh-hist
 
 # Bash/Readline compatibility
 # Zsh's default kills the whole line.
@@ -90,62 +50,48 @@ alias zln='zmv -Liv'
 alias zmv='zmv -Miv'
 
 # Safer alternative to `rm`
-# Requires `brew install trash`.
 alias trash='trash -F'
 
-# Fuzzy search
-# Requires `brew install fd`, `brew install fzf` and `brew install ripgrep`
-export FZF_DEFAULT_COMMAND='fd -HI --color=always'
-zinit light-mode for \
-  id-as'fzf/completion' https://github.com/junegunn/fzf/blob/master/shell/completion.zsh \
-  id-as'fzf/key-bindings' https://github.com/junegunn/fzf/blob/master/shell/key-bindings.zsh
-alias find='fd -HI -E=".git" --color=always'
-alias fzf='fzf --ansi --exact --multi --no-sort'
-alias rg='rg --color=always --hidden --glob !.git --ignore-case --line-number --no-heading --sort=path'
-
 # Better `ls`
-# Requires `brew install exa`.
-alias ls='exa -aF --git --color=always --color-scale -s=extension --group-directories-first'
-ll() {
-  ls -ghlmu --time-style=long-iso $@ | $PAGER
-}
-alias tree='ll -T -L=3'
-compdef _ls ll ll=ls
+alias ls='exa -aFghmu -I .git -s extension --git --color=always --color-scale --group-directories-first --time-style=long-iso'
+alias tree='ls -T'
+
+# Some more commands
+typeset -gU PATH path=(
+  $(znap path github-markdown-toc)
+  ~/Applications/apache-tomcat-8.5.55/bin
+  /usr/local/opt/ncurses/bin
+  $path
+  .
+)
+
+# Command-line syntax highlighting
+export ZSH_HIGHLIGHT_HIGHLIGHTERS=( main brackets )
+znap source zsh-syntax-highlighting
+# znap source fast-syntax-highlighting
+
+# Syntax highlighting in `less` and `man`
+export PAGER='bat'
+export MANPAGER="sh -c 'col -bx | $PAGER -l man'"
+export READNULLCMD='bat'
+export LESS='-giR'
+export BAT_PAGER="less $LESS"
 
 # Colors for 'ls' and completions
-# Requires `brew install coreutils`.
-zinit light-mode for atclone'gdircolors -b LS_COLORS > clrs.zsh' atpull'%atclone' pick'clrs.zsh' \
-  nocompile'!' atload'zstyle ":completion:*" list-colors "${(s.:.)LS_COLORS}"' trapd00r/LS_COLORS
+znap eval LS_COLORS 'gdircolors -b LS_COLORS'
+zstyle ":completion:*" list-colors "${(s.:.)LS_COLORS}"
 
 # Color `grep`
 alias grep='grep --color=always'
 
-# Syntax highlighting in `less`
-# Requires `brew install bat`.
-alias less='bat --pager "$PAGER $LESS" --style=snip,header --color=always'
+znap eval brew-shellenv 'brew shellenv'
+znap eval pyenv-init `pyenv init -`
+znap eval pipenv-completion 'pipenv --completion'
 
-# Log file highlighting in `tail`
-# Requires `brew install multitail`.
-alias tail='multitail -Cs --follow-all'
-
-# zinit light-mode for zsh-users/zsh-autosuggestions
-
-# Command-line syntax highlighting
-# Must be AFTER after all calls to `compdef`, `zle -N` or `zle -C`.
-export ZSH_HIGHLIGHT_HIGHLIGHTERS=( main brackets )
-# zinit light-mode for zdharma/fast-syntax-highlighting
-zinit light-mode for zsh-users/zsh-syntax-highlighting
-
-# Lazy `pyenv init`
-# Requires `brew install pyenv`.
-zinit light-mode for davidparsson/zsh-pyenv-lazy
-
-# Auto-suggest how to install missing commands.
-zinit light-mode for id-as'brew/command-not-found' \
-  https://github.com/Homebrew/homebrew-command-not-found/blob/master/handler.sh
-
-# Table of Contents generator for GitHub Markdown
-zinit light-mode for as'program' pick'gh-md-toc' ekalinin/github-markdown-toc
+# Automatic `pipenv shell`
+# Must come AFTER initializing the prompt.
+znap source zsh-autoswitch-virtualenv
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-zinit light-mode for atload'source ~/.p10k.zsh' romkatv/powerlevel10k
+znap source powerlevel10k
+source ~/.p10k.zsh
