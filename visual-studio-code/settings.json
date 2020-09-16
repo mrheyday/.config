@@ -19,11 +19,6 @@
     "git.autofetch": true,
     "window.zoomLevel": 0,
     "files.defaultLanguage": "shellscript",
-    "files.associations": {
-        "[._]*": "shellscript",
-        "^((?![.]).)*$": "shellscript",
-        "*.zsh": "shellscript"
-    },
     "shebang.associations": [
         {
             "pattern": "^#!/bin/*$",
@@ -31,9 +26,18 @@
         }
     ],
     "workbench.editor.limit.enabled": true,
-    "workbench.editor.limit.value": 4,
-    "editor.fontSize": 13,
     "editor.dragAndDrop": false,
     "css.validate": false,
-    "csscomb.preset": ".csscomb.json"
+    "csscomb.preset": ".csscomb.json",
+    "workbench.editor.showTabs": false,
+    "workbench.editor.enablePreview": false,
+    "workbench.editor.enablePreviewFromQuickOpen": false,
+    "editor.wordWrap": "on",
+    "editor.wordWrapColumn": 99,
+    "files.associations": {
+        "_*": "shellscript",
+        ".*": "shellscript"
+    },
+    "workbench.editor.limit.value": 9,
+    "editor.tabSize": 2
 }
