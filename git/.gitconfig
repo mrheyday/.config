@@ -1,12 +1,16 @@
 [user]
 	name = Marlon Richert
 	email = marlonrichert@users.noreply.github.com
-[push]
-	default = upstream
 [core]
 	autocrlf = false
 	excludesfile = /Users/marlon/.gitignore_global
 	editor = code --wait
+[color]
+	ui = always
+[push]
+	default = upstream
+[pull]
+	rebase = true
 [branch]
 	autosetuprebase = always
 [diff]
@@ -14,8 +18,6 @@
 	noprefix = true
 [difftool "opendiff"]
 	cmd = /usr/bin/opendiff \"$LOCAL\" \"$REMOTE\" -merge \"$MERGED\" 2>/dev/null | cat
-[color]
-	ui = always
 [alias]
 	opendiff = difftool --no-prompt --tool opendiff --dir-diff
 [merge]
