@@ -1,6 +1,6 @@
 automatic_backups/
-complex_modifications/
 configstore/
+dotfilestore/
 *.csv
 *.db
 install-id
