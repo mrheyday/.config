@@ -51,6 +51,11 @@ typeset -gU PATH path=(
   .
 )
 
+# Better line editing tools
+# Get them from https://github.com/marlonrichert/zsh-edit
+znap source zsh-edit
+WORDCHARS='*?\'
+
 # History editing tools
 # Get them from https://github.com/marlonrichert/zsh-hist
 znap source zsh-hist
