@@ -3,15 +3,16 @@
     "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
     "files.exclude": {
         "**/.classpath": true,
+        "**/.factorypath": true,
         "**/.project": true,
         "**/.settings": true,
-        "**/.factorypath": true
+        "**/*.zwc": true
     },
     "java.semanticHighlighting.enabled": true,
     "editor.rulers": [
     99
     ],
-    "diffEditor.ignoreTrimWhitespace": false,
+    "diffEditor.ignoreTrimWhitespace": true,
     "java.autobuild.enabled": false,
     "diffEditor.renderSideBySide": false,
     "workbench.editor.tabCloseButton": "left",
@@ -32,12 +33,16 @@
     "workbench.editor.showTabs": false,
     "workbench.editor.enablePreview": false,
     "workbench.editor.enablePreviewFromQuickOpen": false,
-    "editor.wordWrap": "on",
     "editor.wordWrapColumn": 99,
     "files.associations": {
         "_*": "shellscript",
         ".*": "shellscript"
     },
-    "workbench.editor.limit.value": 9,
-    "editor.tabSize": 2
+    "workbench.editor.limit.value": 100,
+    "editor.tabSize": 2,
+    "explorer.confirmDragAndDrop": false,
+    "editor.fontSize": 13,
+    "editor.minimap.enabled": false,
+    "editor.fontFamily": "'Fira Code'",
+    "extensions.ignoreRecommendations": false
 }
