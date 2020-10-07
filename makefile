@@ -6,10 +6,9 @@ no-update := HOMEBREW_NO_AUTO_UPDATE=1
 code := ~/Library/ApplicationSupport/Code/User/settings.json
 git := ~/.gitconfig
 gradle := ~/.gradle/gradle.properties
-p10k := ~/.p10k.zsh
 ssh := ~/.ssh/config
 zsh := ~/.zshrc
-dotfiles := $(code) $(git) $(gradle) $(p10k) $(ssh) $(zsh)
+dotfiles := $(code) $(git) $(gradle) $(ssh) $(zsh)
 
 clean:
 	$(no-update) brew install trash 2> /dev/null
@@ -25,7 +24,6 @@ link:
 	$(ln) $(makefile-dir)git/.gitconfig $(git)
 	$(ln) $(makefile-dir)gradle/gradle.properties $(gradle)
 	$(ln) $(makefile-dir)ssh/config $(ssh)
-	$(ln) $(makefile-dir)zsh/.p10k.zsh $(p10k)
 	$(ln) $(makefile-dir)zsh/.zshrc $(zsh)
 
 plugins-dir := ~/.zsh

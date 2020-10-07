@@ -1,33 +1,60 @@
-# Environment variables
-PS4='+%N:%I> '
-export LANG='en_US.UTF-8'
-export WORDCHARS='~&|;!#$%^'
-export EDITOR='code'
-export VISUAL='code'
+# #!/bin/zsh
+
+# zmodload zsh/zprof
+
+# Znap! The lightweight plugin manager that's easy to grok.
+# Get it from https://github.com/marlonrichert/zsh-snap
+source ~/.zsh/zsh-snap/znap.zsh
+
+# Znap makes your prompt appear instantly & you can start typing right away.
+znap prompt pure
+# PS4='+%N:%I> '
 
 # Options
 setopt autocd autopushd cdsilent chaselinks pushdignoredups pushdsilent
 setopt NO_caseglob extendedglob globdots globstarshort nullglob numericglobsort
 setopt histfcntllock histignorealldups histreduceblanks histsavenodups sharehistory
-setopt NO_flowcontrol interactivecomments
-setopt NO_shortloops
+setopt NO_flowcontrol interactivecomments rcquotes
 
-# Znap! The lightweight plugin manager that's easy to grok.
-# Get it from https://github.com/marlonrichert/zsh-snap
-source ~/.zsh-plugins/zsh-snap/znap.plugin.zsh
+# Environment variables
+export LANG='en_US.UTF-8'
+export EDITOR='code'
+export VISUAL='code'
+export CLICOLOR=1
+export CLICOLOR_FORCE=1
+export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
+znap eval brew-shellenv 'brew shellenv'
+rm -f $HOMEBREW_PREFIX/share/zsh/site-functions/_git
 
-# Advanced auto-completion
+# Syntax highlighting in `less` and `man`
+export PAGER='less'
+export LESS='-giR'
+export READNULLCMD='bat'
+export MANPAGER="sh -c 'col -bpx | bat -l man'"
+export BAT_PAGER="less $LESS"
+
+# Real-time auto-completion
+# Get it from https://github.com/marlonrichert/zsh-autocomplete
 znap source zsh-autocomplete
-# znap source zsh-autosuggestions
 
-# Enable Powerlevel10k instant prompt.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
+# In-line suggestions
+znap source zsh-autosuggestions
+
+# Add external commands
+znap eval pyenv-init 'pyenv init -'
+znap eval pipenv-completion 'pipenv --completion'
+typeset -gU PATH path=(
+  $(znap path github-markdown-toc)
+  ~/Applications/apache-tomcat-8.5.55/bin
+  $path
+  /usr/local/opt/ncurses/bin
+  .
+)
 
 # History editing tools
-bindkey '^[Q' push-line-or-edit
+# Get them from https://github.com/marlonrichert/zsh-hist
 znap source zsh-hist
+bindkey '^[q' push-line-or-edit
 
 # Bash/Readline compatibility
 # Zsh's default kills the whole line.
@@ -52,46 +79,17 @@ alias zmv='zmv -Miv'
 # Safer alternative to `rm`
 alias trash='trash -F'
 
-# Better `ls`
-alias ls='exa -aFghmu -I .git -s extension --git --color=always --color-scale --group-directories-first --time-style=long-iso'
-alias tree='ls -T'
+# Color `grep`
+alias grep='grep --color=always'
 
-# Some more commands
-typeset -gU PATH path=(
-  $(znap path github-markdown-toc)
-  ~/Applications/apache-tomcat-8.5.55/bin
-  /usr/local/opt/ncurses/bin
-  $path
-  .
-)
+# Colors for 'ls' and completions
+znap eval dircolors 'gdircolors -b'
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+alias ls='ls -AFH'
 
 # Command-line syntax highlighting
 export ZSH_HIGHLIGHT_HIGHLIGHTERS=( main brackets )
 znap source zsh-syntax-highlighting
 # znap source fast-syntax-highlighting
 
-# Syntax highlighting in `less` and `man`
-export PAGER='bat'
-export MANPAGER="sh -c 'col -bx | $PAGER -l man'"
-export READNULLCMD='bat'
-export LESS='-giR'
-export BAT_PAGER="less $LESS"
-
-# Colors for 'ls' and completions
-znap eval LS_COLORS 'gdircolors -b LS_COLORS'
-zstyle ":completion:*" list-colors "${(s.:.)LS_COLORS}"
-
-# Color `grep`
-alias grep='grep --color=always'
-
-znap eval brew-shellenv 'brew shellenv'
-znap eval pyenv-init `pyenv init -`
-znap eval pipenv-completion 'pipenv --completion'
-
-# Automatic `pipenv shell`
-# Must come AFTER initializing the prompt.
-znap source zsh-autoswitch-virtualenv
-
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-znap source powerlevel10k
-source ~/.p10k.zsh
+# zprof
