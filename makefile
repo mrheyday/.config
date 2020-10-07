@@ -28,16 +28,16 @@ link:
 	$(ln) $(makefile-dir)zsh/.p10k.zsh $(p10k)
 	$(ln) $(makefile-dir)zsh/.zshrc $(zsh)
 
-plugins := marlonrichert/zsh-autocomplete marlonrichert/zsh-hist marlonrichert/zsh-snap \
-	ekalinin/github-markdown-toc MichaelAquilina/zsh-autoswitch-virtualenv romkatv/powerlevel10k \
-	trapd00r/LS_COLORS zdharma/fast-syntax-highlighting \
-	zsh-users/zsh-autosuggestions zsh-users/zsh-syntax-highlighting
-plugins-dir := ~/.zsh-plugins
-zsh:
-	mkdir -p $(plugins-dir)
+plugins-dir := ~/.zsh
+znap:
 	$(no-update) brew install git 2> /dev/null
-	$(foreach p, $(plugins), $(if $(wildcard $(plugins-dir)/$(notdir $(p))), , \
-			git -C $(plugins-dir) clone --depth=1 git@github.com:$(p).git;))
+	mkdir -p $(plugins-dir)
+	$(if $(wildcard $(plugins-dir)/zsh-snap), , \
+			git -C $(plugins-dir) clone --depth=1 git@github.com:marlonrichert/zsh-snap.git;)
+
+zsh: znap
+	$(no-update) brew install zsh 2> /dev/null
+	$(shell zsh zsh/znap-clone.zsh )
 
 taps := homebrew/core homebrew/services homebrew/cask homebrew/cask-fonts homebrew/cask-versions
 formulas := asciinema bat coreutils nano ncurses pyenv pipenv svn zsh

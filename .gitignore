@@ -3,4 +3,5 @@ configstore/
 dotfilestore/
 *.csv
 *.db
+*.zwc
 install-id
