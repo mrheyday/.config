@@ -39,8 +39,8 @@ zsh:
 	$(foreach p, $(plugins), $(if $(wildcard $(plugins-dir)/$(notdir $(p))), , \
 			git -C $(plugins-dir) clone --depth=1 git@github.com:$(p).git;))
 
-taps := homebrew/cask homebrew/cask-fonts homebrew/cask-versions homebrew/core homebrew/services
-formulas := asciinema bat coreutils exa ncurses pyenv pipenv svn zsh
+taps := homebrew/core homebrew/services homebrew/cask homebrew/cask-fonts homebrew/cask-versions
+formulas := asciinema bat coreutils nano ncurses pyenv pipenv svn zsh
 casks := font-fira-code karabiner-elements rectangle visual-studio-code
 homebrew:
 	brew upgrade
