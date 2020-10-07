@@ -1,2 +1,3 @@
---style=plain
+-l zsh
 --color=always
+--style=plain
