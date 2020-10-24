@@ -41,8 +41,10 @@
     "workbench.editor.limit.value": 100,
     "editor.tabSize": 2,
     "explorer.confirmDragAndDrop": false,
-    "editor.fontSize": 13,
     "editor.minimap.enabled": false,
     "editor.fontFamily": "'SF Mono'",
-    "extensions.ignoreRecommendations": false
+    "extensions.ignoreRecommendations": false,
+    "editor.columnSelection": false,
+    "workbench.fontAliasing": "antialiased",
+    "window.autoDetectColorScheme": true
 }
