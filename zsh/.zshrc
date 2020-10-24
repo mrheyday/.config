@@ -33,7 +33,7 @@ rm -f $HOMEBREW_PREFIX/share/zsh/site-functions/_git
 export PAGER='less'
 export LESS='-giR'
 export READNULLCMD='bat'
-export MANPAGER="sh -c 'col -bpx | bat -l man'"
+export MANPAGER="sh -c 'col -bpx | bat -l man -p'"
 export BAT_PAGER="less $LESS"
 
 # Real-time auto-completion

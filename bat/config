@@ -1,3 +1,4 @@
 -l zsh
+-n
 --color=always
---style=plain
+--theme=ansi-dark
