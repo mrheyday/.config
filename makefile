@@ -53,6 +53,7 @@ formulas := asciinema bat coreutils nano ncurses pyenv pipenv svn zsh
 casks := karabiner-elements rectangle visual-studio-code
 homebrew:
 	brew upgrade
-	$(foreach t, $(taps), $(no-update) brew tap $(t); )
-	$(foreach f, $(formulas), $(no-update) brew install $(f) 2> /dev/null; )
-	$(foreach c, $(casks), $(no-update) brew cask install $(c) 2> /dev/null; )
+	$(foreach t, $(taps),\
+		$(no-update) brew tap $(t);)
+	$(no-update) brew install $(formulas) 2> /dev/null
+	$(no-update) brew cask install $(casks) 2> /dev/null
