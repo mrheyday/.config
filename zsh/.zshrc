@@ -1,5 +1,9 @@
 # #!/bin/zsh
 
+# Make history a bit bigger than macOS default.
+SAVEHIST=2000
+HISTSIZE=$(( 1.2 * SAVEHIST))  # Zsh recommended value
+
 # zmodload zsh/zprof
 
 # Znap! The lightweight plugin manager that's easy to grok.
