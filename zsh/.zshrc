@@ -55,8 +55,8 @@ znap eval pipenv-completion 'pipenv --completion'
 typeset -gU PATH path=(
   $(znap path github-markdown-toc)
   ~/Applications/apache-tomcat-8.5.55/bin
-  $path
   /usr/local/opt/ncurses/bin
+  $path
   .
 )
 
