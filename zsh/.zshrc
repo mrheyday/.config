@@ -46,6 +46,8 @@ znap source zsh-autocomplete
 
 # In-line suggestions
 znap source zsh-autosuggestions
+ZSH_AUTOSUGGEST_ACCEPT_WIDGETS=( "${ZSH_AUTOSUGGEST_ACCEPT_WIDGETS[@]:#*forward-char}" )
+ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS+=( forward-char vi-forward-char )
 
 # Add external commands
 znap eval pyenv-init 'pyenv init -'
