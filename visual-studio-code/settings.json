@@ -43,6 +43,6 @@
     "explorer.confirmDragAndDrop": false,
     "editor.fontSize": 13,
     "editor.minimap.enabled": false,
-    "editor.fontFamily": "'Fira Code'",
+    "editor.fontFamily": "'SF Mono'",
     "extensions.ignoreRecommendations": false
 }
