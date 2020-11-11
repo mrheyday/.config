@@ -50,7 +50,7 @@ zsh: znap
 
 taps := homebrew/core homebrew/services homebrew/cask homebrew/cask-fonts homebrew/cask-versions
 formulas := asciinema bat coreutils nano ncurses pyenv pipenv svn zsh
-casks := font-fira-code karabiner-elements rectangle visual-studio-code
+casks := karabiner-elements rectangle visual-studio-code
 homebrew:
 	brew upgrade
 	$(foreach t, $(taps), $(no-update) brew tap $(t); )
