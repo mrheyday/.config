@@ -16,7 +16,7 @@ unfunction update_terminal_cwd
 # Options
 setopt autocd autopushd cdsilent chaselinks pushdignoredups pushdsilent
 setopt NO_caseglob extendedglob globdots globstarshort nullglob numericglobsort
-setopt histfcntllock histignorealldups histreduceblanks histsavenodups sharehistory
+setopt histfcntllock histignorealldups histsavenodups sharehistory
 setopt NO_flowcontrol interactivecomments rcquotes
 
 # Environment variables
