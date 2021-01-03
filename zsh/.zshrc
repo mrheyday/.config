@@ -10,6 +10,9 @@ source ~/.zsh/zsh-snap/znap.zsh
 znap prompt pure
 # PS4='+%N:%I> '
 
+add-zsh-hook -d precmd update_terminal_cwd
+unfunction update_terminal_cwd
+
 # Options
 setopt autocd autopushd cdsilent chaselinks pushdignoredups pushdsilent
 setopt NO_caseglob extendedglob globdots globstarshort nullglob numericglobsort
