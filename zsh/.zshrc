@@ -38,9 +38,12 @@ hash -d TMPDIR=$TMPDIR:A
 
 znap prompt sindresorhus/pure # Show prompt.
 
-# Options
-setopt NO_caseglob extendedglob globdots globstarshort nullglob numericglobsort
-setopt NO_flowcontrol interactivecomments rcquotes
+
+##
+# Miscellanous
+#
+setopt NO_caseglob extendedglob globstarshort numericglobsort
+setopt NO_autoparamslash interactivecomments rcquotes
 
 # Environment variables
 export LANG='en_US.UTF-8'
