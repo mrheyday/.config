@@ -1,10 +1,14 @@
-# #!/bin/zsh
+#!/bin/zsh
 
-# Make history a bit bigger than macOS default.
-SAVEHIST=2000
-HISTSIZE=$(( 1.2 * SAVEHIST))  # Zsh recommended value
+##
+# History settings
+# Set these first, so history doesn't get lost when something breaks.
+#
+HISTFILE=~/.local/share/zsh/history
+SAVEHIST=$(( 100 * 1000 ))
+HISTSIZE=$(( 1.2 * SAVEHIST ))  # Zsh recommended value
+setopt histfcntllock histignorealldups histsavenodups sharehistory
 
-# zmodload zsh/zprof
 
 # Znap! The lightweight plugin manager that's easy to grok.
 # Get it from https://github.com/marlonrichert/zsh-snap
@@ -20,7 +24,6 @@ unfunction update_terminal_cwd
 # Options
 setopt autocd autopushd cdsilent chaselinks pushdignoredups pushdsilent
 setopt NO_caseglob extendedglob globdots globstarshort nullglob numericglobsort
-setopt histfcntllock histignorealldups histsavenodups sharehistory
 setopt NO_flowcontrol interactivecomments rcquotes
 
 # Environment variables
