@@ -45,6 +45,16 @@ znap prompt sindresorhus/pure # Show prompt.
 setopt NO_caseglob extendedglob globstarshort numericglobsort
 setopt NO_autoparamslash interactivecomments rcquotes
 
+# Apple attaches their function to the wrong hook.
+# This doesn't need to run before each prompt; just when we change dirs.
+if type -f update_terminal_cwd &>/dev/null; then
+  autoload -Uz add-zsh-hook
+  add-zsh-hook -d precmd update_terminal_cwd
+  add-zsh-hook chpwd update_terminal_cwd
+  update_terminal_cwd
+fi
+
+
 # Environment variables
 export LANG='en_US.UTF-8'
 export EDITOR='code'
