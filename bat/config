@@ -1,4 +1,4 @@
--l zsh
--n
 --color=always
---theme=ansi-dark
+--language=zsh
+--plain
+--theme=ansi
