@@ -5,21 +5,25 @@
 	autocrlf = false
 	excludesfile = /Users/marlon/.gitignore_global
 	editor = code --wait
+[remote]
+	pushdefault = origin
 [push]
-	default = upstream
+	default = current
 [pull]
 	rebase = true
+[merge]
+	tool = opendiff
+	autoStash = true
+[rebase]
+	autoStash = true
 [branch]
 	autosetuprebase = always
 [diff]
 	tool = opendiff
-	noprefix = true
 [difftool "opendiff"]
 	cmd = /usr/bin/opendiff \"$LOCAL\" \"$REMOTE\" -merge \"$MERGED\" 2>/dev/null | cat
 [alias]
 	opendiff = difftool --no-prompt --tool opendiff --dir-diff
-[merge]
-	tool = opendiff
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
