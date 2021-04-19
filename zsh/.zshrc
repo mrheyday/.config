@@ -10,13 +10,18 @@ HISTSIZE=$(( 1.2 * SAVEHIST ))  # Zsh recommended value
 setopt histfcntllock histignorealldups histsavenodups sharehistory
 
 
-# Znap! The lightweight plugin manager that's easy to grok.
-# Get it from https://github.com/marlonrichert/zsh-snap
-source ~/.zsh/zsh-snap/znap.zsh
+##
+# Initialization
+#
+source ~/Git/zsh-snap/znap.zsh  # Plugin manager
 
-# Znap makes your prompt appear instantly & you can start typing right away.
-znap prompt pure
-# PS4='+%N:%I> '
+
+##
+# Instant prompt
+# The code below gets the left side of the primary prompt visible in less than 40ms.
+#
+znap prompt sindresorhus/pure
+
 
 add-zsh-hook -d precmd update_terminal_cwd
 unfunction update_terminal_cwd
