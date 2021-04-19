@@ -26,21 +26,21 @@ setopt autocd autopushd cdsilent chaselinks pushdignoredups pushdminus pushdsile
   dirs $dirs[@] >/dev/null
 }
 
+# Add shortcuts for common dirs.
+setopt autonamedirs
+hash -d TMPDIR=$TMPDIR:A
+
 
 ##
 # Instant prompt
 # The code below gets the left side of the primary prompt visible in less than 40ms.
 #
 
-# Add shortcuts for common dirs.
-setopt autonamedirs
-hash -d TMPDIR=$TMPDIR:A
-
 znap prompt sindresorhus/pure # Show prompt.
 
 
 ##
-# Miscellanous
+# Basic shell settings
 #
 setopt NO_caseglob extendedglob globstarshort numericglobsort
 setopt NO_autoparamslash interactivecomments rcquotes
@@ -95,62 +95,113 @@ fpath+=(
   ~[zsh-users/zsh-completions]/src  # Made possible by Znap
   $HOMEBREW_PREFIX/share/zsh/site-functions
 )
-rm -f $HOMEBREW_PREFIX/share/zsh/site-functions/{_git,git-completion.bash,_git.zwc}
+rm -f $HOMEBREW_PREFIX/share/zsh/site-functions/{_git{,.zwc},git-completion.bash}
 
+
+##
+# Plugins
+#
 
 # Real-time auto-completion
-# Get it from https://github.com/marlonrichert/zsh-autocomplete
-znap source zsh-autocomplete
-
-# In-line suggestions
-znap source zsh-autosuggestions
-ZSH_AUTOSUGGEST_ACCEPT_WIDGETS=( "${ZSH_AUTOSUGGEST_ACCEPT_WIDGETS[@]:#*forward-char}" )
-ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS+=( forward-char vi-forward-char )
+znap source marlonrichert/zsh-autocomplete
 
 # Better line editing tools
-# Get them from https://github.com/marlonrichert/zsh-edit
-znap source zsh-edit
-WORDCHARS='*?\'
+WORDCHARS='*?~\ '
+znap source marlonrichert/zsh-edit
+bindkey -c '^S'  'git status --show-stash'
+bindkey -c '^G'  'git log'
+bindkey -c '^O'  'git log --oneline'
+bindkey -c "^[$key[Up]"   'git push'
+bindkey -c "^[$key[Down]" 'git pull --autostash'
 
 # History editing tools
-# Get them from https://github.com/marlonrichert/zsh-hist
-znap source zsh-hist
-bindkey '^[q' push-line-or-edit
+znap source marlonrichert/zsh-hist
 
-# Bash/Readline compatibility
+# Auto-generated completion colors
+znap source marlonrichert/zcolors
+znap eval zcolors "zcolors ${(q)LS_COLORS}"
+
+# In-line suggestions
+ZSH_AUTOSUGGEST_ACCEPT_WIDGETS=()
+ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS=( forward-char forward-word end-of-line )
+ZSH_AUTOSUGGEST_STRATEGY=( history )
+ZSH_AUTOSUGGEST_HISTORY_IGNORE=$'*\n*'
+znap source zsh-users/zsh-autosuggestions
+
+# Command-line syntax highlighting
+ZSH_HIGHLIGHT_HIGHLIGHTERS=( main brackets )
+znap source zsh-users/zsh-syntax-highlighting
+
+
+##
+# Additional keyboard settings
+#
+
+setopt NO_flowcontrol # Enable ^Q and ^S.
+
+# Make Control-U do the same as in Bash/Readline.
 # Zsh's default kills the whole line.
 bindkey '^U' backward-kill-line
 
-# Prezto/Emacs-undo-tree compatibility
+# Add same Redo keybinding as in Prezto/Emacs-undo-tree.
 # Zsh does not have a default keybinding for this.
 bindkey '^[_' redo
 
-# Enable alt-h help function.
+# Replace some default widgets with better ones.
+zle -A copy-prev-{shell-,}word
+zle -A push-line{-or-edit,}
+zle -A {vi-,}quoted-insert
+
+# `zsh-edit` adds `bindkey -c`, which lets you bind arbitrary commands.
+# $key table is defined by /etc/zshrc & `zsh-autocomplete`.
+
+# Alt-H: Open `man` page of current command.
 unalias run-help
-autoload -Uz  run-help    run-help-git  run-help-ip   run-help-openssl \
-              run-help-p4 run-help-sudo run-help-svk  run-help-svn
+autoload -Uz  run-help{,-{git,ip,openssl,p4,sudo,svk,svn}}
+
+# Alt-Shift-/: Show definition of current command.
+autoload -Uz which-command
+zle -N which-command
+unalias which-command 2>/dev/null
+
+
+##
+# Aliases & functions
+#
+
+# File associations
+alias -s {md,txt}='<' {log,out}='open -a Console'
 
 # Pattern matching support for `cp`, `ln` and `mv`
 # See http://zsh.sourceforge.net/Doc/Release/User-Contributions.html#index-zmv
 autoload -Uz zmv
-alias zcp='zmv -Civ'
-alias zln='zmv -Liv'
-alias zmv='zmv -Miv'
+alias zcp='zmv -Cv' zln='zmv -Lv' zmv='zmv -Mv'
+
+# Colors for 'ls'
+ls() {
+  gls --width=$COLUMNS -x "$@" | less # `gls` needs `--width` and `-x` when piped.
+  return $pipestatus[1]  # Exit status of `gls`
+}
+alias ls='ls --color=always --group-directories-first --sort=extension -AF'
 
 # Safer alternative to `rm`
-alias trash='trash -F'
-
-# Color `grep`
-alias grep='grep --color=always'
-
-# Colors for 'ls' and completions
-znap eval dircolors 'gdircolors -b'
-zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
-alias ls='ls -AFH'
-
-# Command-line syntax highlighting
-export ZSH_HIGHLIGHT_HIGHLIGHTERS=( main brackets )
-znap source zsh-syntax-highlighting
-# znap source fast-syntax-highlighting
-
-# zprof
+trash() {
+  local -aU items=() missing=()
+  local i; for i in $@; do
+    if [[ -e $i ]]; then
+      items+=( $i )
+    else
+      missing+=( $i )
+    fi
+  done
+  local -i ret=66
+  (( $#missing > 0 )) &&
+    print -u2 "trash: no such file(s): $missing"
+  if (( $#items > 0 )); then
+    print Moving $(eval ls -d ${(q)items[@]}) to Trash.
+    items=( '(POSIX file "'${^items[@]:A}'")' )
+    osascript -e 'tell application "Finder" to delete every item of {'${(j:, :)items}'}' >/dev/null
+    ret=$?
+  fi
+  return ret
+}

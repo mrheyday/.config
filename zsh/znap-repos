@@ -5,6 +5,7 @@ marlonrichert/zsh-completions
 marlonrichert/zsh-edit
 marlonrichert/zsh-hist
 marlonrichert/zsh-snap
+sindresorhus/pure
 zsh-users/zsh-autosuggestions
 zsh-users/zsh-completions
 zsh-users/zsh-syntax-highlighting
