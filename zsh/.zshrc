@@ -55,22 +55,48 @@ if type -f update_terminal_cwd &>/dev/null; then
 fi
 
 
-# Environment variables
-export LANG='en_US.UTF-8'
-export EDITOR='code'
-export VISUAL='code'
-export CLICOLOR=1
-export CLICOLOR_FORCE=1
-export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
-znap eval brew-shellenv 'brew shellenv'
-rm -f $HOMEBREW_PREFIX/share/zsh/site-functions/_git
+##
+# External commands
+#
 
-# Syntax highlighting in `less` and `man`
-export PAGER='less'
-export LESS='-giR'
-export READNULLCMD='bat'
-export MANPAGER="sh -c 'col -bpx | bat -l man -p'"
-export BAT_PAGER="less $LESS"
+typeset -U PATH path FPATH fpath MANPATH manpath # Remove duplicates.
+LANG='en_US.UTF-8'
+
+EDITOR='code' VISUAL='code'
+READNULLCMD='bat'
+PAGER='less' MANPAGER='col -bpx | bat --language man'
+export LESS='--ignore-case --quit-if-one-screen --raw-control-char'
+export GREP_OPTIONS='--color=auto'
+
+export HOMEBREW_NO_AUTO_UPDATE=1
+{
+  xcode-select --install 2> /dev/null ||
+    brew update --quiet &> /dev/null &&
+    brew upgrade --fetch-HEAD --quiet &> /dev/null
+} &|
+znap eval brew-shellenv 'brew shellenv'
+
+znap eval pyenv-init ${${:-=pyenv}:A}' init -'
+
+JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
+path=(
+  $HOMEBREW_CELLAR/tomcat@8/*/libexec/bin
+  $HOMEBREW_PREFIX/opt/ncurses/bin
+  ~/.local/bin  # pipx, pipenv
+  $path[@]
+  .
+)
+
+# Completions
+znap eval pip-completion 'pip completion --zsh'
+znap eval pipx-completion 'register-python-argcomplete pipx'
+znap eval pipenv-completion 'pipenv --completion'
+fpath+=(
+  ~[zsh-users/zsh-completions]/src  # Made possible by Znap
+  $HOMEBREW_PREFIX/share/zsh/site-functions
+)
+rm -f $HOMEBREW_PREFIX/share/zsh/site-functions/{_git,git-completion.bash,_git.zwc}
+
 
 # Real-time auto-completion
 # Get it from https://github.com/marlonrichert/zsh-autocomplete
@@ -80,17 +106,6 @@ znap source zsh-autocomplete
 znap source zsh-autosuggestions
 ZSH_AUTOSUGGEST_ACCEPT_WIDGETS=( "${ZSH_AUTOSUGGEST_ACCEPT_WIDGETS[@]:#*forward-char}" )
 ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS+=( forward-char vi-forward-char )
-
-# Add external commands
-znap eval pyenv-init 'pyenv init -'
-znap eval pipenv-completion 'pipenv --completion'
-typeset -gU PATH path=(
-  $(znap path github-markdown-toc)
-  ~/Applications/apache-tomcat-8.5.55/bin
-  /usr/local/opt/ncurses/bin
-  $path
-  .
-)
 
 # Better line editing tools
 # Get them from https://github.com/marlonrichert/zsh-edit
