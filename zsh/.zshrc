@@ -1,10 +1,12 @@
 #!/bin/zsh
 
+XDG_DATA_HOME=~/.local/share
+
 ##
 # History settings
 # Set these first, so history doesn't get lost when something breaks.
 #
-HISTFILE=~/.local/share/zsh/history
+HISTFILE=$XDG_DATA_HOME/zsh/history
 SAVEHIST=$(( 100 * 1000 ))
 HISTSIZE=$(( 1.2 * SAVEHIST ))  # Zsh recommended value
 setopt histfcntllock histignorealldups histsavenodups sharehistory
@@ -13,7 +15,16 @@ setopt histfcntllock histignorealldups histsavenodups sharehistory
 ##
 # Initialization
 #
+
 source ~/Git/zsh-snap/znap.zsh  # Plugin manager
+
+# Load dir stack from file and continue where we left off.
+setopt autocd autopushd cdsilent chaselinks pushdignoredups pushdminus pushdsilent
+() {
+  local dirs=( ${(f@Q)$(< $XDG_DATA_HOME/zsh/chpwd-recent-dirs)} )
+  cd $dirs[1]
+  dirs $dirs[@] >/dev/null
+}
 
 
 ##
