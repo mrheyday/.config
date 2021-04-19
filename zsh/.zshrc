@@ -31,14 +31,14 @@ setopt autocd autopushd cdsilent chaselinks pushdignoredups pushdminus pushdsile
 # Instant prompt
 # The code below gets the left side of the primary prompt visible in less than 40ms.
 #
-znap prompt sindresorhus/pure
 
+# Add shortcuts for common dirs.
+setopt autonamedirs
+hash -d TMPDIR=$TMPDIR:A
 
-add-zsh-hook -d precmd update_terminal_cwd
-unfunction update_terminal_cwd
+znap prompt sindresorhus/pure # Show prompt.
 
 # Options
-setopt autocd autopushd cdsilent chaselinks pushdignoredups pushdsilent
 setopt NO_caseglob extendedglob globdots globstarshort nullglob numericglobsort
 setopt NO_flowcontrol interactivecomments rcquotes
 
