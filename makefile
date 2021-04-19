@@ -1,59 +1,85 @@
 .PHONY: *
-install: clean backup link zsh homebrew
+install: link zsh homebrew
 
-no-update := HOMEBREW_NO_AUTO_UPDATE=1
-
+makefile-dir := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 code-dir := ~/Library/Application\ Support/Code/User/
-code := $(code-dir)settings.json
-
-git := ~/.gitconfig
-
+git-dir := ~/Git
 gradle-dir := ~/.gradle/
-gradle := $(gradle-dir)gradle.properties
-
 ssh-dir := ~/.ssh/
-ssh := $(ssh-dir)config
 
-zsh := ~/.zshrc
+ln := ln -fs
+mkdir := mkdir -pm 0700
+brew-install := brew install --quiet
+homebrew-no-update := HOMEBREW_NO_AUTO_UPDATE=1
+
+code := $(code-dir)settings.json
+git := ~/.gitconfig
+gradle := $(gradle-dir)gradle.properties
+ssh := $(ssh-dir)config
+zsh := ~/.zshenv
 
 dotfiles := $(code) $(git) $(gradle) $(ssh) $(zsh)
 
-clean:
-	$(no-update) brew install trash 2> /dev/null
-	trash -F $(foreach c, $(dotfiles), $(wildcard $(c)~))
+update:
+	$(homebrew-no-update) $(brew-install) git
+	git config remote.pushdefault origin
+	git config push.default current
+	@git remote add upstream https://github.com/marlonrichert/.config.git 2>/dev/null; true;
+	git fetch -q upstream
+	git branch -q --set-upstream-to upstream/master
+	git pull -q --autostash upstream
 
-backup:
-	$(foreach d, $(dotfiles), $(if $(wildcard $(d)), mv -iv $(d) $(d)~; , ))
+clean: update
+	$(foreach c, $(dotfiles),\
+		$(if $(wildcard $(c)~ ),\
+			rm -f $(c)~;,\
+			) )
+backup: clean
+	$(foreach d, $(dotfiles),\
+		$(if $(wildcard $(d) ),\
+			mv -f $(d) $(d)~;,\
+			) )
 
-makefile-dir := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
-ln := ln -fsv
-link:
-	mkdir -p $(code-dir)
+zsh-datadir := ~/.local/share/zsh/
+zsh-oldhist := ~/.zsh_history
+zsh-newhist := $(zsh-datadir)history
+zsh-oldcdr := ~/.chpwd-recent-dirs
+zsh-newcdr := $(zsh-datadir).chpwd-recent-dirs
+link: backup
+	$(mkdir) $(zsh-datadir)
+	$(if $(wildcard $(zsh-oldhist)), \
+		$(if $(wildcard $(zsh-newhist)),\
+			,\
+			mv -f $(zsh-oldhist) $(zsh-newhist) ),\
+		)
+	$(if $(wildcard $(zsh-oldcdr)), \
+		$(if $(wildcard $(zsh-newcdr)),\
+			,\
+			mv -f $(zsh-oldcdr) $(zsh-newcdr) ),\
+		)
+	$(mkdir) $(code-dir)
 	$(ln) $(makefile-dir)visual-studio-code/settings.json $(code)
 	$(ln) $(makefile-dir)git/.gitconfig $(git)
-	mkdir -p $(gradle-dir)
+	$(mkdir) $(gradle-dir)
 	$(ln) $(makefile-dir)gradle/gradle.properties $(gradle)
-	mkdir -p $(ssh-dir)
+	$(mkdir) $(ssh-dir)
 	$(ln) $(makefile-dir)ssh/config $(ssh)
-	$(ln) $(makefile-dir)zsh/.zshrc $(zsh)
+	$(ln) $(makefile-dir)zsh/.zshenv $(zsh)
 
-plugins-dir := ~/.zsh
 znap:
-	$(no-update) brew install git 2> /dev/null
-	mkdir -p $(plugins-dir)
-	$(if $(wildcard $(plugins-dir)/zsh-snap), , \
-			git -C $(plugins-dir) clone --depth=1 git@github.com:marlonrichert/zsh-snap.git )
-
-zsh: znap
-	$(no-update) brew install zsh 2> /dev/null
-	$(shell zsh zsh/znap-clone.zsh )
+	$(homebrew-no-update) $(brew-install) --HEAD --fetch-HEAD zsh
+	$(mkdir) $(git-dir)
+	$(if $(wildcard $(git-dir)/zsh-snap), ,\
+		git -C $(git-dir) clone -q --depth=1 git@github.com:marlonrichert/zsh-snap.git)
+	$(shell zsh $(makefile-dir)zsh/znap-clone.zsh)
 
 taps := homebrew/core homebrew/services homebrew/cask homebrew/cask-fonts homebrew/cask-versions
-formulas := asciinema bat coreutils nano ncurses pyenv pipenv svn zsh
+formulas := asciinema bat coreutils gradle less nano node pyenv tomcat@8
 casks := karabiner-elements rectangle visual-studio-code
-homebrew:
-	brew upgrade
-	$(foreach t, $(taps),\
-		$(no-update) brew tap $(t);)
-	$(no-update) brew install $(formulas) 2> /dev/null
-	$(no-update) brew cask install $(casks) 2> /dev/null
+homebrew: update
+	$(homebrew-no-update)
+	brew upgrade --quiet
+	$(foreach t, $(taps), brew tap --quiet $(t);)
+	$(brew-install) --formula $(formulas)
+	$(brew-install) --cask $(casks) 2>/dev/null
+	brew autoremove
