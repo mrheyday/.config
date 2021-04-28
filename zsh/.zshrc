@@ -20,23 +20,23 @@ setopt histfcntllock histignorealldups histsavenodups sharehistory
 zstyle ':znap:*' default-server git@github.com: # Use SSH instead of HTTPS.
 source ~/Git/zsh-snap/znap.zsh
 
-# Load dir stack from file and continue where we left off.
+# Set cd/pushd options.
 setopt autocd autopushd cdsilent chaselinks pushdignoredups pushdminus pushdsilent
-() {
-  local dirs=( ${(f@Q)$(< $XDG_DATA_HOME/zsh/chpwd-recent-dirs)} )
-  cd $dirs[1]
-  dirs $dirs[@] >/dev/null
-}
 
-# Add shortcuts for common dirs.
-setopt autonamedirs
-hash -d TMPDIR=$TMPDIR:A
+# Load dir stack from file (excl. non-existing dirs).
+zmodload -F zsh/parameter p:dirstack
+dirstack=( ${${(f@Q)^"$( < $XDG_DATA_HOME/zsh/chpwd-recent-dirs )"}[@]:#${TMPDIR:A}/*}(N-/) )
+cd -q $dirstack[1]  # Continue where we left off.
 
 
 ##
 # Instant prompt
 # The code below gets the left side of the primary prompt visible in less than 40ms.
 #
+
+# Add ~shorthands for common dirs.
+setopt autonamedirs
+hash -d TMPDIR=$TMPDIR:A
 
 znap prompt sindresorhus/pure # Show prompt.
 
