@@ -28,7 +28,7 @@
     "files.associations": {
         "_*": "shellscript",
         ".*": "shellscript",
-        "*.ztst": "shellscript",
+        "*.ztst": "plaintext",
         "*.awk": "makefile",
         "*.in": "makefile",
         "*.mdd": "makefile",
