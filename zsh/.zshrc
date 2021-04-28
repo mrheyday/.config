@@ -172,15 +172,16 @@ unalias which-command 2>/dev/null
 # Aliases & functions
 #
 
-# File associations
-alias -s {md,txt}='<' {log,out}='open -a Console'
+# File type associations
+alias -s {md,patch,txt}="$PAGER"
+alias -s {log,out}='open -a Console'
 
 # Pattern matching support for `cp`, `ln` and `mv`
 # See http://zsh.sourceforge.net/Doc/Release/User-Contributions.html#index-zmv
 autoload -Uz zmv
 alias zcp='zmv -Cv' zln='zmv -Lv' zmv='zmv -Mv'
 
-# Colors for 'ls'
+# Paging & colors for 'ls'
 ls() {
   gls --width=$COLUMNS -x "$@" | less # `gls` needs `--width` and `-x` when piped.
   return $pipestatus[1]  # Exit status of `gls`
