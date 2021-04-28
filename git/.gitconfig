@@ -32,44 +32,44 @@
 [color]
 	ui = always
 [color "decorate"]
-	HEAD = brightcyan normal italic
-	remotebranch = brightmagenta normal
-	grafted = red normal italic
-	tag = yellow normal bold
-	branch = brightcyan normal
-	stash = brightblack normal
+	HEAD = 14 normal italic
+	remotebranch = 13 normal
+	grafted = 1 normal italic
+	tag = 3 normal bold
+	branch = 14 normal
+	stash = 8 normal
 [color "status"]
-	nobranch = red normal italic
-	localbranch = brightcyan normal
-	remotebranch = brightmagenta normal
-	branch = brightcyan normal
-	changed = yellow normal
-	unmerged = red normal
-	updated = green normal
-	added = green normal
-	untracked = normal normal dim
-	header = normal normal
+	nobranch = 1 normal italic
+	localbranch = 14 normal
+	remotebranch = 13 normal
+	branch = 14 normal
+	changed = 3 normal
+	unmerged = 1 normal
+	updated = 2 normal
+	added = 2 normal
+	untracked = normal dim
+	header = normal
 [color "interactive"]
-	error = red normal italic
-	help = brightblack normal
-	header = normal normal
+	error = 1 normal italic
+	help = 8 normal
+	header = normal
 [color "branch"]
-	remote = brightmagenta normal
-	upstream = brightmagenta normal
-	plain = brightcyan normal
-	current = brightcyan normal reverse
-	local = brightcyan normal
+	remote = 13 normal
+	upstream = 13 normal
+	plain = 14 normal
+	current = 14 normal reverse
+	local = 14 normal
 [color "grep"]
-	function = brightgreen normal
-	filename = white normal
-	column = brightblack normal
-	linenumber = brightblack normal
+	function = 10 normal
+	filename = 7 normal
+	column = 8 normal
+	linenumber = 8 normal
 [color "remote"]
-	success = green normal
-	error = red normal
-	warning = yellow normal
-	hint = normal normal dim
+	success = 2 normal
+	error = 1 normal
+	warning = 3 normal
+	hint = normal dim
 [color "diff"]
-	commit = yellow normal
-	func = brightgreen normal
-	whitespace = normal normal
+	commit = 3 normal
+	func = 10 normal
+	whitespace = normal
