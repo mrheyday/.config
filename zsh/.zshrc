@@ -71,12 +71,13 @@ export LESS='--ignore-case --quit-if-one-screen --raw-control-char'
 export GREP_OPTIONS='--color=auto'
 
 export HOMEBREW_NO_AUTO_UPDATE=1
+znap eval brew-shellenv 'brew shellenv'
+[[ -o shinstdin ]] &&
 {
   xcode-select --install 2> /dev/null ||
-    brew update --quiet &> /dev/null &&
-    brew upgrade --fetch-HEAD --quiet &> /dev/null
+          brew update --quiet &&
+          brew upgrade --fetch-HEAD --quiet
 } &|
-znap eval brew-shellenv 'brew shellenv'
 
 znap eval pyenv-init ${${:-=pyenv}:A}' init -'
 
