@@ -16,7 +16,9 @@ setopt histfcntllock histignorealldups histsavenodups sharehistory
 # Initialization
 #
 
-source ~/Git/zsh-snap/znap.zsh  # Plugin manager
+# Plugin manager
+zstyle ':znap:*' default-server git@github.com: # Use SSH instead of HTTPS.
+source ~/Git/zsh-snap/znap.zsh
 
 # Load dir stack from file and continue where we left off.
 setopt autocd autopushd cdsilent chaselinks pushdignoredups pushdminus pushdsilent
