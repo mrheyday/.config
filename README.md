@@ -1,6 +1,5 @@
 # .config
-
-Dotfiles for Zsh, Git, SSH, Terminal.app, Karabiner-Elements and my web browser on macOS
+Dotfiles for Zsh, Git, SSH, Terminal.app and Karabiner-Elements on macOS.
 
 ![screenshot](screenshot.png)
 
@@ -12,67 +11,57 @@ Table of Contents:
 * [License](#license)
 
 ## Requirements
-* These dotfiles were written for **macOS**. If you are using some other (Unix-based) OS, they
-  will likely need some editing before you can use them. I have not tested them on anything else
-  than macOS.
-* You need to have **[Homebrew](https://brew.sh)** installed, which is available for both macOS and
-  Linux. (Or you need to modify the `homebrew` target in the [makefile](makefile) to use another
-  package manager of  your choosing.)
-* To benefit from the Zsh config included, you obviously need to be running `zsh` as your shell
-  —which I highly recommend anyway. Here's the best way to install the latest version:
-  1.  Open a terminal (I use macOS's Terminal.app) and use Homebrew (see above) to install the
-      latest version of the Z Shell:
-      ```shell
-      brew install zsh
-      ```
-  1.  Change your shell to `zsh`:
-      ```shell
-      chsh -s /usr/local/bin/zsh
-      ```
-  1.  Restart your terminal.
+These dotfiles were written for **macOS**. With some minor modifications, they might be usable on
+another Unix-based OS, but I have not tested them on anything else than macOS.
 
 ## Installation
 1.  [Fork this repo](fork).
-1.  Edit [`git/.gitconfig`](git/.gitconfig) in your fork so it has **your** name and email address,
-    not mine!
+1.  ⚠️ Edit [`git/.gitconfig`](git/.gitconfig) in your fork (you can do this through GitHub's web
+    UI) to use **your** name and email address, not mine!
 1.  Open a terminal and do the following:
-  ```shell
-  # Go to your home dir:
-  % cd ~
-
-  # Back up your old .config dir (if any):
-  % mv -iv .config .config~
-
-  # Clone your fork, which will make a new .config dir:
-  % git clone https://github.com/<your user name>/.config.git
-
-  # Go to your new .config dir:
-  % cd .config
-
-  # Run the installer:
-  % make
-  # Your old dotfiles will be backed up by appending `~` to their filenames.
-
-  # Merge anything you'd like to keep from your old dotfiles back into your new ones.
-
-  # Finally, once you're happy with the result:
-  % git add .
-  % git commit
-  % git push  # After running `make`, this will automatically push to _your_ fork, not mine.
-  ```
+    ```shell
+    % cd ~                    # Go to your home dir.
+    % mv -iv .config .config~ # Back up your old .config dir (if any).
+    ...
+    % # Clone your fork, which will make a new .config dir:
+    % git clone https://github.com/<YOUR USER NAME>/.config.git
+    ...
+    % cd .config              # Go to your new .config dir.
+    % # 📝 Add anything you want to keep from your old dotfiles.
+    % make clean install      # Run the installer to deploy your new dotfiles.
+    ...
+    % # Finally, once you're happy with the result:
+    % git add .
+    % git commit
+    ...
+    % # After running `make`, your clone will push to YOUR fork, not mine. 🙂
+    % git push
+    ...
+    ```
 1.  _(optional)_ In Terminal.app, go to Preferences, import
     [`terminal/Dark Mode.terminal`](terminal/Dark%20Mode.terminal) and set it as the default.
 1.  Restart your terminal.
 
 ## Getting Updates
-Simply do
+To get new updates to your fork from my repo, do the following:
 ```zsh
 % cd ~/.config
-% make
+% make          # Pull in updates, but don't install them yet.
+...
+# Review the incoming changes and make any adjustments you like.
+% make install  # Run the installer to deploy your changes.
+...
+% # Finally, once you're happy with the result:
+% git add .
+% git commit
+...
+% # After running `make`, your clone will push to YOUR fork, not mine. 🙂
+% git push
+...
 ```
 
 ## Author
-© 2020 [Marlon Richert](https://github.com/marlonrichert)
+© 2020-2021 [Marlon Richert](https://github.com/marlonrichert)
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
