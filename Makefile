@@ -1,6 +1,6 @@
-upstream = https://github.com/marlonrichert/.config.git
+#!/usr/bin/make -f
 
-SHELL = /bin/sh
+SHELL = /bin/zsh
 prefix = /usr/local
 exec_prefix = $(prefix)
 bindir = $(exec_prefix)/bin
@@ -8,92 +8,93 @@ datarootdir = $(prefix)/share
 datadir = $(datarootdir)
 
 makedir = $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
-LN = ln -fs
-MKDIR = @mkdir -pm 0700
-MV = mv -f
+OSASCRIPT = /usr/bin/osascript
 
-brew-no-update = HOMEBREW_NO_AUTO_UPDATE=1
 BREW = $(bindir)/brew
-BREW_INSTALL = $(brew-no-update) $(BREW) install --quiet
+BREWFLAGS = --quiet
+HOMEBREW_PREFIX = $(exec_prefix)
+HOMEBREW_REPOSITORY = $(HOMEBREW_PREFIX)/Homebrew
+HOMEBREW_CELLAR = $(HOMEBREW_PREFIX)/Cellar
 
 BASH = /bin/bash
 CURL = /usr/bin/curl
-GIT = $(bindir)/git
-ZSH = $(bindir)/zsh
 
-gitdir = $(HOME)/Git
-ZNAP = $(gitdir)/zsh-snap
+GIT = /usr/bin/git
+GITFLAGS = --quiet
+upstream = https://github.com/marlonrichert/.config.git
+gitconfig = ~/.gitconfig
 
-taps := core services cask cask-fonts cask-versions
-taps := $(taps:%=$(prefix)/Homebrew/Library/Taps/homebrew/homebrew-%)
+ZSH = /bin/zsh
+zshenv = ~/.zshenv
+ZNAP = ~/Git/zsh-snap
+
+taps := cask cask-fonts cask-versions core services
+taps := $(taps:%=$(HOMEBREW_REPOSITORY)/Library/Taps/homebrew/homebrew-%)
 
 formulas := asciinema bash bat chkrootkit coreutils elasticsearch ffmpeg gawk gnu-sed gource \
-		gradle graphviz less libatomic_ops mariadb nano pyenv subversion tomcat@8 wget xmlstarlet \
-		yarn
-formulas := $(formulas:%=$(exec_prefix)/Cellar/%)
+		gradle graphviz libatomic_ops mariadb@10.3 nano ncurses tomcat@9 wget xmlstarlet yarn
+formulas := $(formulas:%=$(HOMEBREW_CELLAR)/%)
 
-casks = adoptopenjdk8 font-material-icons font-montserrat font-open-sans font-roboto font-ubuntu \
-		karabiner-elements rectangle visual-studio-code
+casks = adoptopenjdk8 karabiner-elements rectangle visual-studio-code \
+		font-material-icons font-montserrat font-open-sans font-roboto font-ubuntu
 
-gitconfig = $(HOME)/.gitconfig
-zshconfig = $(HOME)/.zshenv
-sshconfig = $(HOME)/.ssh/config
-codeconfig = $(HOME)/Library/ApplicationSupport/Code/User/settings.json
-gradleconfig = $(HOME)/.gradle/gradle.properties
+sshconfig = ~/.ssh/config
+vscodesettings = ~/Library/ApplicationSupport/Code/User/settings.json
+vscodekeybindings = ~/Library/ApplicationSupport/Code/User/keybindings.json
+gradleproperties = ~/.gradle/gradle.properties
 
-dotfiles = $(gitconfig) $(zshconfig) $(sshconfig) $(codeconfig) $(gradleconfig)
+dotfiles = $(gitconfig) $(zshenv) $(sshconfig) \
+	$(vscodesettings) $(vscodekeybindings) $(gradleproperties)
 
-backups = $(foreach file,$(dotfiles),$(file)~)
+backups := $(wildcard $(dotfiles:%=%~))
+find = ) (
+replace = ), (
+backups := $(subst $(find),$(replace),$(foreach f,$(backups),(POSIX file "$(f)")))
 
-zsh-datadir = $(HOME)/.local/share/zsh/
+XDG_DATA_HOME = ~/.local/share
+zsh-datadir = $(XDG_DATA_HOME)/zsh/
 zsh-hist = $(zsh-datadir)history
-zsh-hist-old = $(HOME)/.zsh_history
+zsh-hist-old = ~/.zsh_history
 zsh-cdr = $(zsh-datadir).chpwd-recent-dirs
-zsh-cdr-old = $(HOME)/.chpwd-recent-dirs
+zsh-cdr-old = ~/.chpwd-recent-dirs
 
-.SUFFIXES:
 .NOTPARALLEL:
-.PHONY: all clean install casks repos
+.ONESHELL:
+.PHONY: all install installdirs clean
+.SUFFIXES:
 
-all: $(BREW) $(GIT)
-	$(BREW) update
-	$(BREW) upgrade --quiet --fetch-HEAD
-	@rm -f $(datadir)/zsh/site-functions/{_git{,.zwc},git-completion.bash}
+all:
 	@$(GIT) config remote.pushdefault origin
 	@$(GIT) config push.default current
 ifneq ($(upstream),$(shell $(GIT) remote get-url upstream 2>/dev/null))
-	@-$(GIT) remote add upstream https://github.com/marlonrichert/.config.git 2>/dev/null
-	@$(GIT) remote set-url upstream https://github.com/marlonrichert/.config.git
+	@-$(GIT) remote add upstream $(upstream) 2>/dev/null
+	@$(GIT) remote set-url upstream $(upstream)
 endif
-	$(GIT) fetch --quiet upstream
-	@$(GIT) branch --quiet --set-upstream-to upstream/master
-	$(GIT) pull --quiet --autostash upstream
+	$(GIT) fetch $(GITFLAGS) upstream
+	@$(GIT) branch $(GITFLAGS) --set-upstream-to upstream/master
+	$(GIT) pull $(GITFLAGS) --autostash upstream
 
-find = ) (
-replace = ), (
-osabackups = $(subst $(find),$(replace),$(foreach f,$(wildcard $(backups)),(POSIX file "$(f)")))
 clean:
-	$(BREW) autoremove
-	$(BREW) cleanup
-ifneq (,$(osabackups))
-	-osascript -e 'tell application "Finder" to delete every item of {$(osabackups)}' >/dev/null
+ifneq (,$(backups))
+	-$(OSASCRIPT) -e 'tell application "Finder" to delete every item of {$(backups)}' >/dev/null
 endif
 
-install: all $(taps) $(formulas) casks repos $(backups) $(dotfiles) $(zsh-hist) $(zsh-cdr)
+installdirs:
+	mkdir -pm 0700 $(TERMINFO) $(zsh-datadir) $(dir $(ZNAP)) $(dir $(dotfiles))
 
 repos: zsh/znap-repos.zsh $(ZSH) $(gitdir) $(ZNAP)
 	$(ZSH) $<
 
-$(taps): $(BREW)
-	-$(if $(wildcard $@),,$(brew-no-update) $(BREW) tap --quiet homebrew/$(notdir $@))
+$(taps):
+	-$(if $(wildcard $@),,$(BREW) tap $(BREWFLAGS) $(subst -,/,$(notdir $@)) )
 
-$(formulas): $(BREW)
-	-$(if $(wildcard $@),,$(BREW_INSTALL) --formula $(notdir $@))
+$(formulas):
+	-$(if $(wildcard $@),,$(BREW) install $(BREWFLAGS) --formula $(notdir $@))
 
 casks: $(BREW)
 	@-$(BREW_INSTALL) --cask $(casks) 2>/dev/null
 
-$(BREW): $(BASH) $(CURL)
+$(BREW):
 	$(BASH) -c "$$($(CURL) -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 $(GIT): $(BREW)
@@ -105,41 +106,29 @@ ifneq (UserShell: /bin/zsh,$(shell dscl . -read $(HOME)/ UserShell))
 	chsh -s /bin/zsh
 endif
 
-$(ZNAP): $(GIT) $(gitdir)
-ifeq (,$(wildcard $(ZNAP)))
-	$(MKDIR) $(gitdir)
-	$(GIT) -C $(gitdir) clone --quiet --depth=1 git@github.com:marlonrichert/zsh-snap.git
-endif
+$(ZNAP):
+	@mkdir -pm 0700 $(dir $@)
+	$(GIT) -C $(dir $@) clone $(GITFLAGS) --depth=1 git@github.com:marlonrichert/zsh-snap.git
 
-$(backups):
-	-$(MV) $(patsubst %~,%,$@) $@
-
-$(gitconfig): git/.gitconfig
-	$(LN) $(makedir)$< $@
-
-$(zshconfig): zsh/.zshenv
-	$(LN) $(makedir)$< $@
-
-$(sshconfig): ssh/config
-	$(MKDIR) $(dir $@)
-	$(LN) $(makedir)$< $@
-
-$(codeconfig): visual-studio-code/settings.json
-	$(MKDIR) $(dir $@)
-	$(LN) $(makedir)$< $@
-
-$(gradleconfig): gradle/gradle.properties
-	$(MKDIR) $(dir $@)
-	$(LN) $(makedir)$< $@
-
+install: clean all installdirs $(BREW) $(taps) $(formulas) $(ZNAP)
+	$(PRE_INSTALL) # Pre-install:
+	-$(BREW) install $(BREWFLAGS) --cask $(casks) 2>/dev/null
+	@source $(ZNAP)/znap.zsh; znap clone
+	$(NORMAL_INSTALL) # Install:
+	$(foreach f,$(wildcard $(dotfiles)),mv $(f) $(f)~;)
+	ln -s $(makedir)git/.gitconfig $(gitconfig)
+	ln -s $(makedir)zsh/.zshenv $(zshenv)
+	ln -s $(makedir)ssh/config $(sshconfig)
+	ln -s $(makedir)vscode/settings.json $(vscodesettings)
+	ln -s $(makedir)vscode/keybindings.json $(vscodekeybindings)
+	ln -s $(makedir)gradle/gradle.properties $(gradleproperties)
+ifeq (,$(wildcard $(zsh-hist)))
 ifneq (,$(wildcard $(zsh-hist-old)))
-$(zsh-hist): $(zsh-hist-old)
-	$(MKDIR) $(dir $@)
-	$(MV) $< $@
+	mv $(zsh-hist-old) $(zsh-hist)
 endif
-
+endif
+ifeq (,$(wildcard $(zsh-cdr)))
 ifneq (,$(wildcard $(zsh-cdr-old)))
-$(zsh-cdr): $(zsh-cdr-old)
-	$(MKDIR) $(dir $@)
-	$(MV) $< $@
+	mv $(zsh-cdr-old) $(zsh-cdr)
+endif
 endif

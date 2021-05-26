@@ -1,0 +1,68 @@
+// Place your key bindings in this file to override the defaultsauto[]
+[
+  {
+    "key": "cmd+down",
+    "command": "-cursorBottom",
+    "when": "textInputFocus"
+  },
+  {
+    "key": "cmd+up",
+    "command": "-cursorTop",
+    "when": "textInputFocus"
+  },
+  {
+    "key": "ctrl+`",
+    "command": "-workbench.action.terminal.toggleTerminal",
+    "when": "terminal.active"
+  },
+  {
+    "key": "ctrl+`",
+    "command": "workbench.action.terminal.openNativeConsole",
+    "when": "!terminalFocus"
+  },
+  {
+    "key": "end",
+    "command": "-cursorEnd",
+    "when": "textInputFocus"
+  },
+  {
+    "key": "end",
+    "command": "cursorBottom",
+    "when": "textInputFocus"
+  },
+  {
+    "key": "home",
+    "command": "-cursorHome",
+    "when": "textInputFocus"
+  },
+  {
+    "key": "home",
+    "command": "cursorTop",
+    "when": "textInputFocus"
+  },
+  {
+    "key": "shift+cmd+c",
+    "command": "-workbench.action.terminal.openNativeConsole",
+    "when": "!terminalFocus"
+  },
+  {
+    "key": "shift+cmd+down",
+    "command": "-cursorBottomSelect",
+    "when": "textInputFocus"
+  },
+  {
+    "key": "shift+cmd+up",
+    "command": "-cursorTopSelect",
+    "when": "textInputFocus"
+  },
+  {
+    "key": "shift+end",
+    "command": "cursorBottomSelect",
+    "when": "textInputFocus"
+  },
+  {
+    "key": "shift+home",
+    "command": "cursorTopSelect",
+    "when": "textInputFocus"
+  }
+]
