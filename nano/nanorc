@@ -1,1 +1,8 @@
-include /usr/local/share/nano/*.nanorc
+include /usr/local/share/nano/**.nanorc
+bind M-b  prevword all
+bind M-f  nextword all
+bind ^W   chopwordleft  all
+bind M-d  chopwordright all
+bind ^_   undo all
+bind M-<  firstline all
+bind M->  lastline all
