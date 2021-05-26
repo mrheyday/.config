@@ -8,16 +8,10 @@ datarootdir = $(prefix)/share
 datadir = $(datarootdir)
 
 makedir = $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
-OSASCRIPT = /usr/bin/osascript
-
-BREW = $(bindir)/brew
-BREWFLAGS = --quiet
-HOMEBREW_PREFIX = $(exec_prefix)
-HOMEBREW_REPOSITORY = $(HOMEBREW_PREFIX)/Homebrew
-HOMEBREW_CELLAR = $(HOMEBREW_PREFIX)/Cellar
 
 BASH = /bin/bash
 CURL = /usr/bin/curl
+OSASCRIPT = /usr/bin/osascript
 
 GIT = /usr/bin/git
 GITFLAGS = --quiet
@@ -28,23 +22,37 @@ ZSH = /bin/zsh
 zshenv = ~/.zshenv
 ZNAP = ~/Git/zsh-snap
 
+BREW = $(bindir)/brew
+BREWFLAGS = --quiet
+HOMEBREW_PREFIX = $(exec_prefix)
+HOMEBREW_CELLAR = $(HOMEBREW_PREFIX)/Cellar
+HOMEBREW_REPOSITORY = $(HOMEBREW_PREFIX)/Homebrew
+
 taps := cask cask-fonts cask-versions core services
 taps := $(taps:%=$(HOMEBREW_REPOSITORY)/Library/Taps/homebrew/homebrew-%)
 
 formulas := asciinema bash bat chkrootkit coreutils elasticsearch ffmpeg gawk gnu-sed gource \
-		gradle graphviz libatomic_ops mariadb@10.3 nano ncurses tomcat@9 wget xmlstarlet yarn
+	gradle graphviz libatomic_ops mariadb@10.3 nano ncurses pyenv tomcat@9 wget xmlstarlet yarn
 formulas := $(formulas:%=$(HOMEBREW_CELLAR)/%)
 
 casks = adoptopenjdk8 karabiner-elements rectangle visual-studio-code \
-		font-material-icons font-montserrat font-open-sans font-roboto font-ubuntu
+	font-material-icons font-montserrat font-open-sans font-roboto font-ubuntu
 
+PYENV_ROOT = ~/.pyenv
+PYENV = PYENV_ROOT=$(PYENV_ROOT) $(bindir)/pyenv
+PYENV_VERSION = 3.7.10
+PIP = $(PYENV_ROOT)/shims/pip
+PIPFLAGS = --quiet
+PIPX = ~/.local/bin/pipx
+PIPENV = ~/.local/bin/pipenv
+
+gradleproperties = ~/.gradle/gradle.properties
 sshconfig = ~/.ssh/config
 vscodesettings = ~/Library/ApplicationSupport/Code/User/settings.json
 vscodekeybindings = ~/Library/ApplicationSupport/Code/User/keybindings.json
-gradleproperties = ~/.gradle/gradle.properties
 
-dotfiles = $(gitconfig) $(zshenv) $(sshconfig) \
-	$(vscodesettings) $(vscodekeybindings) $(gradleproperties)
+dotfiles = $(gitconfig) $(gradleproperties) $(sshconfig) $(zshenv) \
+	$(vscodesettings) $(vscodekeybindings)
 
 backups := $(wildcard $(dotfiles:%=%~))
 find = ) (
@@ -60,10 +68,14 @@ zsh-cdr-old = ~/.chpwd-recent-dirs
 
 .NOTPARALLEL:
 .ONESHELL:
-.PHONY: all install installdirs clean
+.PHONY: all clean installdirs install
 .SUFFIXES:
 
 all:
+	# all
+ifeq (,$(wildcard /Library/Developer/CommandLineTools))
+	xcode-select --install 2>/dev/null
+endif
 	@$(GIT) config remote.pushdefault origin
 	@$(GIT) config push.default current
 ifneq ($(upstream),$(shell $(GIT) remote get-url upstream 2>/dev/null))
@@ -75,46 +87,24 @@ endif
 	$(GIT) pull $(GITFLAGS) --autostash upstream
 
 clean:
+	# clean
 ifneq (,$(backups))
 	-$(OSASCRIPT) -e 'tell application "Finder" to delete every item of {$(backups)}' >/dev/null
 endif
 
 installdirs:
-	mkdir -pm 0700 $(TERMINFO) $(zsh-datadir) $(dir $(ZNAP)) $(dir $(dotfiles))
+	# install dirs
+	mkdir -pm 0700 $(zsh-datadir) $(dir $(dotfiles))
 
-repos: zsh/znap-repos.zsh $(ZSH) $(gitdir) $(ZNAP)
-	$(ZSH) $<
-
-$(taps):
-	-$(if $(wildcard $@),,$(BREW) tap $(BREWFLAGS) $(subst -,/,$(notdir $@)) )
-
-$(formulas):
-	-$(if $(wildcard $@),,$(BREW) install $(BREWFLAGS) --formula $(notdir $@))
-
-casks: $(BREW)
-	@-$(BREW_INSTALL) --cask $(casks) 2>/dev/null
-
-$(BREW):
-	$(BASH) -c "$$($(CURL) -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-$(GIT): $(BREW)
-	$(BREW_INSTALL) git
-
-$(ZSH): $(BREW)
-	-$(BREW_INSTALL) --fetch-HEAD --HEAD zsh
-ifneq (UserShell: /bin/zsh,$(shell dscl . -read $(HOME)/ UserShell))
-	chsh -s /bin/zsh
-endif
-
-$(ZNAP):
-	@mkdir -pm 0700 $(dir $@)
-	$(GIT) -C $(dir $@) clone $(GITFLAGS) --depth=1 git@github.com:marlonrichert/zsh-snap.git
-
-install: clean all installdirs $(BREW) $(taps) $(formulas) $(ZNAP)
-	$(PRE_INSTALL) # Pre-install:
+install: all clean installdirs $(BREW) $(taps) $(formulas) $(ZNAP) $(PIPX) $(PIPENV)
+	$(PRE_INSTALL) # pre-install
 	-$(BREW) install $(BREWFLAGS) --cask $(casks) 2>/dev/null
+ifneq ($(PYENV_VERSION),$(shell $(PYENV) global))
+	$(PYENV) install -s $(PYENV_VERSION)
+	$(PYENV) global $(PYENV_VERSION)
+endif
 	@source $(ZNAP)/znap.zsh; znap clone
-	$(NORMAL_INSTALL) # Install:
+	$(NORMAL_INSTALL) # install
 	$(foreach f,$(wildcard $(dotfiles)),mv $(f) $(f)~;)
 	ln -s $(makedir)git/.gitconfig $(gitconfig)
 	ln -s $(makedir)zsh/.zshenv $(zshenv)
@@ -132,3 +122,32 @@ ifneq (,$(wildcard $(zsh-cdr-old)))
 	mv $(zsh-cdr-old) $(zsh-cdr)
 endif
 endif
+	$(POST_INSTALL) # post-install
+ifneq (UserShell: /bin/zsh,$(shell dscl . -read ~/ UserShell))
+	chsh -s /bin/zsh
+endif
+
+$(BREW):
+	# brew
+	$(BASH) -c "$$($(CURL) -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+$(taps):
+	# tap
+	-$(if $(wildcard $@),,$(BREW) tap $(BREWFLAGS) $(subst -,/,$(notdir $@)) )
+
+$(formulas):
+	# formula
+	-$(if $(wildcard $@),,$(BREW) install $(BREWFLAGS) --formula $(notdir $@))
+
+$(ZNAP):
+	# znap
+	@mkdir -pm 0700 $(dir $@)
+	$(GIT) -C $(dir $@) clone $(GITFLAGS) --depth=1 git@github.com:marlonrichert/zsh-snap.git
+
+$(PIPX):
+	# pipx
+	$(PIP) install $(PIPFLAGS) --user pipx
+
+$(PIPENV):
+	# pipenv
+	$(PIPX) install pipenv
