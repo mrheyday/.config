@@ -1,6 +1,6 @@
 #!/bin/zsh
+# Executed for each interactive shell, after .zprofile.
 
-XDG_DATA_HOME=~/.local/share
 
 ##
 # History settings
@@ -61,17 +61,6 @@ fi
 # External commands
 #
 
-typeset -U PATH path FPATH fpath MANPATH manpath # Remove duplicates.
-LANG='en_US.UTF-8'
-
-EDITOR='code' VISUAL='code'
-READNULLCMD='bat'
-PAGER='less' MANPAGER='col -bpx | bat --language man'
-export LESS='--ignore-case --quit-if-one-screen --raw-control-char'
-export GREP_OPTIONS='--color=auto'
-
-export HOMEBREW_NO_AUTO_UPDATE=1
-znap eval brew-shellenv 'brew shellenv'
 [[ -o shinstdin ]] &&
 {
   xcode-select --install 2> /dev/null ||
@@ -81,14 +70,12 @@ znap eval brew-shellenv 'brew shellenv'
 
 znap eval pyenv-init ${${:-=pyenv}:A}' init -'
 
-JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
-path=(
-  $HOMEBREW_CELLAR/tomcat@8/*/libexec/bin
-  $HOMEBREW_PREFIX/opt/ncurses/bin
-  ~/.local/bin  # pipx, pipenv
-  $path[@]
-  .
-)
+# `hash` adds invidual commands, without modifying $path.
+# ~[dynamically-named dirs] are provided by Znap.
+hash catalina=$CATALINA_HOME/bin/catalina.sh
+hash clitest=~[aureliojargas/clitest]/clitest
+hash gh-md-toc=~[github-markdown-toc]/gh-md-toc
+hash ls==gls  # GNU coreutils
 
 # Completions
 znap eval pip-completion 'pip completion --zsh'
