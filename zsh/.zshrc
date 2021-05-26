@@ -4,7 +4,7 @@
 
 ##
 # History settings
-# Set these first, so history doesn't get lost when something breaks.
+# Set these before calling any commands, so history doesn't get lost when something breaks.
 #
 HISTFILE=$XDG_DATA_HOME/zsh/history
 SAVEHIST=$(( 100 * 1000 ))
@@ -13,20 +13,10 @@ setopt histfcntllock histignorealldups histsavenodups sharehistory
 
 
 ##
-# Initialization
-#
-
 # Plugin manager
+#
 zstyle ':znap:*' default-server git@github.com: # Use SSH instead of HTTPS.
 source ~/Git/zsh-snap/znap.zsh
-
-# Set cd/pushd options.
-setopt autocd autopushd cdsilent chaselinks pushdignoredups pushdminus pushdsilent
-
-# Load dir stack from file (excl. non-existing dirs).
-zmodload -F zsh/parameter p:dirstack
-dirstack=( ${${(f@Q)^"$( < $XDG_DATA_HOME/zsh/chpwd-recent-dirs )"}[@]:#${TMPDIR:A}/*}(N-/) )
-cd -q $dirstack[1]  # Continue where we left off.
 
 
 ##
@@ -38,22 +28,35 @@ cd -q $dirstack[1]  # Continue where we left off.
 setopt autonamedirs
 hash -d TMPDIR=$TMPDIR:A
 
+znap source marlonrichert/zcolors
+znap eval zcolors "zcolors ${(q)LS_COLORS}" # Generate theme colors.
 znap prompt sindresorhus/pure # Show prompt.
 
 
 ##
-# Basic shell settings
+# Miscellaneous shell options
 #
 setopt NO_caseglob extendedglob globstarshort numericglobsort
 setopt NO_autoparamslash interactivecomments rcquotes
 
-# Apple attaches their function to the wrong hook.
-# This doesn't need to run before each prompt; just when we change dirs.
+
+##
+# Directory config
+#
+
+setopt autocd autopushd cdsilent chaselinks pushdignoredups pushdminus pushdsilent
+
+# Load dir stack from file, excl. current dir, temp dirs & non-existing dirs.
+zmodload -F zsh/parameter p:dirstack
+typeset -gaU dirstack=(
+    ${(u)^${(f@Q)"$( < $XDG_DATA_HOME/zsh/chpwd-recent-dirs )"}[@]:#($PWD|${TMPDIR:A}/*)}(N-/)
+)
+
+# Apple attaches their function to the wrong hook in /etc/zshrc_Apple_Terminal.
 if type -f update_terminal_cwd &>/dev/null; then
-  autoload -Uz add-zsh-hook
-  add-zsh-hook -d precmd update_terminal_cwd
-  add-zsh-hook chpwd update_terminal_cwd
-  update_terminal_cwd
+  add-zsh-hook -d precmd update_terminal_cwd  # Doesn't need to run before each prompt.
+  add-zsh-hook chpwd update_terminal_cwd      # Run it only when we change dirs...
+  update_terminal_cwd                         # ...and once on startup.
 fi
 
 
@@ -82,10 +85,8 @@ znap eval pip-completion 'pip completion --zsh'
 znap eval pipx-completion 'register-python-argcomplete pipx'
 znap eval pipenv-completion 'pipenv --completion'
 fpath+=(
-  ~[zsh-users/zsh-completions]/src  # Made possible by Znap
-  $HOMEBREW_PREFIX/share/zsh/site-functions
+    ~[zsh-users/zsh-completions]/src
 )
-rm -f $HOMEBREW_PREFIX/share/zsh/site-functions/{_git{,.zwc},git-completion.bash}
 
 
 ##
@@ -96,26 +97,18 @@ rm -f $HOMEBREW_PREFIX/share/zsh/site-functions/{_git{,.zwc},git-completion.bash
 znap source marlonrichert/zsh-autocomplete
 
 # Better line editing tools
-WORDCHARS='*?~\ '
+zstyle ':edit:*' word-chars '*?~\'
 znap source marlonrichert/zsh-edit
-bindkey -c '^S'  'git status --show-stash'
-bindkey -c '^G'  'git log'
-bindkey -c '^O'  'git log --oneline'
-bindkey -c "^[$key[Up]"   'git push'
-bindkey -c "^[$key[Down]" 'git pull --autostash'
 
 # History editing tools
+zstyle ':hist:*' expand-aliases yes
 znap source marlonrichert/zsh-hist
-
-# Auto-generated completion colors
-znap source marlonrichert/zcolors
-znap eval zcolors "zcolors ${(q)LS_COLORS}"
 
 # In-line suggestions
 ZSH_AUTOSUGGEST_ACCEPT_WIDGETS=()
-ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS=( forward-char forward-word end-of-line )
+ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS+=( forward-char forward-word end-of-line )
 ZSH_AUTOSUGGEST_STRATEGY=( history )
-ZSH_AUTOSUGGEST_HISTORY_IGNORE=$'*\n*'
+ZSH_AUTOSUGGEST_HISTORY_IGNORE=$'(*\n*|?(#c80,))'
 znap source zsh-users/zsh-autosuggestions
 
 # Command-line syntax highlighting
@@ -124,35 +117,34 @@ znap source zsh-users/zsh-syntax-highlighting
 
 
 ##
-# Additional keyboard settings
+# Key bindings
 #
 
 setopt NO_flowcontrol # Enable ^Q and ^S.
 
-# Make Control-U do the same as in Bash/Readline.
-# Zsh's default kills the whole line.
-bindkey '^U' backward-kill-line
-
-# Add same Redo keybinding as in Prezto/Emacs-undo-tree.
-# Zsh does not have a default keybinding for this.
-bindkey '^[_' redo
-
 # Replace some default widgets with better ones.
-zle -A copy-prev-{shell-,}word
-zle -A push-line{-or-edit,}
-zle -A {vi-,}quoted-insert
-
-# `zsh-edit` adds `bindkey -c`, which lets you bind arbitrary commands.
-# $key table is defined by /etc/zshrc & `zsh-autocomplete`.
+bindkey '^[^_'  copy-prev-shell-word
+bindkey '^[q'   push-line-or-edit
+bindkey '^V'    vi-quoted-insert
 
 # Alt-H: Open `man` page of current command.
 unalias run-help
-autoload -Uz  run-help{,-{git,ip,openssl,p4,sudo,svk,svn}}
+autoload -Uz run-help{,-{git,ip,openssl,p4,sudo,svk,svn}}
 
 # Alt-Shift-/: Show definition of current command.
+unalias which-command
 autoload -Uz which-command
 zle -N which-command
-unalias which-command 2>/dev/null
+
+# -c flag added by zsh-edit
+bindkey -c '^Xo' '@open .'
+bindkey -c '^Xc' '@code .'
+bindkey -c '^Xs' '+git status --show-stash'
+bindkey -c '^Xl' '@git log'
+
+# $key table populated by /etc/zshrc & zsh-autocomplete
+bindkey -c "$key[PageUp]"   'git push'
+bindkey -c "$key[PageDown]" 'git fetch; git pull --autostash'
 
 
 ##
@@ -163,17 +155,19 @@ unalias which-command 2>/dev/null
 alias -s {md,patch,txt}="$PAGER"
 alias -s {log,out}='open -a Console'
 
+alias \$= %=  # Enable pasting of command line examples.
+
 # Pattern matching support for `cp`, `ln` and `mv`
 # See http://zsh.sourceforge.net/Doc/Release/User-Contributions.html#index-zmv
 autoload -Uz zmv
-alias zcp='zmv -Cv' zln='zmv -Lv' zmv='zmv -Mv'
+alias zmv='\zmv -v' zcp='\zmv -Cv' zln='\zmv -Lv'
+# Tip: Use -n for no execution. (Print what would happen, but don’t do it.)
 
-# Paging & colors for 'ls'
+# Paging & colors for `ls`
 ls() {
-  gls --width=$COLUMNS -x "$@" | less # `gls` needs `--width` and `-x` when piped.
-  return $pipestatus[1]  # Exit status of `gls`
+  command ls -AFXx --color=always --group-directories-first --width=$COLUMNS "$@" | $PAGER
+  return $pipestatus[1]  # Exit status of `ls`
 }
-alias ls='ls --color=always --group-directories-first --sort=extension -AF'
 
 # Safer alternative to `rm`
 trash() {
@@ -189,7 +183,7 @@ trash() {
   (( $#missing > 0 )) &&
     print -u2 "trash: no such file(s): $missing"
   if (( $#items > 0 )); then
-    print Moving $(eval ls -d ${(q)items[@]}) to Trash.
+    print Moving $(eval ls -d ${(q)items[@]%/}) to Trash.
     items=( '(POSIX file "'${^items[@]:A}'")' )
     osascript -e 'tell application "Finder" to delete every item of {'${(j:, :)items}'}' >/dev/null
     ret=$?
