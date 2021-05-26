@@ -34,11 +34,9 @@
         "*.mdd": "makefile",
         "Make*": "makefile"
     },
-    "editor.tabSize": 2,
     "explorer.confirmDragAndDrop": false,
     "editor.minimap.enabled": false,
     "editor.fontFamily": "'SF Mono'",
-    "editor.columnSelection": false,
     "workbench.fontAliasing": "antialiased",
     "window.autoDetectColorScheme": true,
     "editor.semanticHighlighting.enabled": true,
@@ -47,5 +45,15 @@
     "search.useReplacePreview": false,
     "editor.accessibilitySupport": "off",
     "terminal.explorerKind": "external",
-    "diffEditor.renderSideBySide": false
+    "diffEditor.renderSideBySide": false,
+    "workbench.editorAssociations": [
+        {
+            "viewType": "jupyter.notebook.ipynb",
+            "filenamePattern": "*.ipynb"
+        }
+    ],
+    "editor.tabCompletion": "on",
+    "editor.insertSpaces": false,
+    "editor.acceptSuggestionOnEnter": "off",
+    "editor.tabSize": 8
 }
