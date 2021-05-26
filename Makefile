@@ -82,9 +82,13 @@ ifneq ($(upstream),$(shell $(GIT) remote get-url upstream 2>/dev/null))
 	@-$(GIT) remote add upstream $(upstream) 2>/dev/null
 	@$(GIT) remote set-url upstream $(upstream)
 endif
+ifeq (,$(shell git branch -l main))
+	@-git branch -m master main 2>/dev/null
+endif
 	$(GIT) fetch $(GITFLAGS) upstream
-	@$(GIT) branch $(GITFLAGS) --set-upstream-to upstream/master
+	@$(GIT) branch $(GITFLAGS) -u upstream/main main
 	$(GIT) pull $(GITFLAGS) --autostash upstream
+	@$(GIT) remote set-head upstream -a
 
 clean:
 	# clean
