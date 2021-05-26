@@ -1,30 +1,24 @@
 {
-    "editor.suggestSelection": "first",
-    "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
-    "files.exclude": {
-        "**/.classpath": true,
-        "**/.factorypath": true,
-        "**/.project": true,
-        "**/.settings": true,
-        "**/*.zwc": true
-    },
-    "java.semanticHighlighting.enabled": true,
-    "editor.rulers": [79,99],
-    "java.autobuild.enabled": false,
-    "workbench.editor.tabCloseButton": "left",
-    "files.trimTrailingWhitespace": true,
-    "git.autofetch": true,
-    "files.defaultLanguage": "shellscript",
-    "shebang.associations": [
-        {
-            "pattern": "^#!/bin/*$",
-            "language": "shellscript"
-        }
-    ],
-    "editor.dragAndDrop": false,
     "csscomb.preset": "../hiboxcentre/.csscomb.json",
-    "workbench.editor.showTabs": false,
+    "diffEditor.renderSideBySide": false,
+    "editor.acceptSuggestionOnEnter": "off",
+    "editor.accessibilitySupport": "off",
+    "editor.dragAndDrop": false,
+    "editor.emptySelectionClipboard": false,
+    "editor.fontFamily": "'SF Mono'",
+    "editor.insertSpaces": false,
+    "editor.minimap.enabled": false,
+    "editor.renderControlCharacters": true,
+    "editor.rulers": [
+        79,
+        99
+    ],
+    "editor.semanticHighlighting.enabled": true,
+    "editor.suggestSelection": "first",
+    "editor.tabCompletion": "on",
+    "editor.tabSize": 8,
     "editor.wordWrapColumn": 99,
+    "explorer.confirmDragAndDrop": false,
     "files.associations": {
         "_*": "shellscript",
         ".*": "shellscript",
@@ -34,26 +28,35 @@
         "*.mdd": "makefile",
         "Make*": "makefile"
     },
-    "explorer.confirmDragAndDrop": false,
-    "editor.minimap.enabled": false,
-    "editor.fontFamily": "'SF Mono'",
-    "workbench.fontAliasing": "antialiased",
-    "window.autoDetectColorScheme": true,
-    "editor.semanticHighlighting.enabled": true,
-    "editor.renderControlCharacters": true,
-    "editor.emptySelectionClipboard": false,
+    "files.defaultLanguage": "shellscript",
+    "files.exclude": {
+        "**/.classpath": true,
+        "**/.factorypath": true,
+        "**/.project": true,
+        "**/.settings": true,
+        "**/*.zwc": true
+    },
+    "files.trimTrailingWhitespace": true,
+    "git.autofetch": true,
+    "java.autobuild.enabled": false,
+    "java.semanticHighlighting.enabled": true,
     "search.useReplacePreview": false,
-    "editor.accessibilitySupport": "off",
+    "shebang.associations": [
+        {
+            "pattern": "^#!/bin/*$",
+            "language": "shellscript"
+        }
+    ],
     "terminal.explorerKind": "external",
-    "diffEditor.renderSideBySide": false,
+    "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+    "window.autoDetectColorScheme": true,
+    "workbench.editor.showTabs": false,
+    "workbench.editor.tabCloseButton": "left",
     "workbench.editorAssociations": [
         {
             "viewType": "jupyter.notebook.ipynb",
             "filenamePattern": "*.ipynb"
         }
     ],
-    "editor.tabCompletion": "on",
-    "editor.insertSpaces": false,
-    "editor.acceptSuggestionOnEnter": "off",
-    "editor.tabSize": 8
+    "workbench.fontAliasing": "antialiased"
 }
