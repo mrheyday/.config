@@ -15,7 +15,6 @@
     ],
     "editor.semanticHighlighting.enabled": true,
     "editor.suggestSelection": "first",
-    "editor.tabCompletion": "on",
     "editor.tabSize": 8,
     "editor.wordWrapColumn": 99,
     "explorer.confirmDragAndDrop": false,
