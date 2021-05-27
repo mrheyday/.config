@@ -13,16 +13,17 @@ export HOMEBREW_REPOSITORY=$HOMEBREW_PREFIX/Homebrew
 export PYENV_ROOT=~/.pyenv
 
 # We need to set $path here and not in .zshenv, else /etc/zprofile will override it.
-typeset -U PATH path FPATH fpath MANPATH manpath # Remove duplicates.
+export -U PATH path FPATH fpath MANPATH manpath # Remove duplicates.
 path=(
-  $HOMEBREW_PREFIX/opt/{mariadb@10.3,ncurses}/bin
-  $HOMEBREW_PREFIX/{bin,sbin}
-  ~/.local/bin  # pipx, pipenv
+  ~/.local/bin          # pipx, pipenv
   $PYENV_ROOT/{bin,shims}
+  $HOMEBREW_PREFIX/opt/{mariadb@10.3,ncurses,tomcat@9}/bin
+  $HOMEBREW_PREFIX/{bin,sbin}
+  /opt/local/{bin,sbin} # MacPorts
   $path[@]
   .
 )
-manpath=(  $HOMEBREW_PREFIX/share/man  $manpath[@]  )
+manpath=( $HOMEBREW_PREFIX/share/man $manpath[@] )
 
 export JAVA_HOME=$( /usr/libexec/java_home -v 1.8 )
 export CATALINA_HOME=$HOMEBREW_PREFIX/opt/tomcat@9/libexec
