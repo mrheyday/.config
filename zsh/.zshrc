@@ -90,11 +90,10 @@ fpath+=(
 znap source marlonrichert/zsh-autocomplete
 
 # Better line editing tools
-zstyle ':edit:*' word-chars '*?~\'
 znap source marlonrichert/zsh-edit
+zstyle ':edit:*' word-chars '*?~\'
 
 # History editing tools
-zstyle ':hist:*' expand-aliases yes
 znap source marlonrichert/zsh-hist
 
 # In-line suggestions
@@ -107,13 +106,13 @@ znap source zsh-users/zsh-autosuggestions
 # Command-line syntax highlighting
 ZSH_HIGHLIGHT_HIGHLIGHTERS=( main brackets )
 znap source zsh-users/zsh-syntax-highlighting
-
+# znap source zdharma/fast-syntax-highlighting
 
 ##
 # Key bindings
 #
 
-setopt NO_flowcontrol # Enable ^Q and ^S.
+setopt NO_flowcontrol  # Enable ^Q and ^S.
 
 # Replace some default widgets with better ones.
 bindkey '^[^_'  copy-prev-shell-word
@@ -130,14 +129,17 @@ autoload -Uz which-command
 zle -N which-command
 
 # -c flag added by zsh-edit
+bindkey -c '^Xp' '@cd .'
 bindkey -c '^Xo' '@open .'
 bindkey -c '^Xc' '@code .'
 bindkey -c '^Xs' '+git status --show-stash'
 bindkey -c '^Xl' '@git log'
 
 # $key table populated by /etc/zshrc & zsh-autocomplete
-bindkey -c "$key[PageUp]"   'git push'
-bindkey -c "$key[PageDown]" 'git fetch; git pull --autostash'
+bindkey -c "^[$key[Up]"   'git push'
+bindkey -c "^[$key[Down]" 'git fetch && git pull --autostash'
+bindkey "$key[Home]" beginning-of-buffer
+bindkey "$key[End]"  end-of-buffer
 
 
 ##

@@ -1,7 +1,8 @@
 automatic_backups/
 configstore/
 dotfilestore/
+install-id
+.tmp
 *.csv
 *.db
 *.zwc
-install-id
