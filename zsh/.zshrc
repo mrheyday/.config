@@ -64,26 +64,19 @@ fi
 # External commands
 #
 
-[[ -o shinstdin ]] &&
-{
-  xcode-select --install 2> /dev/null ||
-          brew update --quiet &&
-          brew upgrade --fetch-HEAD --quiet
-} &|
+# Link commands into ~/.local/bin
+ln -fns ~[aureliojargas/clitest]/clitest ~/.local/bin/clitest
+ln -fns ~[github-markdown-toc]/gh-md-toc ~/.local/bin/gh-md-toc
+# ~[dynamically-named dirs] provided by Znap
 
+# Include full path, so when it changes, Znap invalidates cache.
 znap eval pyenv-init ${${:-=pyenv}:A}' init -'
 
-# `hash` adds invidual commands, without modifying $path.
-# ~[dynamically-named dirs] are provided by Znap.
-hash catalina=$CATALINA_HOME/bin/catalina.sh
-hash clitest=~[aureliojargas/clitest]/clitest
-hash gh-md-toc=~[github-markdown-toc]/gh-md-toc
-hash ls==gls  # GNU coreutils
-
 # Completions
-znap eval pip-completion 'pip completion --zsh'
-znap eval pipx-completion 'register-python-argcomplete pipx'
-znap eval pipenv-completion 'pipenv --completion'
+# Include shell-specific Python version as comment, so when it changes, Znap invalidates cache.
+znap eval pip-completion "pip completion --zsh  # $PYENV_VERSION"
+znap eval pipx-completion "register-python-argcomplete pipx  # $PYENV_VERSION"
+znap eval pipenv-completion "pipenv --completion  # $PYENV_VERSION"
 fpath+=(
     ~[zsh-users/zsh-completions]/src
 )
@@ -154,6 +147,7 @@ bindkey -c "$key[PageDown]" 'git fetch; git pull --autostash'
 # File type associations
 alias -s {md,patch,txt}="$PAGER"
 alias -s {log,out}='open -a Console'
+alias -s gz='gzip -l'
 
 alias \$= %=  # Enable pasting of command line examples.
 
@@ -165,9 +159,10 @@ alias zmv='\zmv -v' zcp='\zmv -Cv' zln='\zmv -Lv'
 
 # Paging & colors for `ls`
 ls() {
-  command ls -AFXx --color=always --group-directories-first --width=$COLUMNS "$@" | $PAGER
+  gls --width=$COLUMNS "$@" | $PAGER
   return $pipestatus[1]  # Exit status of `ls`
 }
+alias ls='\ls --color=always --group-directories-first -AFXx'
 
 # Safer alternative to `rm`
 trash() {

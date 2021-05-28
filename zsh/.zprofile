@@ -3,27 +3,27 @@
 # In macOS's Terminal.app, the first shell in each tab/window is a login shell.
 # Everything here should be exported, so it's available in new shells started from the login shell.
 
+# We need to set $path here and not in .zshenv, else /etc/zprofile will override it.
+export -U PATH path FPATH fpath MANPATH manpath  # Remove duplicates.
+export -TU INFOPATH infopath
+
 export HOMEBREW_BAT=1
 export HOMEBREW_COLOR=1
 export HOMEBREW_NO_AUTO_UPDATE=1
-export HOMEBREW_PREFIX=/usr/local
-export HOMEBREW_CELLAR=$HOMEBREW_PREFIX/Cellar
-export HOMEBREW_REPOSITORY=$HOMEBREW_PREFIX/Homebrew
+eval "$( brew shellenv )"
 
 export PYENV_ROOT=~/.pyenv
+export PYENV_VERSION=3.7.10
+export PIPX_BIN_DIR=~/.local/bin
 
-# We need to set $path here and not in .zshenv, else /etc/zprofile will override it.
-export -U PATH path FPATH fpath MANPATH manpath # Remove duplicates.
 path=(
-  ~/.local/bin          # pipx, pipenv
+  $PIPX_BIN_DIR
   $PYENV_ROOT/{bin,shims}
   $HOMEBREW_PREFIX/opt/{mariadb@10.3,ncurses,tomcat@9}/bin
-  $HOMEBREW_PREFIX/{bin,sbin}
   /opt/local/{bin,sbin} # MacPorts
   $path[@]
   .
 )
-manpath=( $HOMEBREW_PREFIX/share/man $manpath[@] )
 
 export JAVA_HOME=$( /usr/libexec/java_home -v 1.8 )
 export CATALINA_HOME=$HOMEBREW_PREFIX/opt/tomcat@9/libexec
