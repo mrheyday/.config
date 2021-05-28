@@ -35,8 +35,7 @@ export EDITOR='nano'
 export READNULLCMD='bat'
 export PAGER='less'
 export MANPAGER='col -bpx | bat -l man'
-export LESS='-FiMr -j.5 --incsearch --use-color -DSkY'
+export LESS='-FiMr -j.5 --incsearch'
 export LESSHISTFILE=$XDG_DATA_HOME/less/lesshst
-export GREP_OPTIONS='--color=auto'
 
 export SHELL_SESSIONS_DISABLE=1  # Disable Apple's Save/Restore Shell State feature.
