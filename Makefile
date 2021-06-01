@@ -21,7 +21,7 @@ gitignore = ~/.gitignore_global
 
 ZSH = /bin/zsh
 zshenv = ~/.zshenv
-ZNAP = ~/Git/zsh-snap
+ZNAP = ~/Git/zsh-snap/znap.zsh
 
 BREW = $(bindir)/brew
 BREWFLAGS = --quiet
@@ -108,7 +108,6 @@ ifneq ($(PYENV_VERSION),$(shell $(PYENV) global))
 	$(PYENV) install -s $(PYENV_VERSION)
 	$(PYENV) global $(PYENV_VERSION)
 endif
-	@source $(ZNAP)/znap.zsh; znap clone
 	$(NORMAL_INSTALL) # install
 	$(foreach f,$(wildcard $(dotfiles)),mv $(f) $(f)~;)
 	ln -s $(makedir)git/gitconfig $(gitconfig)
@@ -147,8 +146,9 @@ $(formulas):
 
 $(ZNAP):
 	# znap
-	@mkdir -pm 0700 $(dir $@)
-	$(GIT) -C $(dir $@) clone $(GITFLAGS) --depth=1 git@github.com:marlonrichert/zsh-snap.git
+	@mkdir -pm 0700 $(dir $(dir $@))
+	$(GIT) -C $(dir $(dir $@)) clone $(GITFLAGS) --depth=1 \
+		git@github.com:marlonrichert/zsh-snap.git
 
 $(PIPX):
 	# pipx
