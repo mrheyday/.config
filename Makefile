@@ -17,6 +17,7 @@ GIT = /usr/bin/git
 GITFLAGS = --quiet
 upstream = https://github.com/marlonrichert/.config.git
 gitconfig = ~/.gitconfig
+gitignore = ~/.gitignore_global
 
 ZSH = /bin/zsh
 zshenv = ~/.zshenv
@@ -51,7 +52,7 @@ sshconfig = ~/.ssh/config
 vscodesettings = ~/Library/ApplicationSupport/Code/User/settings.json
 vscodekeybindings = ~/Library/ApplicationSupport/Code/User/keybindings.json
 
-dotfiles = $(gitconfig) $(gradleproperties) $(sshconfig) $(zshenv) \
+dotfiles = $(gitconfig) $(gitignore) $(gradleproperties) $(sshconfig) $(zshenv) \
 	$(vscodesettings) $(vscodekeybindings)
 
 backups := $(wildcard $(dotfiles:%=%~))
@@ -110,7 +111,8 @@ endif
 	@source $(ZNAP)/znap.zsh; znap clone
 	$(NORMAL_INSTALL) # install
 	$(foreach f,$(wildcard $(dotfiles)),mv $(f) $(f)~;)
-	ln -s $(makedir)git/.gitconfig $(gitconfig)
+	ln -s $(makedir)git/gitconfig $(gitconfig)
+	ln -s $(makedir)git/gitignore_global $(gitignore)
 	ln -s $(makedir)zsh/.zshenv $(zshenv)
 	ln -s $(makedir)ssh/config $(sshconfig)
 	ln -s $(makedir)vscode/settings.json $(vscodesettings)
