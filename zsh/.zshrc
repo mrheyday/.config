@@ -24,10 +24,6 @@ source ~/Git/zsh-snap/znap.zsh
 # The code below gets the left side of the primary prompt visible in less than 40ms.
 #
 
-# Add ~shorthands for common dirs.
-setopt autonamedirs
-hash -d TMPDIR=$TMPDIR:A
-
 znap source marlonrichert/zcolors
 znap eval zcolors "zcolors ${(q)LS_COLORS}" # Generate theme colors.
 znap prompt sindresorhus/pure # Show prompt.
