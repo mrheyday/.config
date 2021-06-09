@@ -1,4 +1,19 @@
 include /usr/local/share/nano/**.nanorc
+
+set guidestripe 80
+set stripecolor normal,lightblack
+
+set indicator
+set scrollercolor lightblack
+
+set linenumbers
+set numbercolor lightblack,normal
+
+set softwrap
+set atblanks
+
+set stateflags
+
 bind M-b  prevword all
 bind M-f  nextword all
 bind ^W   chopwordleft  all
