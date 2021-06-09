@@ -9,16 +9,18 @@ export -TU INFOPATH infopath
 
 export HOMEBREW_BAT=1
 export HOMEBREW_COLOR=1
-export HOMEBREW_NO_AUTO_UPDATE=1
 eval "$( brew shellenv )"
 
 export PYENV_ROOT=~/.pyenv
 export PYENV_VERSION=3.7.10
 export PIPX_BIN_DIR=~/.local/bin
 
+export ANDROID_SDK_ROOT=$HOMEBREW_PREFIX/share/android-commandlinetools
+
 path=(
   $PIPX_BIN_DIR
   $PYENV_ROOT/{bin,shims}
+  $ANDROID_SDK_ROOT/{emulator,platform-tools}
   $HOMEBREW_PREFIX/opt/{mariadb@10.3,ncurses,tomcat@9}/bin
   /opt/local/{bin,sbin} # MacPorts
   $path[@]
