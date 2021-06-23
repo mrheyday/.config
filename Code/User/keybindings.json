@@ -1,0 +1,23 @@
+// Place your key bindings in this file to override the defaultsauto[]
+[
+	{
+		"key": "ctrl+pageup",
+		"command": "cursorLineStart"
+	},
+	{
+		"key": "ctrl+shift+pageup",
+		"command": "cursorLineStartSelect"
+	},
+	{
+		"key": "ctrl+pagedown",
+		"command": "cursorLineEnd"
+	},
+	{
+		"key": "ctrl+shift+pagedown",
+		"command": "cursorLineEndSelect"
+	},
+	{
+		"key": "ctrl+shift+backspace",
+		"command": "deleteAllLeft"
+	}
+]

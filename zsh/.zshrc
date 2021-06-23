@@ -15,7 +15,6 @@ setopt histfcntllock histignorealldups histsavenodups sharehistory
 ##
 # Plugin manager
 #
-zstyle ':znap:*' default-server git@github.com: # Use SSH instead of HTTPS.
 source ~/Git/zsh-snap/znap.zsh
 
 
@@ -43,10 +42,17 @@ setopt NO_autoparamslash interactivecomments rcquotes
 setopt autocd autopushd cdsilent chaselinks pushdignoredups pushdminus pushdsilent
 
 # Load dir stack from file, excl. current dir, temp dirs & non-existing dirs.
-zmodload -F zsh/parameter p:dirstack
-typeset -gaU dirstack=(
-    ${(u)^${(f@Q)"$( < $XDG_DATA_HOME/zsh/chpwd-recent-dirs )"}[@]:#($PWD|${TMPDIR:A}/*)}(N-/)
-)
+() {
+  local cdr=$XDG_DATA_HOME/zsh/chpwd-recent-dirs
+
+  [[ -r $cdr ]] ||
+      return
+
+  zmodload -F zsh/parameter p:dirstack
+  typeset -gaU dirstack=(
+      ${(u)^${(f@Q)"$( < $cdr )"}[@]:#($PWD|${TMPDIR:A}/*)}(N-/)
+  )
+}
 
 # Apple attaches their function to the wrong hook in /etc/zshrc_Apple_Terminal.
 if type -f update_terminal_cwd &>/dev/null; then
@@ -55,15 +61,15 @@ if type -f update_terminal_cwd &>/dev/null; then
   update_terminal_cwd                         # ...and once on startup.
 fi
 
+# Necessary for VTE-based terminals (Gnome Terminal, Tilix) in Ubuntu to preserve $PWD when opening
+# new windows/tabs.
+[[ $VENDOR == ubuntu && -n $VTE_VERSION ]] &&
+    source /etc/profile.d/vte-*.*.sh
+
 
 ##
 # External commands
 #
-
-# Link commands into ~/.local/bin
-ln -fns ~[aureliojargas/clitest]/clitest ~/.local/bin/clitest
-ln -fns ~[github-markdown-toc]/gh-md-toc ~/.local/bin/gh-md-toc
-# ~[dynamically-named dirs] provided by Znap
 
 # Include full path, so when it changes, Znap invalidates cache.
 znap eval pyenv-init ${${:-=pyenv}:A}' init -'
@@ -85,7 +91,7 @@ fpath+=(
 # Real-time auto-completion
 znap source marlonrichert/zsh-autocomplete
 
-# Better line editing tools
+# Better command line editing tools
 znap source marlonrichert/zsh-edit
 zstyle ':edit:*' word-chars '*?~\'
 
@@ -116,11 +122,13 @@ bindkey '^[q'   push-line-or-edit
 bindkey '^V'    vi-quoted-insert
 
 # Alt-H: Open `man` page of current command.
-unalias run-help
+alias run-help > /dev/null &&
+    unalias run-help
 autoload -Uz run-help{,-{git,ip,openssl,p4,sudo,svk,svn}}
 
 # Alt-Shift-/: Show definition of current command.
-unalias which-command
+alias which-command > /dev/null &&
+    unalias which-command
 autoload -Uz which-command
 zle -N which-command
 
@@ -144,42 +152,55 @@ bindkey "$key[End]"  end-of-buffer
 
 # File type associations
 alias -s {md,patch,txt}="$PAGER"
-alias -s {log,out}='open -a Console'
 alias -s gz='gzip -l'
+if [[ $OSTYPE == darwin* ]]; then
+  alias -s {log,out}='open -a Console'
+else
+  alias -s {log,out}='tail -f'
+fi
 
 alias \$= %=  # Enable pasting of command line examples.
 
+alias grep='grep --color'
+
 # Pattern matching support for `cp`, `ln` and `mv`
 # See http://zsh.sourceforge.net/Doc/Release/User-Contributions.html#index-zmv
+# Tip: Use -n for no execution. (Print what would happen, but don’t do it.)
 autoload -Uz zmv
 alias zmv='\zmv -v' zcp='\zmv -Cv' zln='\zmv -Lv'
-# Tip: Use -n for no execution. (Print what would happen, but don’t do it.)
 
 # Paging & colors for `ls`
+[[ $OSTYPE != linux-gnu ]] &&
+    hash ls==gls  # GNU coreutils ls
 ls() {
-  gls --width=$COLUMNS "$@" | $PAGER
-  return $pipestatus[1]  # Exit status of `ls`
+  command ls --width=$COLUMNS "$@" | $PAGER
+  return $pipestatus[1]  # Return exit status of ls, not $PAGER
 }
-alias ls='\ls --color=always --group-directories-first -AFXx'
+alias ls='\ls --group-directories-first --color -AFXx'
 
-# Safer alternative to `rm`
-trash() {
-  local -aU items=() missing=()
-  local i; for i in $@; do
-    if [[ -e $i ]]; then
-      items+=( $i )
-    else
-      missing+=( $i )
+# Safer alternatives to `rm`
+if command -v gio > /dev/null; then
+  alias trash='gio trash'
+elif command -v osascript > /dev/null; then
+  trash() {
+    local -aU items=() missing=()
+    local i; for i in $@; do
+      if [[ -e $i ]]; then
+        items+=( $i )
+      else
+        missing+=( $i )
+      fi
+    done
+    local -i ret=66
+    (( $#missing > 0 )) &&
+      print -u2 "trash: no such file(s): $missing"
+    if (( $#items > 0 )); then
+      print Moving $(eval ls -d ${(q)items[@]%/}) to Trash.
+      items=( '(POSIX file "'${^items[@]:A}'")' )
+      osascript -e 'tell application "Finder" to delete every item of {'${(j:, :)items}'}' \
+          > /dev/null
+      ret=$?
     fi
-  done
-  local -i ret=66
-  (( $#missing > 0 )) &&
-    print -u2 "trash: no such file(s): $missing"
-  if (( $#items > 0 )); then
-    print Moving $(eval ls -d ${(q)items[@]%/}) to Trash.
-    items=( '(POSIX file "'${^items[@]:A}'")' )
-    osascript -e 'tell application "Finder" to delete every item of {'${(j:, :)items}'}' >/dev/null
-    ret=$?
-  fi
-  return ret
-}
+    return ret
+  }
+fi

@@ -1,8 +1,2 @@
-automatic_backups/
-configstore/
-dotfilestore/
-install-id
-.tmp
-*.csv
-*.db
-*.zwc
+# Ignore all the thingsm because there's just too much garbage in ~/.config on Ubuntu.
+*
