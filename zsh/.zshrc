@@ -37,8 +37,8 @@ TIMEFMT=$'zsh: %E %MkB\t%J'
 ##
 # Miscellaneous shell options
 #
-setopt NO_caseglob extendedglob globstarshort numericglobsort
-setopt NO_autoparamslash interactivecomments rcquotes
+setopt extendedglob globstarshort nullglob numericglobsort rcexpandparam
+setopt NO_autoparamslash interactivecomments
 
 
 ##
@@ -66,7 +66,7 @@ TMPDIR=$TMPDIR:A  # Needed to get ~TMPDIR to work with `chaselinks`
 if type -f update_terminal_cwd &>/dev/null; then
   add-zsh-hook -d precmd update_terminal_cwd  # Doesn't need to run before each prompt.
   add-zsh-hook chpwd update_terminal_cwd      # Run it only when we change dirs...
-  update_terminal_cwd                         # ...and once on startup.
+  update_terminal_cwd                         # ...and once for our initial dir.
 fi
 
 # Necessary for VTE-based terminals (Gnome Terminal, Tilix) in Ubuntu to preserve $PWD when opening
