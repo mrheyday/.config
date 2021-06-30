@@ -192,9 +192,7 @@ ls() {
 alias ls='\ls --group-directories-first --color -AFXx'
 
 # Safer alternatives to `rm`
-if command -v gio > /dev/null; then
-  alias trash='gio trash'
-elif command -v osascript > /dev/null; then
+if [[ $OSTYPE == darwin* ]]; then
   trash() {
     local -aU items=() missing=()
     local i; for i in $@; do
@@ -216,4 +214,7 @@ elif command -v osascript > /dev/null; then
     fi
     return ret
   }
+elif command -v gio > /dev/null; then
+  # gio is available for macOS, but gio trash DOES NOT WORK correctly there.
+  alias trash='gio trash'
 fi
