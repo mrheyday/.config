@@ -7,5 +7,4 @@ setopt autonamedirs
 hash -d TMPDIR=$TMPDIR:A  # Add ~TMPDIR
 
 XDG_CONFIG_HOME=~/.config
-XDG_DATA_HOME=~/.local/share
 ZDOTDIR=$XDG_CONFIG_HOME/zsh

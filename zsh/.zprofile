@@ -9,6 +9,9 @@
 export -U PATH path FPATH fpath MANPATH manpath  # Remove duplicates.
 export -TU INFOPATH infopath
 
+export XDG_CONFIG_HOME  # Value is set in .zshenv
+export XDG_DATA_HOME=~/.local/share
+
 export HOMEBREW_BAT=1
 export HOMEBREW_COLOR=1
 path=( /home/linuxbrew/.linuxbrew/bin(N) $path[@] )
@@ -45,7 +48,7 @@ export PAGER=less
 export MANPAGER='bat -l man'; [[ $OSTYPE == darwin* ]] && MANPAGER="col -bpx | $MANPAGER"
 export LESS='-FiMr -j.5 --incsearch'
 export LESSHISTFILE=$XDG_DATA_HOME/less/lesshst
-export QUOTING_STYLE=escape # Used by GNU ls.
+export QUOTING_STYLE=escape # Used by GNU ls
 
 [[ $OSTYPE == darwin* ]] &&
     export SHELL_SESSIONS_DISABLE=1  # Disable Apple's Save/Restore Shell State feature.
