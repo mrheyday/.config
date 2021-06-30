@@ -163,8 +163,11 @@ bindkey "$key[End]"  end-of-buffer
 # Aliases & functions
 #
 
+# Expand aliases before submitting command line.
+zstyle ':hist:*' expand-aliases yes
+
 # File type associations
-alias -s {md,patch,txt}="$PAGER"
+alias -s {gradle,json,md,patch,properties,txt,xml,yml}="$PAGER"
 alias -s gz='gzip -l'
 if [[ $OSTYPE == darwin* ]]; then
   alias -s {log,out}='open -a Console'
