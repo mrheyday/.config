@@ -47,6 +47,8 @@ setopt NO_autoparamslash interactivecomments rcquotes
 
 setopt autocd autopushd cdsilent chaselinks pushdignoredups pushdminus pushdsilent
 
+TMPDIR=$TMPDIR:A  # Needed to get ~TMPDIR to work with `chaselinks`
+
 # Load dir stack from file, excl. current dir, temp dirs & non-existing dirs.
 () {
   local cdr=$XDG_DATA_HOME/zsh/chpwd-recent-dirs
@@ -56,7 +58,7 @@ setopt autocd autopushd cdsilent chaselinks pushdignoredups pushdminus pushdsile
 
   zmodload -F zsh/parameter p:dirstack
   typeset -gaU dirstack=(
-      ${(u)^${(f@Q)"$( < $cdr )"}[@]:#($PWD|${TMPDIR:A}/*)}(N-/)
+      ${(u)^${(f@Q)"$( < $cdr )"}[@]:#($PWD|${TMPDIR}/*)}(N-/)
   )
 }
 
