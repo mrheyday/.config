@@ -19,13 +19,13 @@
     "editor.wordWrapColumn": 99,
     "explorer.confirmDragAndDrop": false,
     "files.associations": {
-        "_*": "shellscript",
-        ".*": "shellscript",
-        "*.ztst": "plaintext",
         "*.awk": "makefile",
         "*.in": "makefile",
         "*.mdd": "makefile",
-        "Make*": "makefile"
+        "Make*": "makefile",
+        "*.ztst": "plaintext",
+        "_*": "shellscript",
+        ".*": "shellscript"
     },
     "files.defaultLanguage": "shellscript",
     "files.exclude": {
@@ -49,6 +49,7 @@
     "terminal.explorerKind": "external",
     "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
     "window.autoDetectColorScheme": true,
+    "workbench.editor.limit.value": 16,
     "workbench.editor.showTabs": false,
     "workbench.editor.tabCloseButton": "left",
     "workbench.editorAssociations": {
