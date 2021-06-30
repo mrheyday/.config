@@ -19,13 +19,19 @@ source ~/Git/zsh-snap/znap.zsh
 
 
 ##
-# Instant prompt
-# The code below gets the left side of the primary prompt visible in less than 40ms.
+# Prompt and other theming
 #
+
+# `znap prompt` gets the left side of the primary prompt visible in less than 40ms.
+znap prompt sindresorhus/pure
 
 znap source marlonrichert/zcolors
 znap eval zcolors "zcolors ${(q)LS_COLORS}" # Generate theme colors.
-znap prompt sindresorhus/pure # Show prompt.
+
+setopt printexitvalue
+REPORTMEMORY=80 # min kB
+REPORTTIME=1    # min seconds
+TIMEFMT=$'zsh: %E %MkB\t%J'
 
 
 ##
@@ -68,17 +74,21 @@ fi
 
 
 ##
-# External commands
+# Initialization for external commands
 #
 
 # Include full path, so when it changes, Znap invalidates cache.
 znap eval pyenv-init ${${:-=pyenv}:A}' init -'
 
-# Completions
 # Include shell-specific Python version as comment, so when it changes, Znap invalidates cache.
 znap eval pip-completion "pip completion --zsh  # $PYENV_VERSION"
 znap eval pipx-completion "register-python-argcomplete pipx  # $PYENV_VERSION"
 znap eval pipenv-completion "pipenv --completion  # $PYENV_VERSION"
+
+
+##
+# Additional completions
+#
 fpath+=(
     ~[zsh-users/zsh-completions]/src
 )
@@ -110,13 +120,14 @@ ZSH_HIGHLIGHT_HIGHLIGHTERS=( main brackets )
 znap source zsh-users/zsh-syntax-highlighting
 # znap source zdharma/fast-syntax-highlighting
 
+
 ##
 # Key bindings
 #
 
 setopt NO_flowcontrol  # Enable ^Q and ^S.
 
-# Replace some default widgets with better ones.
+# Replace some default keybindings with better widgets.
 bindkey '^[^_'  copy-prev-shell-word
 bindkey '^[q'   push-line-or-edit
 bindkey '^V'    vi-quoted-insert
