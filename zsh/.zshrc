@@ -105,7 +105,7 @@ znap source marlonrichert/zsh-autocomplete
 
 # Better command line editing tools
 znap source marlonrichert/zsh-edit
-zstyle ':edit:*' word-chars '*?~\'
+zstyle ':edit:*' word-chars '*?\'
 
 # History editing tools
 znap source marlonrichert/zsh-hist
@@ -134,10 +134,12 @@ bindkey '^[^_'  copy-prev-shell-word
 bindkey '^[q'   push-line-or-edit
 bindkey '^V'    vi-quoted-insert
 
-# Alt-H: Open `man` page of current command.
+# Alt-H: Open `man` page (or other help) for current command.
 alias run-help > /dev/null &&
     unalias run-help
-autoload -Uz run-help{,-{git,ip,openssl,p4,sudo,svk,svn}}
+autoload +X -Uz run-help
+zmodload -F zsh/parameter p:functions_source
+autoload -Uz $functions_source[run-help]-*~*.zwc
 
 # Alt-Shift-/: Show definition of current command.
 alias which-command > /dev/null &&
@@ -153,8 +155,10 @@ bindkey -c '^Xs' '+git status --show-stash'
 bindkey -c '^Xl' '@git log'
 
 # $key table populated by /etc/zshrc & zsh-autocomplete
-bindkey -c "^[$key[Up]"   'git push'
-bindkey -c "^[$key[Down]" 'git fetch && git pull --autostash'
+bindkey -c "$key[PageUp]"   'git push'
+bindkey -c "$key[PageDown]" 'git fetch -t && git pull --autostash'
+
+# beginning/end-of-buffer provided by zsh-edit
 bindkey "$key[Home]" beginning-of-buffer
 bindkey "$key[End]"  end-of-buffer
 
