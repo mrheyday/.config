@@ -106,6 +106,10 @@ ifeq (,$(wildcard /Library/Developer/CommandLineTools))
 	xcode-select --install 2> /dev/null
 endif
 endif
+ifneq (,$(wildcard $(DCONF)))
+	# Write Terminal prefs to file.
+	$(DCONF) dump /org/gnome/terminal/ > $(CURDIR)/terminal/dconf.txt
+endif
 	$(GIT) config remote.pushdefault origin
 	$(GIT) config push.default current
 ifneq ($(upstream),$(shell $(GIT) remote get-url upstream 2> /dev/null))
@@ -145,9 +149,11 @@ endif
 	source $(ZNAP); znap install $(executables)
 	$(foreach f,$(wildcard $(dotfiles)),mv $(f) $(f)~;)
 ifneq (,$(wildcard $(DCONF)))
-	# Ensure that Terminal & Tilix open login shells.
-	$(foreach p,$(filter-out list,\
-		$(shell $(DCONF) list /org/gnome/terminal/legacy/profiles:/)),\
+	# Load Terminal prefs from file:
+	$(DCONF) load /org/gnome/terminal/ < $(CURDIR)/terminal/dconf.txt
+	# Ensure that Terminal & Tilix open login shells:
+	$(foreach p,\
+		$(filter-out list,$(shell $(DCONF) list /org/gnome/terminal/legacy/profiles:/)),\
 		$(DCONF) write /org/gnome/terminal/legacy/profiles:/$(p)login-shell true;)
 	$(foreach p,$(filter-out list,\
 		$(shell $(DCONF) list /com/gexperts/Tilix/profiles/)),\
