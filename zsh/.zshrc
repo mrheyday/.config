@@ -1,13 +1,12 @@
 #!/bin/zsh
 # Executed for each interactive shell, after .zprofile.
 
-
 ##
 # History settings
 # Set these before calling any commands, so history doesn't get lost when something breaks.
 #
 HISTFILE=$XDG_DATA_HOME/zsh/history
-SAVEHIST=$(( 100 * 1000 ))
+SAVEHIST=$(( 50 * 1000 ))       # For readability
 HISTSIZE=$(( 1.2 * SAVEHIST ))  # Zsh recommended value
 setopt histfcntllock histignorealldups histsavenodups sharehistory
 
@@ -27,11 +26,6 @@ znap prompt sindresorhus/pure
 
 znap source marlonrichert/zcolors
 znap eval zcolors "zcolors ${(q)LS_COLORS}" # Generate theme colors.
-
-setopt printexitvalue
-REPORTMEMORY=80 # min kB
-REPORTTIME=1    # min seconds
-TIMEFMT=$'zsh: %E %MkB\t%J'
 
 
 ##
