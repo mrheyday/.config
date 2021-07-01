@@ -3,21 +3,27 @@
 	email = marlonrichert@users.noreply.github.com
 [core]
 	autocrlf = false
-	excludesfile = /Users/marlon/.gitignore_global
 	editor = code --wait
+	excludesfile = /Users/marlon/.gitignore_global
+	untrackedCache = true
+[feature]
+	manyFiles = true
+	writeCommitGraph = true
+[checkout]
+	workers = -1
 [remote]
 	pushdefault = origin
-[push]
-	default = current
 [pull]
 	rebase = true
-[merge]
-	tool = opendiff
-	autoStash = true
-[rebase]
-	autoStash = true
+[push]
+	default = current
 [branch]
 	autosetuprebase = always
+[rebase]
+	autoStash = true
+[merge]
+	autoStash = true
+	tool = opendiff
 [diff]
 	tool = opendiff
 [difftool "opendiff"]
@@ -26,8 +32,8 @@
 	opendiff = difftool --no-prompt --tool opendiff --dir-diff
 [filter "lfs"]
 	clean = git-lfs clean -- %f
-	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
+	smudge = git-lfs smudge -- %f
 	required = true
 [color]
 	ui = always

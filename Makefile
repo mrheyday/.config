@@ -119,7 +119,7 @@ endif
 ifeq (,$(shell git branch -l main))
 	-git branch -m master main 2> /dev/null
 endif
-	$(GIT) fetch $(GITFLAGS) upstream
+	$(GIT) fetch $(GITFLAGS) -t upstream
 	$(GIT) branch $(GITFLAGS) -u upstream/main main
 	$(GIT) pull $(GITFLAGS) --autostash upstream
 	$(GIT) remote set-head upstream -a
