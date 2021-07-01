@@ -1,20 +1,20 @@
 #!/bin/zsh
-# Executed for each interactive shell, after .zprofile.
+# Zsh runs .zshrc for each interactive shell, after .zprofile
+
 
 ##
-# History settings
-# Set these before calling any commands, so history doesn't get lost when something breaks.
+# Essentials
 #
 HISTFILE=$XDG_DATA_HOME/zsh/history
 SAVEHIST=$(( 50 * 1000 ))       # For readability
 HISTSIZE=$(( 1.2 * SAVEHIST ))  # Zsh recommended value
-setopt histfcntllock histignorealldups histsavenodups sharehistory
 
-
-##
 # Plugin manager
-#
 source ~/Git/zsh-snap/znap.zsh
+
+setopt histfcntllock histignorealldups histsavenodups sharehistory
+setopt extendedglob globstarshort numericglobsort
+setopt NO_autoparamslash interactivecomments
 
 
 ##
@@ -31,10 +31,11 @@ source ~/Git/zsh-snap/znap.zsh
 PS1='%F{%(?,10,9)}%#%f '
 znap prompt
 
-add-zsh-hook chpwd .zshrc.chpwd # Call whenever we change dirs.
-setopt cdsilent pushdsilent     # Suppress output of cd and pushd.
+add-zsh-hook chpwd .zshrc.chpwd   # Call whenever we change dirs.
+setopt cdsilent pushdsilent       # Suppress output of cd and pushd.
 
 add-zsh-hook precmd .zshrc.precmd # Call before each prompt.
+
 ZLE_RPROMPT_INDENT=0              # Right prompt margin
 setopt transientrprompt           # Auto-remove right prompt.
 
@@ -70,25 +71,11 @@ setopt transientrprompt           # Auto-remove right prompt.
   }
 }
 
-# Generate theme colors for Git & Zsh.
-znap source marlonrichert/zcolors
-znap eval zcolors "zcolors ${(q)LS_COLORS}"
-
-
-##
-# Miscellaneous shell options
-#
-setopt extendedglob globstarshort nullglob numericglobsort rcexpandparam
-setopt NO_autoparamslash interactivecomments
-
 
 ##
 # Directory config
 #
-
-setopt autocd autopushd cdsilent chaselinks pushdignoredups pushdminus pushdsilent
-
-TMPDIR=$TMPDIR:A  # Needed to get ~TMPDIR to work with `chaselinks`
+setopt autocd autopushd chaselinks pushdignoredups pushdminus
 
 # Load dir stack from file, excl. current dir, temp dirs & non-existing dirs.
 () {
@@ -103,72 +90,38 @@ TMPDIR=$TMPDIR:A  # Needed to get ~TMPDIR to work with `chaselinks`
   )
 }
 
-# Apple attaches their function to the wrong hook in /etc/zshrc_Apple_Terminal.
-if type -f update_terminal_cwd &>/dev/null; then
-  add-zsh-hook -d precmd update_terminal_cwd  # Doesn't need to run before each prompt.
-  add-zsh-hook chpwd update_terminal_cwd      # Run it only when we change dirs...
-  update_terminal_cwd                         # ...and once for our initial dir.
-fi
-
-# Necessary for VTE-based terminals (Gnome Terminal, Tilix) in Ubuntu to preserve $PWD when opening
-# new windows/tabs.
-[[ $VENDOR == ubuntu && -n $VTE_VERSION ]] &&
-    source /etc/profile.d/vte-*.*.sh
-
 
 ##
-# Initialization for external commands
+# Completion
 #
-
-# Include full path, so when it changes, Znap invalidates cache.
-znap eval pyenv-init ${${:-=pyenv}:A}' init -'
-
-# Include shell-specific Python version as comment, so when it changes, Znap invalidates cache.
-znap eval pip-completion "pip completion --zsh  # $PYENV_VERSION"
-znap eval pipx-completion "register-python-argcomplete pipx  # $PYENV_VERSION"
-znap eval pipenv-completion "pipenv --completion  # $PYENV_VERSION"
-
-
-##
-# Additional completions
-#
-fpath+=(
-    ~[zsh-users/zsh-completions]/src
-)
-
-
-##
-# Plugins
-#
+fpath+=( ~[zsh-users/zsh-completions]/src )
 
 # Real-time auto-completion
 znap source marlonrichert/zsh-autocomplete
 
-# Better command line editing tools
-znap source marlonrichert/zsh-edit
-zstyle ':edit:*' word-chars '*?\'
-
-# History editing tools
-znap source marlonrichert/zsh-hist
-
-# In-line suggestions
-ZSH_AUTOSUGGEST_ACCEPT_WIDGETS=()
-ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS+=( forward-char forward-word end-of-line )
-ZSH_AUTOSUGGEST_STRATEGY=( history )
-ZSH_AUTOSUGGEST_HISTORY_IGNORE=$'(*\n*|?(#c80,))'
-znap source zsh-users/zsh-autosuggestions
-
-# Command-line syntax highlighting
-ZSH_HIGHLIGHT_HIGHLIGHTERS=( main brackets )
-znap source zsh-users/zsh-syntax-highlighting
-# znap source zdharma/fast-syntax-highlighting
+# Include Python version as comment, for cache invalidation.
+znap eval    pip-completion "pip completion --zsh             # $PYENV_VERSION"
+znap eval   pipx-completion "register-python-argcomplete pipx # $PYENV_VERSION"
+znap eval pipenv-completion "pipenv --completion              # $PYENV_VERSION"
 
 
 ##
 # Key bindings
 #
-
 setopt NO_flowcontrol  # Enable ^Q and ^S.
+
+# Better command line editing tools
+znap source marlonrichert/zsh-edit
+zstyle ':edit:*' word-chars '*?\'
+bindkey -c '^Xp' '@cd .'
+bindkey -c '^Xo' '@open .'
+bindkey -c '^Xc' '@code .'
+bindkey -c '^Xs' '+git status -Mu --show-stash'
+bindkey -c '^Xl' '@git log'
+bindkey -c "$key[PageUp]"   'git push'
+bindkey -c "$key[PageDown]" 'git fetch -t && git pull --autostash'
+bindkey "$key[Home]" beginning-of-buffer
+bindkey "$key[End]"  end-of-buffer
 
 # Replace some default keybindings with better widgets.
 bindkey '^[^_'  copy-prev-shell-word
@@ -188,27 +141,47 @@ alias which-command > /dev/null &&
 autoload -Uz which-command
 zle -N which-command
 
-# -c flag added by zsh-edit
-bindkey -c '^Xp' '@cd .'
-bindkey -c '^Xo' '@open .'
-bindkey -c '^Xc' '@code .'
-bindkey -c '^Xs' '+git status --show-stash'
-bindkey -c '^Xl' '@git log'
 
-# $key table populated by /etc/zshrc & zsh-autocomplete
-bindkey -c "$key[PageUp]"   'git push'
-bindkey -c "$key[PageDown]" 'git fetch -t && git pull --autostash'
+##
+# Miscellaneous
+#
 
-# beginning/end-of-buffer provided by zsh-edit
-bindkey "$key[Home]" beginning-of-buffer
-bindkey "$key[End]"  end-of-buffer
+# Generate theme colors for Git & Zsh.
+znap source marlonrichert/zcolors
+znap eval zcolors "zcolors ${(q)LS_COLORS}"
+
+# In-line suggestions
+ZSH_AUTOSUGGEST_ACCEPT_WIDGETS=()
+ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS+=( forward-char forward-word end-of-line )
+ZSH_AUTOSUGGEST_STRATEGY=( history )
+ZSH_AUTOSUGGEST_HISTORY_IGNORE=$'(*\n*|?(#c80,))'
+znap source zsh-users/zsh-autosuggestions
+
+# Command-line syntax highlighting
+ZSH_HIGHLIGHT_HIGHLIGHTERS=( main brackets )
+znap source zsh-users/zsh-syntax-highlighting
+# znap source zdharma/fast-syntax-highlighting
+
+# Apple attaches their function to the wrong hook in /etc/zshrc_Apple_Terminal.
+if type -f update_terminal_cwd &>/dev/null; then
+  add-zsh-hook -d precmd update_terminal_cwd  # Doesn't need to run before each prompt.
+  add-zsh-hook chpwd update_terminal_cwd      # Run it only when we change dirs...
+  update_terminal_cwd                         # ...and once for our initial dir.
+fi
+
+# Necessary for VTE-based terminals (Gnome Terminal, Tilix) in Ubuntu to preserve $PWD when opening
+# new windows/tabs.
+[[ $VENDOR == ubuntu && -n $VTE_VERSION ]] &&
+    source /etc/profile.d/vte-*.*.sh
 
 
 ##
-# Aliases & functions
+# Commands, aliases & functions
 #
+znap eval pyenv-init ${${:-=pyenv}:A}' init -'  # Abs path for cache invalidation
 
-# Expand aliases before submitting command line.
+# History editing tools
+znap source marlonrichert/zsh-hist
 zstyle ':hist:*' expand-aliases yes
 
 # File type associations
@@ -220,15 +193,8 @@ else
   alias -s {log,out}='tail -f'
 fi
 
-alias \$= %=  # Enable pasting of command line examples.
-
+alias \$= %=  # For pasting command line examples
 alias grep='grep --color'
-
-# Pattern matching support for `cp`, `ln` and `mv`
-# See http://zsh.sourceforge.net/Doc/Release/User-Contributions.html#index-zmv
-# Tip: Use -n for no execution. (Print what would happen, but don’t do it.)
-autoload -Uz zmv
-alias zmv='\zmv -v' zcp='\zmv -Cv' zln='\zmv -Lv'
 
 # Paging & colors for `ls`
 [[ $OSTYPE != linux-gnu ]] &&
@@ -239,6 +205,12 @@ ls() {
 }
 zstyle ':completion:*:ls:*:options' ignored-patterns \
     --group-directories-first --width --color -A -F -v -x
+
+# Pattern matching support for `cp`, `ln` and `mv`
+# See http://zsh.sourceforge.net/Doc/Release/User-Contributions.html#index-zmv
+# Tip: Use -n for no execution. (Print what would happen, but don’t do it.)
+autoload -Uz zmv
+alias zmv='\zmv -v' zcp='\zmv -Cv' zln='\zmv -Lv'
 
 # Safer alternatives to `rm`
 if [[ $OSTYPE == darwin* ]]; then
