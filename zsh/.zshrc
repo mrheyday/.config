@@ -121,7 +121,7 @@ bindkey -c '^Xo' '@open .'
 bindkey -c '^Xc' '@code .'
 bindkey -c '^Xs' '+git status -Mu --show-stash'
 bindkey -c '^Xl' '@git log'
-bindkey -c "$key[PageUp]"   'git push'
+bindkey -c "$key[PageUp]"   'git push && git fetch -t'
 bindkey -c "$key[PageDown]" 'git fetch -t && git pull --autostash'
 bindkey "$key[Home]" beginning-of-buffer
 bindkey "$key[End]"  end-of-buffer
