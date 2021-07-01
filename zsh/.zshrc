@@ -154,7 +154,7 @@ znap eval zcolors "zcolors ${(q)LS_COLORS}"
 ZSH_AUTOSUGGEST_ACCEPT_WIDGETS=()
 ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS+=( forward-char forward-word end-of-line )
 ZSH_AUTOSUGGEST_STRATEGY=( history )
-ZSH_AUTOSUGGEST_HISTORY_IGNORE=$'(*\n*|?(#c80,))'
+ZSH_AUTOSUGGEST_HISTORY_IGNORE=$'(*\n*|?(#c80,)|*\#:hist:push-line:)'
 znap source zsh-users/zsh-autosuggestions
 
 # Command-line syntax highlighting
