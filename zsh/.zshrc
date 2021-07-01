@@ -187,12 +187,11 @@ alias zmv='\zmv -v' zcp='\zmv -Cv' zln='\zmv -Lv'
 [[ $OSTYPE != linux-gnu ]] &&
     hash ls==gls  # GNU coreutils ls
 ls() {
-  command ls --group-directories-first --width=$COLUMNS --color -Fvx "$@" | $PAGER
+  command ls --group-directories-first --width=$COLUMNS --color -AFvx "$@" | $PAGER
   return $pipestatus[1]  # Return exit status of ls, not $PAGER
 }
-alias ls='\ls --group-directories-first --color -AFXx'
-zstyle ':completion:*:ls:*:options' \
-    ignored-patterns --group-directories-first --width --color -F -v -x
+zstyle ':completion:*:ls:*:options' ignored-patterns \
+    --group-directories-first --width --color -A -F -v -x
 
 # Safer alternatives to `rm`
 if [[ $OSTYPE == darwin* ]]; then
