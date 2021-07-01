@@ -18,14 +18,61 @@ source ~/Git/zsh-snap/znap.zsh
 
 
 ##
-# Prompt and other theming
+# Prompt config
 #
+.zshrc.chpwd() {
+  print -P -- '\n%F{12}%~%f/'
+  RPS1=
+  ( git fetch -t 2> /dev/null ) &|
+}
+.zshrc.chpwd
 
-# `znap prompt` gets the left side of the primary prompt visible in less than 40ms.
-znap prompt sindresorhus/pure
+# `znap prompt` makes the left side of the primary prompt visible in less than 40ms.
+PS1='%F{%(?,10,9)}%#%f '
+znap prompt
 
+add-zsh-hook chpwd .zshrc.chpwd # Call whenever we change dirs.
+setopt cdsilent pushdsilent     # Suppress output of cd and pushd.
+
+add-zsh-hook precmd .zshrc.precmd # Call before each prompt.
+ZLE_RPROMPT_INDENT=0              # Right prompt margin
+setopt transientrprompt           # Auto-remove right prompt.
+
+.zshrc.precmd() {
+  local fd
+  exec {fd}< <( # Start asynchronous process.
+    local gitstatus MATCH MBEGIN MEND
+
+    if ! gitstatus="$( git status -sbu 2> /dev/null )"; then
+      print
+      return
+    fi
+
+    local -a lines=( "${(f)gitstatus}" )
+    local -aU symbols=( ${(@MSu)lines[2,-1]##[^[:blank:]]##} )
+    print -r -- "${${lines[1]/'##'/$symbols}//(#m)$'\C-[['[;[:digit:]]#m/%{${MATCH}%\}}"
+  )
+  zle -F "$fd" .zshrc.precmd.callback
+}
+
+.zshrc.precmd.callback() {
+  local fd=$1
+  {
+    zle -F "$fd"  # Unhook callback.
+
+    [[ $2 != (|hup) ]] &&
+        return  # Error occured.
+
+    read -ru $fd -- RPS1
+    zle .reset-prompt
+  } always {
+    exec {fd}<&-  # Close file descriptor.
+  }
+}
+
+# Generate theme colors for Git & Zsh.
 znap source marlonrichert/zcolors
-znap eval zcolors "zcolors ${(q)LS_COLORS}" # Generate theme colors.
+znap eval zcolors "zcolors ${(q)LS_COLORS}"
 
 
 ##
