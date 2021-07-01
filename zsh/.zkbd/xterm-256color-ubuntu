@@ -1,5 +1,5 @@
 #!/bin/zsh
-# On macOS, this is picked up automatically by /etc/zshrc
+
 typeset -gA key=(
     Tab           $'\t'
     Shift-Tab     $'\e[Z'
@@ -8,9 +8,9 @@ typeset -gA key=(
     Delete        $'\e[3~'
     Control-Space $'\0'
     Up            $'\e[A'
-    Alt-Up        $'\e\e[A'
+    Alt-Up        $'\e[1;3A'
     Down          $'\e[B'
-    Alt-Down      $'\e\e[B'
+    Alt-Down      $'\e[1;3B'
     Left          $'\e[D'
     Right         $'\e[C'
     PageUp        $'\e[5~'
