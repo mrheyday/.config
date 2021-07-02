@@ -1,9 +1,12 @@
 #!/bin/zsh
-# Executed once for each new login shell, after .zshenv, but before .zshrc.
-# Everything here should be exported, so it's available in new shells started from the login shell.
 
+##
+# Zsh runs .zprofile once for each new login shell, after .zshenv, but before .zshrc. Everything
+# here should be exported, so it's available in new shells started from the login shell.
+#
 # NOTE: In VTE-based terminals, such as Gnome Terminal & Tilix, you have to explicitly set in each
 # profile that a new window/tab opens a login shell. Otherwise, .zprofile will not get sourced!
+#
 
 # We need to set $path here and not in .zshenv, else /etc/zprofile will override it.
 export -U PATH path FPATH fpath MANPATH manpath  # Remove duplicates.

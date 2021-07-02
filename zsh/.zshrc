@@ -1,5 +1,8 @@
 #!/bin/zsh
+
+##
 # Zsh runs .zshrc for each interactive shell, after .zprofile
+#
 
 
 ##

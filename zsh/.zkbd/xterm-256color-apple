@@ -1,5 +1,5 @@
 #!/bin/zsh
-# On macOS, this is picked up automatically by /etc/zshrc
+# On macOS, this file is read automatically by /etc/zshrc
 typeset -gA key=(
     Tab           $'\t'
     Shift-Tab     $'\e[Z'

@@ -1,5 +1,5 @@
 #!/bin/zsh
-
+# zsh-autocomplete will read this file automatically.
 typeset -gA key=(
     Tab           $'\t'
     Shift-Tab     $'\e[Z'
