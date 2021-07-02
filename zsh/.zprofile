@@ -23,20 +23,17 @@ export PIPX_BIN_DIR=~/.local/bin
 
 export ANDROID_SDK_ROOT=$HOMEBREW_PREFIX/share/android-commandlinetools
 
+# (N) deletes the item if it doesn't exist.
 path=(
-  $PIPX_BIN_DIR
-  $PYENV_ROOT/{bin,shims}
+  $PIPX_BIN_DIR(N)
+  $PYENV_ROOT/{bin,shims}(N)
   $ANDROID_SDK_ROOT/{emulator,platform-tools}(N)
   $HOMEBREW_PREFIX/opt/{mariadb@10.3,ncurses,tomcat@9}/bin(N)
   /opt/local/{bin,sbin}(N) # MacPorts
   $path[@]
   .
 )
-[[ $OSTYPE == linux-gnu ]] &&
-    fpath+=( $HOMEBREW_PREFIX/share/zsh/site-functions )
 
-[[ $OSTYPE == darwin* ]] &&
-    export JAVA_HOME=$( /usr/libexec/java_home -v 1.8 )
 export CATALINA_HOME=$HOMEBREW_PREFIX/opt/tomcat@9/libexec
 export CATALINA_BASE=~/Tomcat9
 
@@ -50,8 +47,13 @@ export LESS='-FiMr -j.5 --incsearch'
 export LESSHISTFILE=$XDG_DATA_HOME/less/lesshst
 export QUOTING_STYLE=escape # Used by GNU ls
 
-[[ $OSTYPE == darwin* ]] &&
-    export SHELL_SESSIONS_DISABLE=1  # Disable Apple's Save/Restore Shell State feature.
-
+if [[ $OSTYPE == darwin*   ]]; then
+  export SHELL_SESSIONS_DISABLE=1
+  export JAVA_HOME=$( /usr/libexec/java_home -v 1.8 )
+fi
+if [[ $OSTYPE == linux-gnu ]]; then
+  export DEBIAN_PREVENT_KEYBOARD_CHANGES=1
+  fpath+=( $HOMEBREW_PREFIX/share/zsh/site-functions )
+fi
 [[ $VENDOR == ubuntu ]] &&
     export skip_global_compinit=1
