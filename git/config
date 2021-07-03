@@ -1,16 +1,15 @@
 [user]
 	name = Marlon Richert
 	email = marlonrichert@users.noreply.github.com
-[core]
-	autocrlf = false
-	editor = code --wait
-	excludesfile = /Users/marlon/.gitignore_global
-	untrackedCache = true
 [feature]
 	manyFiles = true
 	writeCommitGraph = true
+[core]
+	autocrlf = false
+	editor = code --wait
 [checkout]
 	workers = -1
+	defaultRemote = upstream
 [remote]
 	pushdefault = origin
 [pull]
@@ -18,23 +17,12 @@
 [push]
 	default = current
 [branch]
-	autosetuprebase = always
+	autoSetupRebase = always
 [rebase]
 	autoStash = true
 [merge]
 	autoStash = true
 	tool = opendiff
-[diff]
-	tool = opendiff
-[difftool "opendiff"]
-	cmd = /usr/bin/opendiff \"$LOCAL\" \"$REMOTE\" -merge \"$MERGED\" 2>/dev/null | cat
-[alias]
-	opendiff = difftool --no-prompt --tool opendiff --dir-diff
-[filter "lfs"]
-	clean = git-lfs clean -- %f
-	process = git-lfs filter-process
-	smudge = git-lfs smudge -- %f
-	required = true
 [color]
 	ui = always
 [color "decorate"]

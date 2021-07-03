@@ -20,13 +20,10 @@ endif
 
 executables = aureliojargas/clitest ekalinin/github-markdown-toc
 
-gitconfig = ~/.gitconfig
-gitignore = ~/.gitignore_global
 zshenv = ~/.zshenv
 gradleproperties = ~/.gradle/gradle.properties
 sshconfig = ~/.ssh/config
-dotfiles := $(gitconfig) $(gitignore) $(zshenv) $(gradleproperties) $(sshconfig)
-
+dotfiles := $(zshenv) $(gradleproperties) $(sshconfig)
 ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
 vscodesettings = ~/Library/ApplicationSupport/Code/User/settings.json
 vscodekeybindings = ~/Library/ApplicationSupport/Code/User/keybindings.json
@@ -34,21 +31,19 @@ dotfiles += $(vscodesettings) $(vscodekeybindings)
 endif
 
 prefix = /usr/local
-
 ifeq (linux-gnu,$(shell print $$OSTYPE))
 exec_prefix = /home/linuxbrew/.linuxbrew
 else
 exec_prefix = $(prefix)
 endif
-
 bindir = $(exec_prefix)/bin
 datarootdir = $(prefix)/share
 datadir = $(datarootdir)
 
 BASH = /bin/bash
 CURL = /usr/bin/curl
-DSCL = /usr/bin/dscl
 OSASCRIPT = /usr/bin/osascript
+DSCL = /usr/bin/dscl
 APT = /usr/bin/apt
 DCONF = /usr/bin/dconf
 GETENT = /usr/bin/getent
@@ -159,8 +154,6 @@ ifneq (,$(wildcard $(DCONF)))
 		$(shell $(DCONF) list /com/gexperts/Tilix/profiles/)),\
 		$(DCONF) write /com/gexperts/Tilix/profiles:/$(p)login-shell true;)
 endif
-	ln -s $(CURDIR)/git/gitconfig $(gitconfig)
-	ln -s $(CURDIR)/git/gitignore_global $(gitignore)
 	ln -s $(CURDIR)/zsh/.zshenv $(zshenv)
 ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
 	ln -s $(CURDIR)/ssh/config $(sshconfig)
