@@ -21,9 +21,8 @@ endif
 executables = aureliojargas/clitest ekalinin/github-markdown-toc
 
 zshenv = ~/.zshenv
-gradleproperties = ~/.gradle/gradle.properties
 sshconfig = ~/.ssh/config
-dotfiles := $(zshenv) $(gradleproperties) $(sshconfig)
+dotfiles := $(zshenv) $(sshconfig)
 ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
 vscodesettings = ~/Library/ApplicationSupport/Code/User/settings.json
 vscodekeybindings = ~/Library/ApplicationSupport/Code/User/keybindings.json
@@ -160,7 +159,6 @@ ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
 	ln -s $(CURDIR)/vscode/settings.json $(vscodesettings)
 	ln -s $(CURDIR)/vscode/keybindings.json $(vscodekeybindings)
 endif
-	ln -s $(CURDIR)/gradle/gradle.properties $(gradleproperties)
 ifeq (,$(wildcard $(zsh-hist)))
 ifneq (,$(wildcard $(zsh-hist-old)))
 	mv $(zsh-hist-old) $(zsh-hist)

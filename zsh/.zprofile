@@ -14,6 +14,7 @@ export -TU INFOPATH infopath
 
 export XDG_CONFIG_HOME  # Value is set in .zshenv
 export XDG_DATA_HOME=~/.local/share
+export GRADLE_USER_HOME=$XDG_CONFIG_HOME/gradle
 
 export HOMEBREW_BAT=1
 export HOMEBREW_COLOR=1
