@@ -26,7 +26,12 @@ setopt NO_autoparamslash interactivecomments
 .zshrc.chpwd() {
   print -P -- '\n%F{12}%~%f/'
   RPS1=
-  ( git fetch -t 2> /dev/null ) &|
+  (
+    local upstream
+    upstream=${$( git rev-parse --abbrev-ref @{u} 2> /dev/null )%%/*} &&
+        git fetch -t $upstream '+refs/heads/*:refs/remotes/'$upstream'/*' &> /dev/null &&
+        git remote set-branches $upstream '*' &> /dev/null
+  ) &|
 }
 .zshrc.chpwd
 
@@ -72,6 +77,24 @@ setopt transientrprompt           # Auto-remove right prompt.
   } always {
     exec {fd}<&-  # Close file descriptor.
   }
+}
+
+# Shown after output that doesn't end in a newline.
+PROMPT_EOL_MARK='%F{cyan}%S%#%f%s'
+
+# Continuation prompt
+() {
+  local -a indent=( '%('{1..36}'_,  ,)' )
+  PS2="${(j::)indent}" RPS2='%F{11}%^'
+}
+
+# Xtrace prompt
+() {
+  local -a indent=( '%('{1..36}"e,$( echoti cuf 2 ),)" )
+  local i=$'\t'${(j::)indent}
+  PS4=$'\r%(?,,'$i$'  -> %F{9}%?%f\n)'
+  PS4+=$'%{\e[2m%}%F{10}%1N%f\r'
+  PS4+=$i$'%I%b %(1_,%F{11}%_%f ,)'
 }
 
 
@@ -121,8 +144,8 @@ bindkey -c '^Xo' '@open .'
 bindkey -c '^Xc' '@code .'
 bindkey -c '^Xs' '+git status -Mu --show-stash'
 bindkey -c '^Xl' '@git log'
-bindkey -c "$key[PageUp]"   'git push && git fetch -t'
-bindkey -c "$key[PageDown]" 'git fetch -t && git pull --autostash'
+bindkey -c "$key[PageUp]"   'git push && git fetch'
+bindkey -c "$key[PageDown]" 'git fetch && git pull --autostash'
 bindkey "$key[Home]" beginning-of-buffer
 bindkey "$key[End]"  end-of-buffer
 
