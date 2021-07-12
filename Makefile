@@ -3,22 +3,19 @@
 upstream = https://github.com/marlonrichert/.config.git
 SHELL = /bin/zsh
 
-# Include only those formulas that we want on all machines.
+# Include only the software that we want on all machines.
+executables = aureliojargas/clitest ekalinin/github-markdown-toc
 formulas := asciinema bat less nano
 ifeq (linux-gnu,$(shell print $$OSTYPE))
 formulas += grep
 else
 formulas += bash coreutils
 endif
-
 taps := autoupdate core services
 ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
 taps += cask cask-fonts cask-versions
-casks = karabiner-elements rectangle adoptopenjdk8 visual-studio-code \
-	font-material-icons font-montserrat font-open-sans font-roboto font-ubuntu
+casks = karabiner-elements rectangle visual-studio-code
 endif
-
-executables = aureliojargas/clitest ekalinin/github-markdown-toc
 
 zshenv = ~/.zshenv
 sshconfig = ~/.ssh/config
