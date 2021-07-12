@@ -4,10 +4,16 @@ Properly managed dotfiles for macOS and Ubuntu.
 ![screenshot](screenshot.png)
 
 ## Installation
-0.  _(Ubuntu only)_ Install Zsh:
-    ```
-    sudo apt install zsh
-    ```
+0.  Depending on your OS, open a terminal, do one of the folowing and wait for the installation to
+    complete:
+    * macOS:
+      ```shell
+      xcode-select --install
+      ```
+    * Ubuntu:
+      ```shell
+      sudo apt install zsh
+      ```
 1.  [Fork this repo](fork).
 1.  ⚠️ In your fork, edit [`git/.gitconfig`](git/.gitconfig) (you can do this through GitHub's web
     UI) to make Git use _your_ name and email address, not mine! 🙂

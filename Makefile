@@ -91,12 +91,6 @@ zsh-cdr-old = ~/.chpwd-recent-dirs
 .SUFFIXES:
 
 all: $(GIT)
-	# all
-ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
-ifeq (,$(wildcard /Library/Developer/CommandLineTools))
-	xcode-select --install 2> /dev/null
-endif
-endif
 ifneq (,$(wildcard $(DCONF)))
 	# Write Terminal prefs to file.
 	$(DCONF) dump /org/gnome/terminal/ > $(CURDIR)/terminal/dconf.txt
