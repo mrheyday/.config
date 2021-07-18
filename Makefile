@@ -5,15 +5,14 @@ SHELL = /bin/zsh
 
 # Include only the software that we want on all machines.
 executables = aureliojargas/clitest ekalinin/github-markdown-toc
-formulas := asciinema bat less nano
+formulas := asciinema bat less nano pyenv
+taps := autoupdate services
 ifeq (linux-gnu,$(shell print $$OSTYPE))
-formulas += grep
-else
-formulas += bash coreutils
+formulas += git grep
 endif
-taps := autoupdate core services
 ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
 taps += cask cask-fonts cask-versions
+formulas += bash coreutils
 casks = karabiner-elements rectangle visual-studio-code
 endif
 
@@ -50,25 +49,28 @@ GIT = $(bindir)/git
 else
 GIT = /usr/bin/git
 endif
-GITFLAGS =
+GITFLAGS = -q
 
 ZSH = /bin/zsh
 ZNAP = ~/Git/zsh-snap/znap.zsh
 
 BREW = $(bindir)/brew
-BREWFLAGS =
+BREWFLAGS = -q
 HOMEBREW_PREFIX = $(exec_prefix)
 HOMEBREW_CELLAR = $(HOMEBREW_PREFIX)/Cellar
 HOMEBREW_REPOSITORY = $(HOMEBREW_PREFIX)/Homebrew
-taps := $(taps:%=$(HOMEBREW_REPOSITORY)/Library/Taps/homebrew/homebrew-%)
+tapsdir = $(HOMEBREW_REPOSITORY)/Library/Taps/homebrew
+taps := $(taps:%=$(tapsdir)/homebrew-%)
 formulas := $(formulas:%=$(HOMEBREW_CELLAR)/%)
 
 PYENV_ROOT = ~/.pyenv
 PYENV = $(bindir)/pyenv
 PYENV_VERSION = 3.7.10
+PYENVFLAGS =
 PIP = $(PYENV_ROOT)/shims/pip
-PIPFLAGS =
+PIPFLAGS = -q
 PIPX = ~/.local/bin/pipx
+PIPXFLAGS =
 PIPENV = ~/.local/bin/pipenv
 
 backups := $(wildcard $(dotfiles:%=%~))
@@ -85,58 +87,58 @@ zsh-hist-old = ~/.zsh_history
 zsh-cdr = $(zsh-datadir).chpwd-recent-dirs
 zsh-cdr-old = ~/.chpwd-recent-dirs
 
-.NOTPARALLEL:
-.ONESHELL:
-.PHONY: all clean installdirs install
+FORCE:
 .SUFFIXES:
 
-all: $(GIT)
+all: terminal git
+
+terminal: FORCE
 ifneq (,$(wildcard $(DCONF)))
-	# Write Terminal prefs to file.
 	$(DCONF) dump /org/gnome/terminal/ > $(CURDIR)/terminal/dconf.txt
 endif
+
+git-config: FORCE
 	$(GIT) config remote.pushdefault origin
 	$(GIT) config push.default current
+
+git-remote: FORCE
 ifneq ($(upstream),$(shell $(GIT) remote get-url upstream 2> /dev/null))
-	-$(GIT) remote add upstream $(upstream) 2> /dev/null
+	-$(GIT) remote add upstream $(upstream)
 	$(GIT) remote set-url upstream $(upstream)
 endif
-ifeq (,$(shell git branch -l main))
-	-git branch -m master main 2> /dev/null
+
+git-branch: FORCE
+ifeq (,$(shell $(GIT) branch -l main))
+	-$(GIT) branch $(GITFLAGS) -m master main
 endif
+
+git: git-config git-remote git-branch
 	$(GIT) fetch $(GITFLAGS) -t upstream
 	$(GIT) branch $(GITFLAGS) -u upstream/main main
-	$(GIT) pull $(GITFLAGS) --autostash upstream
-	$(GIT) remote set-head upstream -a
+	$(GIT) pull $(GITFLAGS) --autostash upstream > /dev/null
+	$(GIT) remote set-head upstream -a > /dev/null
 
-clean:
-	# clean
+clean: FORCE
 ifneq (,$(backups))
 ifneq (,$(wildcard $(OSASCRIPT)))
-	-$(OSASCRIPT) -e 'tell application "Finder" to delete every item of {$(backups)}' \
-		> /dev/null
+	$(OSASCRIPT) -e 'tell application "Finder" to delete every item of {$(backups)}' &> /dev/null || :
 else ifneq (,$(wildcard $(GIO)))
-	-$(GIO) trash $(backups)
+	$(GIO) trash $(backups)
 endif
 endif
 
-installdirs:
-	# install dirs
+installdirs: FORCE
+ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
+ifneq (,$(wildcard $(HOME)/Library/ApplicationSupport))
+	$(OSASCRIPT) -e 'tell application "Finder" to delete every item of {(POSIX file "$(HOME)/Library/ApplicationSupport")}' &> /dev/null || :
+endif
+	ln -fns "$(HOME)/Library/Application Support" ~/Library/ApplicationSupport
+endif
 	mkdir -pm 0700 $(sort $(zsh-datadir) $(dir $(dotfiles)))
 
-install: all clean installdirs $(taps) $(formulas) $(ZNAP) $(PYENV) $(PIP) $(PIPX) $(PIPENV)
-	$(PRE_INSTALL) # install: pre
-ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
-	-$(BREW) install $(BREWFLAGS) --cask $(casks) 2> /dev/null
-endif
-	-$(BREW) autoupdate $(BREWFLAGS) start --upgrade --cleanup 2> /dev/null
-	$(NORMAL_INSTALL) # install: normal
-	source $(ZNAP); znap install $(executables)
-	$(foreach f,$(wildcard $(dotfiles)),mv $(f) $(f)~;)
+install: all installdirs install-brew install-shell install-python $(dotfiles:%=%~)
 ifneq (,$(wildcard $(DCONF)))
-	# Load Terminal prefs from file:
 	$(DCONF) load /org/gnome/terminal/ < $(CURDIR)/terminal/dconf.txt
-	# Ensure that Terminal & Tilix open login shells:
 	$(foreach p,\
 		$(filter-out list,$(shell $(DCONF) list /org/gnome/terminal/legacy/profiles:/)),\
 		$(DCONF) write /org/gnome/terminal/legacy/profiles:/$(p)login-shell true;)
@@ -160,7 +162,13 @@ ifneq (,$(wildcard $(zsh-cdr-old)))
 	mv $(zsh-cdr-old) $(zsh-cdr)
 endif
 endif
-	$(POST_INSTALL) # install: post
+
+$(dotfiles:%=%~): clean
+	$(if $(wildcard $(@:%~=%)), mv $(@:%~=%) $@,)
+
+install-shell: install-shell-executables install-shell-change
+
+install-shell-change: FORCE
 ifneq (,$(wildcard $(DSCL)))
 ifneq (UserShell: $(SHELL),$(shell $(DSCL) . -read ~/ UserShell))
 	chsh -s $(SHELL)
@@ -172,43 +180,69 @@ endif
 endif
 
 $(BREW):
-	# brew
 	$(BASH) -c "$$( $(CURL) -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh )"
 
-$(taps):
-	# tap
-	-$(if $(wildcard $@),,\
-		$(BREW) tap $(BREWFLAGS) $(subst homebrew-,homebrew/,$(notdir $@)) )
+$(taps): install-brew-upgrade
+	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) tap $(BREWFLAGS) $(subst homebrew-,homebrew/,$(notdir $@))
 
-$(formulas):
-	# formula
-	-$(if $(wildcard $@),,$(BREW) install $(BREWFLAGS) --formula $(notdir $@))
+$(formulas): install-brew-upgrade
+	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) install $(BREWFLAGS) --formula $(notdir $@)
 
-ifeq (linux-gnu,$(shell print $$OSTYPE))
-$(GIT): $(BREW)
-	$(BREW) install $(BREWFLAGS) --formula git
+ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
+$(casks): $(tapsdir)/homebrew-cask
+	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) install $(BREWFLAGS) --cask $@ 2> /dev/null
 endif
+
+install-brew: $(formulas) $(casks) install-brew-autoupdate
+	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) autoremove $(BREWFLAGS)
+	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) cleanup $(BREWFLAGS)
+
+install-brew-upgrade: $(BREW)
+	$(BREW) update
+	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) upgrade $(BREWFLAGS)
+
+install-brew-autoupdate: $(tapsdir)/homebrew-autoupdate
+	-HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) autoupdate stop $(BREWFLAGS) > /dev/null
+	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) autoupdate start $(BREWFLAGS) --cleanup --upgrade > /dev/null
 
 $(ZNAP):
-	# znap
-	@mkdir -pm 0700 $(abspath $(dir $@)..)
-	$(GIT) -C $(abspath $(dir $@)..) clone $(GITFLAGS) --depth=1 \
-		https://github.com/marlonrichert/zsh-snap.git
+	mkdir -pm 0700 $(abspath $(dir $@)..)
+	$(GIT) -C $(abspath $(dir $@)..) clone $(GITFLAGS) --depth=1 https://github.com/marlonrichert/zsh-snap.git
 
-$(PYENV):
-	$(BREW) install $(BREWFLAGS) --formula pyenv
+install-shell-executables: $(ZNAP)
+	source $(ZNAP) && znap install $(executables) > /dev/null
 
-$(PIP):
-ifneq (,$(wildcard $(APT)))
-	sudo $(APT) install zlib1g-dev bzip2 sqlite3
+install-python: install-python-pipenv
+
+install-python-pyenv: $(HOMEBREW_CELLAR)/pyenv
+ifeq (linux-gnu,$(shell print $$OSTYPE))
+	sudo $(APT) install bzip2 sqlite3 zlib1g-dev
 endif
-	PYENV_ROOT=$(PYENV_ROOT) $(PYENV) install -s $(PYENV_VERSION)
+ifeq (,$(findstring $(PYENV_VERSION),$(shell $(PYENV) versions --bare)))
+	@print '\e[5;31;40mCompiling Python $(PYENV_VERSION). This might take a while! Please stand by...\e[0m' && :
+	PYENV_ROOT=$(PYENV_ROOT) $(PYENV) install $(PYENVFLAGS) -s $(PYENV_VERSION)
+endif
 	PYENV_ROOT=$(PYENV_ROOT) $(PYENV) global $(PYENV_VERSION)
 
-$(PIPX):
-	# pipx
-	$(PIP) install $(PIPFLAGS) --user pipx
+install-python-pipx-pip: install-python-pip
+	$(PIP) install $(PIPFLAGS) -U --user pipx
 
-$(PIPENV):
-	# pipenv
-	$(PIPX) install pipenv
+install-python-pipenv-pipx: install-python-pipx
+	$(PIPX) upgrade pipenv &> /dev/null || $(PIPX) install $(PIPXFLAGS) pipenv > /dev/null
+
+install-python-pipenv-brew: FORCE
+ifneq (,$(wildcard $(HOMEBREW_CELLAR)/pipenv))
+	-HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) uninstall $(BREWFLAGS) --formula pipenv
+endif
+
+install-python-pip: install-python-pyenv
+	$(PIP) install $(PIPFLAGS) -U pip
+
+install-python-pipx: install-python-pipx-brew install-python-pipx-pip
+
+install-python-pipx-brew: FORCE
+ifneq (,$(wildcard $(HOMEBREW_CELLAR)/pipx))
+	-HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) uninstall $(BREWFLAGS) --formula pipx
+endif
+
+install-python-pipenv: install-python-pipenv-brew install-python-pipenv-pipx

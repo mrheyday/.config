@@ -1,6 +1,8 @@
 # .config
 Properly managed dotfiles for macOS and Ubuntu.
 
+> Enjoy using this software? [Become a sponsor!](https://github.com/sponsors/marlonrichert).
+
 ![screenshot](screenshot.png)
 
 ## Installation
@@ -24,12 +26,12 @@ Properly managed dotfiles for macOS and Ubuntu.
     % # Clone your fork, which will make a new .config dir:
     % git clone https://github.com/<YOUR USER NAME>/.config.git
     ...
-    % cd .config    # Go to your new .config dir.
+    % cd .config            # Go to your new .config dir.
     📝 Add anything you want to keep from your old dotfiles.
-    % make install  # Run the installer to deploy your new dotfiles.
+    % make -j install       # Run the installer to deploy your new dotfiles.
     ...
     % # Finally, update your fork with your changes:
-    % git add -f <file>... # Choose which files you actually want to track in Git.
+    % git add -f <file>...  # Choose which files you actually want to track in Git.
     % git commit
     % git push
     ...
@@ -45,13 +47,13 @@ Properly managed dotfiles for macOS and Ubuntu.
 To get new updates to your fork from my repo, do the following:
 ```zsh
 % cd ~/.config
-% make          # Pull in updates from upstream (my repo), but don't install them yet.
+% make -j               # Pull in updates from upstream (my repo), but don't install them yet.
 ...
 📝 Review the incoming changes and make any adjustments you like.
-% make install  # Run the installer to deploy your changes.
+% make -j install       # Run the installer to deploy your changes.
 ...
 % # Finally, update your fork with your changes:
-% git add -f <file>... # Choose which files you actually want to track in Git.
+% git add -f <file>...  # Choose which files you actually want to track in Git.
 % git commit
 % git push
 ...
