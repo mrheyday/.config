@@ -18,6 +18,7 @@ export GRADLE_USER_HOME=$XDG_CONFIG_HOME/gradle
 
 export HOMEBREW_BAT=1
 export HOMEBREW_COLOR=1
+export HOMEBREW_NO_AUTO_UPDATE=1
 path=( /home/linuxbrew/.linuxbrew/bin(N) $path[@] )
 eval "$( brew shellenv )"
 
