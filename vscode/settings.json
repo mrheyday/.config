@@ -1,5 +1,6 @@
 {
     "csscomb.preset": "../hiboxcentre/.csscomb.json",
+    "diffEditor.ignoreTrimWhitespace": false,
     "diffEditor.renderSideBySide": false,
     "editor.acceptSuggestionOnEnter": "off",
     "editor.accessibilitySupport": "off",
@@ -46,6 +47,7 @@
             "language": "shellscript"
         }
     ],
+    "shell-syntax.defaultShell": "zsh",
     "terminal.explorerKind": "external",
     "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
     "window.autoDetectColorScheme": true,
