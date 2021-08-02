@@ -17,6 +17,7 @@
     "editor.semanticHighlighting.enabled": true,
     "editor.suggestSelection": "first",
     "editor.tabSize": 8,
+    "editor.wordSeparators": " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~",
     "editor.wordWrapColumn": 99,
     "explorer.confirmDragAndDrop": false,
     "files.associations": {
