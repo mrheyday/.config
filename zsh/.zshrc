@@ -189,7 +189,7 @@ znap source zsh-users/zsh-syntax-highlighting
 # znap source zdharma/fast-syntax-highlighting
 
 # Apple attaches their function to the wrong hook in /etc/zshrc_Apple_Terminal.
-if type -f update_terminal_cwd &>/dev/null; then
+if (( $precmd_functions[(I)update_terminal_cwd] )); then
   add-zsh-hook -d precmd update_terminal_cwd  # Doesn't need to run before each prompt.
   add-zsh-hook chpwd update_terminal_cwd      # Run it only when we change dirs...
   update_terminal_cwd                         # ...and once for our initial dir.
@@ -223,6 +223,12 @@ fi
 alias \$= %=  # For pasting command line examples
 alias grep='\grep --color' make='\make -j'
 
+# Pattern matching support for `cp`, `ln` and `mv`
+# See http://zsh.sourceforge.net/Doc/Release/User-Contributions.html#index-zmv
+# Tip: Use -n for no execution. (Print what would happen, but don’t do it.)
+autoload -Uz zmv
+alias zmv='\zmv -v' zcp='\zmv -Cv' zln='\zmv -Lv'
+
 # Paging & colors for `ls`
 [[ $OSTYPE != linux-gnu ]] &&
     hash ls==gls  # GNU coreutils ls
@@ -233,34 +239,19 @@ ls() {
 zstyle ':completion:*:ls:*:options' ignored-patterns \
     --group-directories-first --width --color -A -F -v -x
 
-# Pattern matching support for `cp`, `ln` and `mv`
-# See http://zsh.sourceforge.net/Doc/Release/User-Contributions.html#index-zmv
-# Tip: Use -n for no execution. (Print what would happen, but don’t do it.)
-autoload -Uz zmv
-alias zmv='\zmv -v' zcp='\zmv -Cv' zln='\zmv -Lv'
-
 # Safer alternatives to `rm`
 if [[ $OSTYPE == darwin* ]]; then
   trash() {
-    local -aU items=() missing=()
-    local i; for i in $@; do
-      if [[ -e $i ]]; then
-        items+=( $i )
-      else
-        missing+=( $i )
-      fi
-    done
-    local -i ret=66
-    (( $#missing > 0 )) &&
-      print -u2 "trash: no such file(s): $missing"
-    if (( $#items > 0 )); then
-      print Moving $(eval ls -d ${(q)items[@]%/}) to Trash.
-      items=( '(POSIX file "'${^items[@]:A}'")' )
-      osascript -e 'tell application "Finder" to delete every item of {'${(j:, :)items}'}' \
-          > /dev/null
-      ret=$?
-    fi
-    return ret
+    local -aU items=( $^@(N) )
+    local -aU missing=( ${@:|items} )
+    (( $#missing )) &&
+        print -u2 "trash: no such file(s): $missing"
+    (( $#items )) ||
+        return 66
+    print Moving $( eval ls -d ${(q)items[@]%/} ) to Trash.
+    items=( '(POSIX file "'${^items[@]:A}'")' )
+    osascript -e 'tell application "Finder" to delete every item of {'${(j:, :)items}'}' \
+        > /dev/null
   }
 elif command -v gio > /dev/null; then
   # gio is available for macOS, but gio trash DOES NOT WORK correctly there.
