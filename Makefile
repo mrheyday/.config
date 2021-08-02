@@ -83,7 +83,12 @@ ifeq (linux-gnu,$(shell print $$OSTYPE))
 python-dependencies = bzip2 sqlite3 zlib1g-dev
 endif
 
-all: terminal git
+all: ibus terminal git
+
+ibus: FORCE
+ifneq (,$(wildcard $(DCONF)))
+	$(DCONF) dump /desktop/ibus/ > $(CURDIR)/ibus/dconf.txt
+endif
 
 terminal: FORCE
 ifneq (,$(wildcard $(DCONF)))
@@ -129,6 +134,7 @@ endif
 
 install: all installdirs install-brew install-shell install-python $(dotfiles:%=%~)
 ifneq (,$(wildcard $(DCONF)))
+	$(DCONF) load /desktop/ibus/ < $(CURDIR)/ibus/dconf.txt
 	$(DCONF) load /org/gnome/terminal/ < $(CURDIR)/terminal/dconf.txt
 	$(foreach p,\
 		$(filter-out list,$(shell $(DCONF) list /org/gnome/terminal/legacy/profiles:/)),\

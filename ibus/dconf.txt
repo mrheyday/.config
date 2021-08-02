@@ -1,0 +1,6 @@
+[general/hotkey]
+triggers=@as []
+
+[panel/emoji]
+hotkey=@as []
+unicode-hotkey=@as []
