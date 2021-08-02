@@ -99,16 +99,16 @@ git: git-config git-remote git-branch
 	$(GIT) fetch $(GITFLAGS) -t upstream
 	$(GIT) branch $(GITFLAGS) -u upstream/main main
 	$(GIT) pull $(GITFLAGS) --autostash upstream > /dev/null
-	$(GIT) remote set-head upstream -a > /dev/null
+	@$(GIT) remote set-head upstream -a > /dev/null
 
 git-config: FORCE
-	$(GIT) config remote.pushdefault origin
-	$(GIT) config push.default current
+	@$(GIT) config remote.pushdefault origin
+	@$(GIT) config push.default current
 
 git-remote: FORCE
 ifneq ($(upstream),$(shell $(GIT) remote get-url upstream 2> /dev/null))
-	-$(GIT) remote add upstream $(upstream)
-	$(GIT) remote set-url upstream $(upstream)
+	@-$(GIT) remote add upstream $(upstream)
+	@$(GIT) remote set-url upstream $(upstream)
 endif
 
 git-branch: FORCE
@@ -174,11 +174,15 @@ install-brew: $(formulas) $(casks) $(taps) install-brew-autoupdate
 	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) cleanup $(BREWFLAGS)
 
 $(formulas): install-brew-upgrade
+ifneq (,$(wildcard $@))
 	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) install $(BREWFLAGS) --formula $(notdir $@)
+endif
 
 $(casks): $(tapsdir)/homebrew-cask
 ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
+ifneq (,$(wildcard $@))
 	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) install $(BREWFLAGS) --cask $@ 2> /dev/null
+endif
 endif
 
 install-brew-autoupdate: $(tapsdir)/homebrew-autoupdate
@@ -188,7 +192,9 @@ ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
 endif
 
 $(taps): install-brew-upgrade
+ifneq (,$(wildcard $@))
 	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) tap $(BREWFLAGS) $(subst homebrew-,homebrew/,$(notdir $@))
+endif
 
 install-brew-upgrade: $(BREW)
 	$(BREW) update
