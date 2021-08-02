@@ -169,7 +169,7 @@ endif
 endif
 	mkdir -pm 0700 $(sort $(zsh-datadir) $(dir $(dotfiles)))
 
-install-brew: $(formulas) $(casks) install-brew-autoupdate
+install-brew: $(formulas) $(casks) $(taps) install-brew-autoupdate
 	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) autoremove $(BREWFLAGS)
 	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) cleanup $(BREWFLAGS)
 
