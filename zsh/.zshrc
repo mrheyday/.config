@@ -211,16 +211,17 @@ znap source marlonrichert/zsh-hist
 zstyle ':hist:*' expand-aliases yes
 
 # File type associations
-alias -s {gradle,json,md,patch,properties,txt,xml,yml}="$PAGER"
+alias -s {gradle,json,md,patch,properties,txt,xml,yml}=$PAGER
 alias -s gz='gzip -l'
 if [[ $OSTYPE == darwin* ]]; then
-  alias -s {log,out}='open -a Console'
+    alias -s {log,out}='open -a Console'
 else
-  alias -s {log,out}='tail -f'
+    alias -s {log,out}='tail -f'
+    alias -s deb='sudo apt install'
 fi
 
 alias \$= %=  # For pasting command line examples
-alias grep='grep --color'
+alias grep='\grep --color' make='\make -j'
 
 # Paging & colors for `ls`
 [[ $OSTYPE != linux-gnu ]] &&
