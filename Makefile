@@ -132,7 +132,7 @@ else ifneq (,$(wildcard $(GIO)))
 endif
 endif
 
-install: all installdirs install-brew install-shell install-python $(dotfiles:%=%~)
+install: all installdirs install-brew install-shell install-python install-code $(dotfiles:%=%~)
 ifneq (,$(wildcard $(DCONF)))
 	$(DCONF) load /desktop/ibus/ < $(CURDIR)/ibus/dconf.txt
 	$(DCONF) load /org/gnome/terminal/ < $(CURDIR)/terminal/dconf.txt
@@ -252,6 +252,12 @@ endif
 $(python-dependencies): FORCE
 ifeq (linux-gnu,$(shell print $$OSTYPE))
 	$(APT) show $@ &> /dev/null || sudo $(APT) install $@
+endif
+
+install-code: FORCE
+ifeq (linux-gnu,$(shell print $$OSTYPE))
+	snap list code &> /dev/null && snap remove code || :
+	command -v code > /dev/null || ( TMPSUFFIX=.deb; sudo apt install =( wget -ncv --show-progress -O - 'https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64' ) )
 endif
 
 $(dotfiles:%=%~): clean
