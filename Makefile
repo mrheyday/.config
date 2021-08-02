@@ -6,12 +6,12 @@ SHELL = /bin/zsh
 # Include only the software that we want on all machines.
 executables = aureliojargas/clitest ekalinin/github-markdown-toc
 formulas := asciinema bat less nano pyenv
-taps := autoupdate services
+taps := services
 ifeq (linux-gnu,$(shell print $$OSTYPE))
 formulas += git grep
 endif
 ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
-taps += cask cask-fonts cask-versions
+taps += autoupdate cask cask-fonts cask-versions
 formulas += bash coreutils
 casks = karabiner-elements rectangle visual-studio-code
 endif
@@ -87,10 +87,10 @@ zsh-hist-old = ~/.zsh_history
 zsh-cdr = $(zsh-datadir).chpwd-recent-dirs
 zsh-cdr-old = ~/.chpwd-recent-dirs
 
-FORCE:
-.SUFFIXES:
-
 all: terminal git
+
+.SUFFIXES:
+FORCE:
 
 terminal: FORCE
 ifneq (,$(wildcard $(DCONF)))
@@ -202,8 +202,10 @@ install-brew-upgrade: $(BREW)
 	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) upgrade $(BREWFLAGS)
 
 install-brew-autoupdate: $(tapsdir)/homebrew-autoupdate
+ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
 	-HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) autoupdate stop $(BREWFLAGS) > /dev/null
 	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) autoupdate start $(BREWFLAGS) --cleanup --upgrade > /dev/null
+endif
 
 $(ZNAP):
 	mkdir -pm 0700 $(abspath $(dir $@)..)
@@ -214,15 +216,21 @@ install-shell-executables: $(ZNAP)
 
 install-python: install-python-pipenv
 
-install-python-pyenv: $(HOMEBREW_CELLAR)/pyenv
 ifeq (linux-gnu,$(shell print $$OSTYPE))
-	sudo $(APT) install bzip2 sqlite3 zlib1g-dev
+packages = bzip2 sqlite3 zlib1g-dev
 endif
+
+install-python-pyenv: $(HOMEBREW_CELLAR)/pyenv $(packages)
 ifeq (,$(findstring $(PYENV_VERSION),$(shell $(PYENV) versions --bare)))
 	@print '\e[5;31;40mCompiling Python $(PYENV_VERSION). This might take a while! Please stand by...\e[0m' && :
 	PYENV_ROOT=$(PYENV_ROOT) $(PYENV) install $(PYENVFLAGS) -s $(PYENV_VERSION)
 endif
 	PYENV_ROOT=$(PYENV_ROOT) $(PYENV) global $(PYENV_VERSION)
+
+$(packages): FORCE
+ifeq (linux-gnu,$(shell print $$OSTYPE))
+	$(APT) show $@ &> /dev/null || sudo $(APT) install $@
+endif
 
 install-python-pipx-pip: install-python-pip
 	$(PIP) install $(PIPFLAGS) -U --user pipx
