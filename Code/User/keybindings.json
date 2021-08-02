@@ -53,6 +53,18 @@
 		"when": "workbench.scm.active"
 	},
 	{
+		"key": "ctrl+shift+o",
+		"command": "-workbench.action.gotoSymbol"
+	},
+	{
+		"key": "ctrl+shift+o",
+		"command": "workbench.action.quickOpen"
+	},
+	{
+		"key": "ctrl+p",
+		"command": "-workbench.action.quickOpen"
+	},
+	{
 		"key": "f3",
 		"command": "-editor.action.nextMatchFindAction",
 		"when": "editorFocus"
