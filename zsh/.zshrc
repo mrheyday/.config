@@ -1,13 +1,12 @@
 #!/bin/zsh
-
-##
 # Zsh runs .zshrc for each interactive shell, after .zprofile
-#
 
 
 ##
 # Essentials
 #
+
+# Set these first, so history is preserved, no matter what happens.
 HISTFILE=$XDG_DATA_HOME/zsh/history
 SAVEHIST=$(( 50 * 1000 ))       # For readability
 HISTSIZE=$(( 1.2 * SAVEHIST ))  # Zsh recommended value
@@ -15,6 +14,7 @@ HISTSIZE=$(( 1.2 * SAVEHIST ))  # Zsh recommended value
 # Plugin manager
 source ~/Git/zsh-snap/znap.zsh
 
+# Shell options
 setopt histfcntllock histignorealldups histsavenodups sharehistory
 setopt extendedglob globstarshort numericglobsort
 setopt NO_autoparamslash interactivecomments
@@ -23,7 +23,12 @@ setopt NO_autoparamslash interactivecomments
 ##
 # Prompt config
 #
-.zshrc.chpwd() {
+
+# Call this hook whenever we change dirs...
+autoload -Uz add-zsh-hook
+add-zsh-hook chpwd .prompt.chpwd
+.prompt.chpwd() {
+  zle && zle -I # Invalidate the prompt, in case this gets called while the ZLE is active.
   print -P -- '\n%F{12}%~%f/'
   RPS1=
   (
@@ -33,21 +38,19 @@ setopt NO_autoparamslash interactivecomments
         git remote set-branches $upstream '*' &> /dev/null
   ) &|
 }
-.zshrc.chpwd
+.prompt.chpwd               # ...and once on startup, immediately.
+setopt cdsilent pushdsilent # Suppress built-in output of cd and pushd.
 
-# `znap prompt` makes the left side of the primary prompt visible in less than 40ms.
 PS1='%F{%(?,10,9)}%#%f '
-znap prompt
+znap prompt                 # Make the left side of the primary prompt visible, immediately.
 
-add-zsh-hook chpwd .zshrc.chpwd   # Call whenever we change dirs.
-setopt cdsilent pushdsilent       # Suppress output of cd and pushd.
+ZLE_RPROMPT_INDENT=0        # Right prompt margin
+setopt transientrprompt     # Auto-remove the right side of each prompt.
 
-add-zsh-hook precmd .zshrc.precmd # Call before each prompt.
-
-ZLE_RPROMPT_INDENT=0              # Right prompt margin
-setopt transientrprompt           # Auto-remove right prompt.
-
-.zshrc.precmd() {
+# Asynchronously check for git status whenever the prompt gets (re)drawn.
+autoload -Uz add-zsh-hook
+add-zsh-hook precmd .prompt.git-status
+.prompt.git-status() {
   local fd
   exec {fd}< <( # Start asynchronous process.
     local gitstatus MATCH MBEGIN MEND
@@ -61,13 +64,13 @@ setopt transientrprompt           # Auto-remove right prompt.
     local -aU symbols=( ${(@MSu)lines[2,-1]##[^[:blank:]]##} )
     print -r -- "${${lines[1]/'##'/$symbols}//(#m)$'\C-[['[;[:digit:]]#m/%{${MATCH}%\}}"
   )
-  zle -F "$fd" .zshrc.precmd.callback
+  zle -Fw "$fd" .prompt.git-status.callback
 }
-
-.zshrc.precmd.callback() {
+zle -N .prompt.git-status.callback
+.prompt.git-status.callback() {
   local fd=$1
   {
-    zle -F "$fd"  # Unhook callback.
+    zle -F "$fd"  # Unhook this callback.
 
     [[ $2 != (|hup) ]] &&
         return  # Error occured.
@@ -88,13 +91,11 @@ PROMPT_EOL_MARK='%F{cyan}%S%#%f%s'
   PS2="${(j::)indent}" RPS2='%F{11}%^'
 }
 
-# Xtrace prompt
+# Debugging prompt
 () {
   local -a indent=( '%('{1..36}"e,$( echoti cuf 2 ),)" )
   local i=$'\t'${(j::)indent}
-  PS4=$'\r%(?,,'$i$'  -> %F{9}%?%f\n)'
-  PS4+=$'%{\e[2m%}%F{10}%1N%f\r'
-  PS4+=$i$'%I%b %(1_,%F{11}%_%f ,)'
+  PS4=$'\r%(?,,'$i$'  -> %F{9}%?%f\n)%{\e[2m%}%F{10}%1N%f\r'$i$'%I%b %(1_,%F{11}%_%f ,)'
 }
 
 
@@ -118,8 +119,10 @@ setopt autocd autopushd chaselinks pushdignoredups pushdminus
 
 
 ##
-# Completion
+# Completion config
 #
+
+# Additional completions
 fpath+=( ~[zsh-users/zsh-completions]/src )
 
 # Real-time auto-completion
@@ -134,22 +137,30 @@ znap eval pipenv-completion "pipenv --completion              # $PYENV_VERSION"
 ##
 # Key bindings
 #
+zmodload -F zsh/parameter p:functions p:functions_source  # Used below
+
 setopt NO_flowcontrol  # Enable ^Q and ^S.
 
 # Better command line editing tools
 znap source marlonrichert/zsh-edit
 zstyle ':edit:*' word-chars '*?\'
-bindkey -c '^Xp' '@cd .'
-bindkey -c '^Xo' '@open .'
-bindkey -c '^Xc' '@code .'
-bindkey -c '^Xs' '+git status -Mu --show-stash'
-bindkey -c '^Xl' '@git log'
-bindkey -c "$key[PageUp]"   'git push && git fetch'
-bindkey -c "$key[PageDown]" 'git fetch && git pull --autostash'
+
 bindkey "$key[Home]" beginning-of-buffer
 bindkey "$key[End]"  end-of-buffer
 
-# Replace some default keybindings with better widgets.
+bind '^Xp' 'cd .'
+bind '^Xo' 'open .'
+bind '^Xc' 'code .'
+bind '^Xs' 'git status -Mu --show-stash'
+bind '^Xl' 'git log'
+bind "$key[PageUp]"   'git push && git fetch'
+bind "$key[PageDown]" 'git fetch && git pull --autostash'
+
+# Refresh the prompt's git status after each of the above commands.
+autoload +X -Uz ${functions_source[_execute_cmd]:-_execute_cmd}
+functions[_execute_cmd]="$functions[_execute_cmd]; .prompt.git-status"
+
+# Replace some default keybindings with better built-in widgets.
 bindkey '^[^_'  copy-prev-shell-word
 bindkey '^[q'   push-line-or-edit
 bindkey '^V'    vi-quoted-insert
@@ -158,7 +169,6 @@ bindkey '^V'    vi-quoted-insert
 alias run-help > /dev/null &&
     unalias run-help
 autoload +X -Uz run-help
-zmodload -F zsh/parameter p:functions_source
 autoload -Uz $functions_source[run-help]-*~*.zwc
 
 # Alt-Shift-/: Show definition of current command.
@@ -204,6 +214,7 @@ fi
 ##
 # Commands, aliases & functions
 #
+
 znap eval pyenv-init ${${:-=pyenv}:A}' init -'  # Abs path for cache invalidation
 
 # History editing tools
