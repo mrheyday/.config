@@ -20,10 +20,17 @@ zshenv = ~/.zshenv
 sshconfig = ~/.ssh/config
 dotfiles := $(zshenv) $(sshconfig)
 ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
-vscodesettings = ~/Library/ApplicationSupport/Code/User/settings.json
-vscodekeybindings = ~/Library/ApplicationSupport/Code/User/keybindings.json
-dotfiles += $(vscodesettings) $(vscodekeybindings)
+vscode-settings = ~/Library/ApplicationSupport/Code/User/settings.json
+vscode-keybindings = ~/Library/ApplicationSupport/Code/User/keybindings.json
+dotfiles += $(vscode-settings) $(vscode-keybindings)
 endif
+
+XDG_DATA_HOME = ~/.local/share
+zsh-datadir = $(XDG_DATA_HOME)/zsh/
+zsh-hist = $(zsh-datadir)history
+zsh-hist-old = ~/.zsh_history
+zsh-cdr = $(zsh-datadir).chpwd-recent-dirs
+zsh-cdr-old = ~/.chpwd-recent-dirs
 
 prefix = /usr/local
 ifeq (linux-gnu,$(shell print $$OSTYPE))
@@ -72,30 +79,22 @@ PIPFLAGS = -q
 PIPX = ~/.local/bin/pipx
 PIPXFLAGS =
 PIPENV = ~/.local/bin/pipenv
-
-backups := $(wildcard $(dotfiles:%=%~))
-ifneq (,$(wildcard $(OSASCRIPT)))
-find = ) (
-replace = ), (
-backups := $(subst $(find),$(replace),$(foreach f,$(backups),(POSIX file "$(f)")))
+ifeq (linux-gnu,$(shell print $$OSTYPE))
+python-dependencies = bzip2 sqlite3 zlib1g-dev
 endif
 
-XDG_DATA_HOME = ~/.local/share
-zsh-datadir = $(XDG_DATA_HOME)/zsh/
-zsh-hist = $(zsh-datadir)history
-zsh-hist-old = ~/.zsh_history
-zsh-cdr = $(zsh-datadir).chpwd-recent-dirs
-zsh-cdr-old = ~/.chpwd-recent-dirs
-
 all: terminal git
-
-.SUFFIXES:
-FORCE:
 
 terminal: FORCE
 ifneq (,$(wildcard $(DCONF)))
 	$(DCONF) dump /org/gnome/terminal/ > $(CURDIR)/terminal/dconf.txt
 endif
+
+git: git-config git-remote git-branch
+	$(GIT) fetch $(GITFLAGS) -t upstream
+	$(GIT) branch $(GITFLAGS) -u upstream/main main
+	$(GIT) pull $(GITFLAGS) --autostash upstream > /dev/null
+	$(GIT) remote set-head upstream -a > /dev/null
 
 git-config: FORCE
 	$(GIT) config remote.pushdefault origin
@@ -112,11 +111,12 @@ ifeq (,$(shell $(GIT) branch -l main))
 	-$(GIT) branch $(GITFLAGS) -m master main
 endif
 
-git: git-config git-remote git-branch
-	$(GIT) fetch $(GITFLAGS) -t upstream
-	$(GIT) branch $(GITFLAGS) -u upstream/main main
-	$(GIT) pull $(GITFLAGS) --autostash upstream > /dev/null
-	$(GIT) remote set-head upstream -a > /dev/null
+backups := $(wildcard $(dotfiles:%=%~))
+ifneq (,$(wildcard $(OSASCRIPT)))
+find = ) (
+replace = ), (
+backups := $(subst $(find),$(replace),$(foreach f,$(backups),(POSIX file "$(f)")))
+endif
 
 clean: FORCE
 ifneq (,$(backups))
@@ -126,15 +126,6 @@ else ifneq (,$(wildcard $(GIO)))
 	$(GIO) trash $(backups)
 endif
 endif
-
-installdirs: FORCE
-ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
-ifneq (,$(wildcard $(HOME)/Library/ApplicationSupport))
-	$(OSASCRIPT) -e 'tell application "Finder" to delete every item of {(POSIX file "$(HOME)/Library/ApplicationSupport")}' &> /dev/null || :
-endif
-	ln -fns "$(HOME)/Library/Application Support" ~/Library/ApplicationSupport
-endif
-	mkdir -pm 0700 $(sort $(zsh-datadir) $(dir $(dotfiles)))
 
 install: all installdirs install-brew install-shell install-python $(dotfiles:%=%~)
 ifneq (,$(wildcard $(DCONF)))
@@ -149,8 +140,8 @@ endif
 	ln -s $(CURDIR)/zsh/.zshenv $(zshenv)
 ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
 	ln -s $(CURDIR)/ssh/config $(sshconfig)
-	ln -s $(CURDIR)/vscode/settings.json $(vscodesettings)
-	ln -s $(CURDIR)/vscode/keybindings.json $(vscodekeybindings)
+	ln -s $(CURDIR)/vscode/settings.json $(vscode-settings)
+	ln -s $(CURDIR)/vscode/keybindings.json $(vscode-keybindings)
 endif
 ifeq (,$(wildcard $(zsh-hist)))
 ifneq (,$(wildcard $(zsh-hist-old)))
@@ -163,10 +154,47 @@ ifneq (,$(wildcard $(zsh-cdr-old)))
 endif
 endif
 
-$(dotfiles:%=%~): clean
-	$(if $(wildcard $(@:%~=%)), mv $(@:%~=%) $@,)
+installdirs: FORCE
+ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
+ifneq (,$(wildcard $(HOME)/Library/ApplicationSupport))
+	$(OSASCRIPT) -e 'tell application "Finder" to delete every item of {(POSIX file "$(HOME)/Library/ApplicationSupport")}' &> /dev/null || :
+endif
+	ln -fns "$(HOME)/Library/Application Support" ~/Library/ApplicationSupport
+endif
+	mkdir -pm 0700 $(sort $(zsh-datadir) $(dir $(dotfiles)))
+
+install-brew: $(formulas) $(casks) install-brew-autoupdate
+	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) autoremove $(BREWFLAGS)
+	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) cleanup $(BREWFLAGS)
+
+$(formulas): install-brew-upgrade
+	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) install $(BREWFLAGS) --formula $(notdir $@)
+
+$(casks): $(tapsdir)/homebrew-cask
+ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
+	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) install $(BREWFLAGS) --cask $@ 2> /dev/null
+endif
+
+install-brew-autoupdate: $(tapsdir)/homebrew-autoupdate
+ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
+	-HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) autoupdate stop $(BREWFLAGS) > /dev/null
+	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) autoupdate start $(BREWFLAGS) --cleanup --upgrade > /dev/null
+endif
+
+$(taps): install-brew-upgrade
+	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) tap $(BREWFLAGS) $(subst homebrew-,homebrew/,$(notdir $@))
+
+install-brew-upgrade: $(BREW)
+	$(BREW) update
+	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) upgrade $(BREWFLAGS)
+
+$(BREW):
+	$(BASH) -c "$$( $(CURL) -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh )"
 
 install-shell: install-shell-executables install-shell-change
+
+install-shell-executables: $(ZNAP)
+	source $(ZNAP) && znap install $(executables) > /dev/null
 
 install-shell-change: FORCE
 ifneq (,$(wildcard $(DSCL)))
@@ -179,72 +207,21 @@ ifneq ($(SHELL),$(findstring $(SHELL),$(shell $(GETENT) passwd $$LOGNAME)))
 endif
 endif
 
-$(BREW):
-	$(BASH) -c "$$( $(CURL) -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh )"
-
-$(taps): install-brew-upgrade
-	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) tap $(BREWFLAGS) $(subst homebrew-,homebrew/,$(notdir $@))
-
-$(formulas): install-brew-upgrade
-	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) install $(BREWFLAGS) --formula $(notdir $@)
-
-ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
-$(casks): $(tapsdir)/homebrew-cask
-	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) install $(BREWFLAGS) --cask $@ 2> /dev/null
-endif
-
-install-brew: $(formulas) $(casks) install-brew-autoupdate
-	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) autoremove $(BREWFLAGS)
-	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) cleanup $(BREWFLAGS)
-
-install-brew-upgrade: $(BREW)
-	$(BREW) update
-	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) upgrade $(BREWFLAGS)
-
-install-brew-autoupdate: $(tapsdir)/homebrew-autoupdate
-ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
-	-HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) autoupdate stop $(BREWFLAGS) > /dev/null
-	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) autoupdate start $(BREWFLAGS) --cleanup --upgrade > /dev/null
-endif
-
 $(ZNAP):
 	mkdir -pm 0700 $(abspath $(dir $@)..)
 	$(GIT) -C $(abspath $(dir $@)..) clone $(GITFLAGS) --depth=1 https://github.com/marlonrichert/zsh-snap.git
 
-install-shell-executables: $(ZNAP)
-	source $(ZNAP) && znap install $(executables) > /dev/null
-
 install-python: install-python-pipenv
 
-ifeq (linux-gnu,$(shell print $$OSTYPE))
-packages = bzip2 sqlite3 zlib1g-dev
-endif
-
-install-python-pyenv: $(HOMEBREW_CELLAR)/pyenv $(packages)
-ifeq (,$(findstring $(PYENV_VERSION),$(shell $(PYENV) versions --bare)))
-	@print '\e[5;31;40mCompiling Python $(PYENV_VERSION). This might take a while! Please stand by...\e[0m' && :
-	PYENV_ROOT=$(PYENV_ROOT) $(PYENV) install $(PYENVFLAGS) -s $(PYENV_VERSION)
-endif
-	PYENV_ROOT=$(PYENV_ROOT) $(PYENV) global $(PYENV_VERSION)
-
-$(packages): FORCE
-ifeq (linux-gnu,$(shell print $$OSTYPE))
-	$(APT) show $@ &> /dev/null || sudo $(APT) install $@
-endif
-
-install-python-pipx-pip: install-python-pip
-	$(PIP) install $(PIPFLAGS) -U --user pipx
-
-install-python-pipenv-pipx: install-python-pipx
-	$(PIPX) upgrade pipenv &> /dev/null || $(PIPX) install $(PIPXFLAGS) pipenv > /dev/null
+install-python-pipenv: install-python-pipenv-brew install-python-pipenv-pipx
 
 install-python-pipenv-brew: FORCE
 ifneq (,$(wildcard $(HOMEBREW_CELLAR)/pipenv))
 	-HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) uninstall $(BREWFLAGS) --formula pipenv
 endif
 
-install-python-pip: install-python-pyenv
-	$(PIP) install $(PIPFLAGS) -U pip
+install-python-pipenv-pipx: install-python-pipx
+	$(PIPX) upgrade pipenv &> /dev/null || $(PIPX) install $(PIPXFLAGS) pipenv > /dev/null
 
 install-python-pipx: install-python-pipx-brew install-python-pipx-pip
 
@@ -253,4 +230,26 @@ ifneq (,$(wildcard $(HOMEBREW_CELLAR)/pipx))
 	-HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) uninstall $(BREWFLAGS) --formula pipx
 endif
 
-install-python-pipenv: install-python-pipenv-brew install-python-pipenv-pipx
+install-python-pipx-pip: install-python-pip
+	$(PIP) install $(PIPFLAGS) -U --user pipx
+
+install-python-pip: install-python-pyenv
+	$(PIP) install $(PIPFLAGS) -U pip
+
+install-python-pyenv: $(HOMEBREW_CELLAR)/pyenv $(python-dependencies)
+ifeq (,$(findstring $(PYENV_VERSION),$(shell $(PYENV) versions --bare)))
+	@print '\e[5;31;40mCompiling Python $(PYENV_VERSION). This might take a while! Please stand by...\e[0m' && :
+	PYENV_ROOT=$(PYENV_ROOT) $(PYENV) install $(PYENVFLAGS) -s $(PYENV_VERSION)
+endif
+	PYENV_ROOT=$(PYENV_ROOT) $(PYENV) global $(PYENV_VERSION)
+
+$(python-dependencies): FORCE
+ifeq (linux-gnu,$(shell print $$OSTYPE))
+	$(APT) show $@ &> /dev/null || sudo $(APT) install $@
+endif
+
+$(dotfiles:%=%~): clean
+	$(if $(wildcard $(@:%~=%)), mv $(@:%~=%) $@,)
+
+.SUFFIXES:
+FORCE:
