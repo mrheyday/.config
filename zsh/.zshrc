@@ -42,44 +42,53 @@ add-zsh-hook chpwd .prompt.chpwd
 setopt cdsilent pushdsilent # Suppress built-in output of cd and pushd.
 
 PS1='%F{%(?,10,9)}%#%f '
-znap prompt                 # Make the left side of the primary prompt visible, immediately.
+# znap prompt                 # Make the left side of the primary prompt visible, immediately.
 
 ZLE_RPROMPT_INDENT=0        # Right prompt margin
 setopt transientrprompt     # Auto-remove the right side of each prompt.
 
-# Asynchronously check for git status whenever the prompt gets (re)drawn.
+# Reduce prompt latency by fetching git status asynchronously.
 autoload -Uz add-zsh-hook
-add-zsh-hook precmd .prompt.git-status
-.prompt.git-status() {
+add-zsh-hook precmd .prompt.git-status.async
+zle -N .prompt.git-status.callback
+.prompt.git-status.async() {
   local fd
-  exec {fd}< <( # Start asynchronous process.
-    local gitstatus MATCH MBEGIN MEND
-
-    if ! gitstatus="$( git status -sbu 2> /dev/null )"; then
-      print
-      return
-    fi
-
-    local -a lines=( "${(f)gitstatus}" )
-    local -aU symbols=( ${(@MSu)lines[2,-1]##[^[:blank:]]##} )
-    print -r -- "${${lines[1]/'##'/$symbols}//(#m)$'\C-[['[;[:digit:]]#m/%{${MATCH}%\}}"
-  )
+  exec {fd}< <( .prompt.git-status )
   zle -Fw "$fd" .prompt.git-status.callback
 }
-zle -N .prompt.git-status.callback
 .prompt.git-status.callback() {
-  local fd=$1
+  local fd=$1 REPLY
   {
     zle -F "$fd"  # Unhook this callback.
-
     [[ $2 != (|hup) ]] &&
         return  # Error occured.
-
-    read -ru $fd -- RPS1
-    zle .reset-prompt
+    read -ru $fd
+    .prompt.git-status.update "$REPLY"
   } always {
     exec {fd}<&-  # Close file descriptor.
   }
+}
+
+# Periodically sync git status in prompt.
+TMOUT=2  # Update interval in seconds
+trap .prompt.git-status.update ALRM
+.prompt.git-status.update() {
+  local rps1=${1-$( .prompt.git-status )}
+  [[ $rps1 == $RPS1 ]] &&
+      return 1
+  RPS1=$rps1
+  zle .reset-prompt
+}
+
+.prompt.git-status() {
+  local MATCH MBEGIN MEND
+  local -a lines
+  if ! lines=( ${(f)"$( git status -sbu 2> /dev/null )"} ); then
+    print
+    return
+  fi
+  local -aU symbols=( ${(@MSu)lines[2,-1]##[^[:blank:]]##} )
+  print -r -- "${${lines[1]/'##'/$symbols}//(#m)$'\C-[['[;[:digit:]]#m/%{${MATCH}%\}}"
 }
 
 # Shown after output that doesn't end in a newline.
@@ -158,7 +167,7 @@ bind "$key[PageDown]" 'git fetch && git pull --autostash'
 
 # Refresh the prompt's git status after each of the above commands.
 autoload +X -Uz ${functions_source[_execute_cmd]:-_execute_cmd}
-functions[_execute_cmd]="$functions[_execute_cmd]; .prompt.git-status"
+functions[_execute_cmd]="$functions[_execute_cmd]; .prompt.git-status.async"
 
 # Replace some default keybindings with better built-in widgets.
 bindkey '^[^_'  copy-prev-shell-word
