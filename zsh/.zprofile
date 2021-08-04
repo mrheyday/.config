@@ -44,7 +44,7 @@ export CATALINA_BASE=~/Tomcat9
 
 export LANG=en_US.UTF-8
 export VISUAL=code
-export EDITOR=nano
+export EDITOR=micro
 export READNULLCMD=bat
 export PAGER=less
 export MANPAGER='bat -l man'; [[ $OSTYPE == darwin* ]] && MANPAGER="col -bpx | $MANPAGER"

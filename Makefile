@@ -5,7 +5,7 @@ SHELL = /bin/zsh
 
 # Include only the software that we want on all machines.
 executables = aureliojargas/clitest ekalinin/github-markdown-toc
-formulas := asciinema bat less nano pyenv
+formulas := asciinema bat less micro pyenv
 taps := services
 ifeq (linux-gnu,$(shell print $$OSTYPE))
 formulas += git grep

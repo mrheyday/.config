@@ -241,7 +241,7 @@ else
 fi
 
 alias \$= %=  # For pasting command line examples
-alias grep='\grep --color' make='\make -j'
+alias grep='\grep --color' make='\make -j' nano=$EDITOR
 
 # Pattern matching support for `cp`, `ln` and `mv`
 # See http://zsh.sourceforge.net/Doc/Release/User-Contributions.html#index-zmv
