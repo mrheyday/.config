@@ -31,17 +31,23 @@ setopt NO_autoparamslash interactivecomments
 autoload -Uz add-zsh-hook
 add-zsh-hook chpwd .prompt.chpwd
 .prompt.chpwd() {
-  zle && zle -I # Invalidate the prompt, in case this gets called while the ZLE is active.
+  if zle; then
+    [[ $CONTEXT == start ]] &&
+        .prompt.git-status.async # Update git status, if on primary prompt.
+    zle -I  # Prepare the line editor for our output, below.
+  fi
   print -P -- '\n%F{12}%~%f/'
   RPS1=
   (
     local upstream
     upstream=${$( git rev-parse --abbrev-ref @{u} 2> /dev/null )%%/*} &&
-        git fetch -t $upstream '+refs/heads/*:refs/remotes/'$upstream'/*' &> /dev/null &&
+        git fetch -qt $upstream '+refs/heads/*:refs/remotes/'$upstream'/*' &> /dev/null &&
         git remote set-branches $upstream '*' &> /dev/null
   ) &|
+  typeset -gHi _prompt_last_fetch=$SECONDS
 }
 .prompt.chpwd               # ...and once on startup, immediately.
+
 setopt cdsilent pushdsilent # Suppress built-in output of cd and pushd.
 
 PS1='%F{%(?,10,9)}%#%f '
@@ -53,20 +59,22 @@ setopt transientrprompt     # Auto-remove the right side of each prompt.
 # Reduce prompt latency by fetching git status asynchronously.
 autoload -Uz add-zsh-hook
 add-zsh-hook precmd .prompt.git-status.async
-zle -N .prompt.git-status.callback
 .prompt.git-status.async() {
   local fd
-  exec {fd}< <( .prompt.git-status )
+  exec {fd}< <( .prompt.git-status.parse )
   zle -Fw "$fd" .prompt.git-status.callback
 }
+zle -N .prompt.git-status.callback
 .prompt.git-status.callback() {
   local fd=$1 REPLY
   {
     zle -F "$fd"  # Unhook this callback.
-    [[ $2 != (|hup) ]] &&
+
+    [[ $2 == (|hup) ]] ||
         return  # Error occured.
+
     read -ru $fd
-    .prompt.git-status.update "$REPLY"
+    .prompt.git-status.repaint "$REPLY"
   } always {
     exec {fd}<&-  # Close file descriptor.
   }
@@ -74,22 +82,33 @@ zle -N .prompt.git-status.callback
 
 # Periodically sync git status in prompt.
 TMOUT=2  # Update interval in seconds
-trap .prompt.git-status.update ALRM
-.prompt.git-status.update() {
-  local rps1=${1-$( .prompt.git-status )}
-  [[ $rps1 == $RPS1 ]] &&
-      return 1
-  RPS1=$rps1
-  zle && zle .reset-prompt
+trap .prompt.git-status.sync ALRM
+.prompt.git-status.sync() {
+  [[ $CONTEXT == start ]] ||
+      return  # Update only on primary prompt.
+
+  if (( SECONDS - _prompt_last_fetch > 120 )); then
+    ( git fetch -q &> /dev/null ) &|
+    _prompt_last_fetch=$SECONDS
+  fi
+  .prompt.git-status.repaint "$( .prompt.git-status.parse )"
 }
 
-.prompt.git-status() {
+.prompt.git-status.repaint() {
+  [[ $1 == $RPS1 ]] &&
+      return  # Don't repaint when there's no change.
+
+  RPS1=$1
+  zle .reset-prompt
+}
+
+.prompt.git-status.parse() {
   local MATCH MBEGIN MEND
   local -a lines
-  if ! lines=( ${(f)"$( git status -sbu 2> /dev/null )"} ); then
-    print
-    return
-  fi
+
+  lines=( ${(f)"$( git status -sbu 2> /dev/null )"} ) ||
+      { print; return } # Not a git repo
+
   local -aU symbols=( ${(@MSu)lines[2,-1]##[^[:blank:]]##} )
   print -r -- "${${lines[1]/'##'/$symbols}//(#m)$'\C-[['[;[:digit:]]#m/%{${MATCH}%\}}"
 }

@@ -47,7 +47,11 @@ export VISUAL=code
 export EDITOR=micro
 export READNULLCMD=bat
 export PAGER=less
-export MANPAGER='bat -l man'; [[ $OSTYPE == darwin* ]] && MANPAGER="col -bpx | $MANPAGER"
+
+export MANPAGER='bat -l man'
+[[ $OSTYPE == darwin* ]] &&
+    MANPAGER="col -bpx | $MANPAGER"
+
 export LESS='-FiMr -j.5 --incsearch'
 export LESSHISTFILE=$XDG_DATA_HOME/less/lesshst
 export QUOTING_STYLE=escape # Used by GNU ls
