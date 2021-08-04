@@ -1,5 +1,8 @@
 #!/bin/zsh
+
+##
 # Zsh runs .zshrc for each interactive shell, after .zprofile
+#
 
 
 ##
@@ -77,7 +80,7 @@ trap .prompt.git-status.update ALRM
   [[ $rps1 == $RPS1 ]] &&
       return 1
   RPS1=$rps1
-  zle .reset-prompt
+  zle && zle .reset-prompt
 }
 
 .prompt.git-status() {
@@ -165,10 +168,6 @@ bind '^Xl' 'git log'
 bind "$key[PageUp]"   'git push && git fetch'
 bind "$key[PageDown]" 'git fetch && git pull --autostash'
 
-# Refresh the prompt's git status after each of the above commands.
-autoload +X -Uz ${functions_source[_execute_cmd]:-_execute_cmd}
-functions[_execute_cmd]="$functions[_execute_cmd]; .prompt.git-status.async"
-
 # Replace some default keybindings with better built-in widgets.
 bindkey '^[^_'  copy-prev-shell-word
 bindkey '^[q'   push-line-or-edit
@@ -185,7 +184,6 @@ alias which-command > /dev/null &&
     unalias which-command
 autoload -Uz which-command
 zle -N which-command
-
 
 ##
 # Miscellaneous
