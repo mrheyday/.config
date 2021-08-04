@@ -118,15 +118,27 @@ setopt autocd autopushd chaselinks pushdignoredups pushdminus
 
 # Load dir stack from file, excl. current dir, temp dirs & non-existing dirs.
 () {
+  zmodload -F zsh/parameter p:dirstack
   local cdr=$XDG_DATA_HOME/zsh/chpwd-recent-dirs
 
   [[ -r $cdr ]] ||
       return
 
-  zmodload -F zsh/parameter p:dirstack
-  typeset -gaU dirstack=(
-      ${(u)^${(f@Q)"$( < $cdr )"}[@]:#($PWD|${TMPDIR}/*)}(N-/)
-  )
+  typeset -gaU dirstack=( ${(u)^${(f@Q)"$( < $cdr )"}[@]:#($PWD|${TMPDIR:-/tmp}/*)}(N-/) )
+}
+
+# Needed by VTE-based terminals (Gnome Terminal, Tilix) to preserve $PWD on new windows/tabs.
+[[ $VENDOR == ubuntu ]] &&
+    source /etc/profile.d/vte-*.*.sh
+
+# Both Apple & VTE attach their function to the wrong hook!
+() {
+  local f=$precmd_functions[(R)(__vte_osc7|update_terminal_cwd)]
+  if [[ -n $f ]]; then
+    add-zsh-hook -d precmd $f  # Does not need to run before each prompt.
+    add-zsh-hook chpwd $f      # Run it when we change dirs...
+    $f                         # ...and once for our initial dir.
+  fi
 }
 
 
@@ -204,18 +216,6 @@ znap source zsh-users/zsh-autosuggestions
 ZSH_HIGHLIGHT_HIGHLIGHTERS=( main brackets )
 znap source zsh-users/zsh-syntax-highlighting
 # znap source zdharma/fast-syntax-highlighting
-
-# Apple attaches their function to the wrong hook in /etc/zshrc_Apple_Terminal.
-if (( $precmd_functions[(I)update_terminal_cwd] )); then
-  add-zsh-hook -d precmd update_terminal_cwd  # Doesn't need to run before each prompt.
-  add-zsh-hook chpwd update_terminal_cwd      # Run it only when we change dirs...
-  update_terminal_cwd                         # ...and once for our initial dir.
-fi
-
-# Necessary for VTE-based terminals (Gnome Terminal, Tilix) in Ubuntu to preserve $PWD when opening
-# new windows/tabs.
-[[ $VENDOR == ubuntu && -n $VTE_VERSION ]] &&
-    source /etc/profile.d/vte-*.*.sh
 
 
 ##
