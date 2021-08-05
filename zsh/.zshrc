@@ -44,7 +44,6 @@ add-zsh-hook chpwd .prompt.chpwd
         git fetch -qt $upstream '+refs/heads/*:refs/remotes/'$upstream'/*' &> /dev/null &&
         git remote set-branches $upstream '*' &> /dev/null
   ) &|
-  typeset -gHi _prompt_last_fetch=$SECONDS
 }
 .prompt.chpwd               # ...and once on startup, immediately.
 
@@ -87,10 +86,12 @@ trap .prompt.git-status.sync ALRM
   [[ $CONTEXT == start ]] ||
       return  # Update only on primary prompt.
 
-  if (( SECONDS - _prompt_last_fetch > 120 )); then
-    ( git fetch -q &> /dev/null ) &|
-    _prompt_last_fetch=$SECONDS
-  fi
+  (
+    # Fetch only if no fetch has occured within the last 2 minutes.
+    local gitdir=$( git rev-parse --git-dir 2> /dev/null )
+    [[ -n $gitdir && -z $gitdir/FETCH_HEAD(Nmm-2) ]] &&
+        git fetch -q &> /dev/null
+  ) &|
   .prompt.git-status.repaint "$( .prompt.git-status.parse )"
 }
 
