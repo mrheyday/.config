@@ -265,7 +265,6 @@ znap source zsh-users/zsh-syntax-highlighting
 
 # History editing tools
 znap source marlonrichert/zsh-hist
-zstyle ':hist:*' expand-aliases yes
 
 # File type associations
 alias -s {gradle,json,md,patch,properties,txt,xml,yml}=$PAGER
@@ -278,23 +277,23 @@ else
 fi
 
 alias \$= %=  # For pasting command line examples
-alias grep='\grep --color' make='\make -j' nano=$EDITOR
+alias grep='grep --color' make='make -j' nano=$EDITOR
 
 # Pattern matching support for `cp`, `ln` and `mv`
 # See http://zsh.sourceforge.net/Doc/Release/User-Contributions.html#index-zmv
 # Tip: Use -n for no execution. (Print what would happen, but don’t do it.)
 autoload -Uz zmv
-alias zmv='\zmv -v' zcp='\zmv -Cv' zln='\zmv -Lv'
+alias zmv='zmv -v' zcp='zmv -Cv' zln='zmv -Lv'
 
 # Paging & colors for `ls`
 [[ $OSTYPE != linux-gnu ]] &&
     hash ls==gls  # GNU coreutils ls
 ls() {
-  command ls --group-directories-first --width=$COLUMNS --color -AFvx "$@" | $PAGER
+  command ls --width=$COLUMNS "$@" | $PAGER
   return $pipestatus[1]  # Return exit status of ls, not $PAGER
 }
-zstyle ':completion:*:ls:*:options' ignored-patterns \
-    --group-directories-first --width --color -A -F -v -x
+zstyle ':completion:*:ls:*:options' ignored-patterns --width
+alias ls='ls --group-directories-first --color -AFvx'
 
 # Safer alternatives to `rm`
 if [[ $OSTYPE == darwin* ]]; then
