@@ -22,8 +22,8 @@ export HOMEBREW_NO_AUTO_UPDATE=1
 path=( /home/linuxbrew/.linuxbrew/bin(N) $path[@] )
 eval "$( brew shellenv )"
 
-export PYENV_ROOT=~/.pyenv
 export PYENV_VERSION=3.7.10
+export PYENV_ROOT=~/.pyenv
 export PIPX_BIN_DIR=~/.local/bin
 
 export ANDROID_SDK_ROOT=$HOMEBREW_PREFIX/share/android-commandlinetools
@@ -34,11 +34,16 @@ path=(
   $PYENV_ROOT/{bin,shims}(N)
   $ANDROID_SDK_ROOT/{emulator,platform-tools}(N)
   $HOMEBREW_PREFIX/opt/{mariadb@10.3,ncurses,tomcat@9}/bin(N)
-  /opt/local/{bin,sbin}(N) # MacPorts
+  /opt/local/{,s}bin(N) # MacPorts
   $path[@]
   .
 )
 
+[[ $OSTYPE == linux-gnu ]] &&
+    fpath+=( $HOMEBREW_PREFIX/share/zsh/site-functions )
+
+[[ $OSTYPE == darwin* ]] &&
+    export JAVA_HOME=$( /usr/libexec/java_home -v 1.8 )
 export CATALINA_HOME=$HOMEBREW_PREFIX/opt/tomcat@9/libexec
 export CATALINA_BASE=~/Tomcat9
 
@@ -56,13 +61,9 @@ export LESS='-FiMr -j.5 --incsearch'
 export LESSHISTFILE=$XDG_DATA_HOME/less/lesshst
 export QUOTING_STYLE=escape # Used by GNU ls
 
-if [[ $OSTYPE == darwin*   ]]; then
-  export SHELL_SESSIONS_DISABLE=1
-  export JAVA_HOME=$( /usr/libexec/java_home -v 1.8 )
-fi
-if [[ $OSTYPE == linux-gnu ]]; then
-  export DEBIAN_PREVENT_KEYBOARD_CHANGES=1
-  fpath+=( $HOMEBREW_PREFIX/share/zsh/site-functions )
-fi
+[[ $OSTYPE == darwin* ]] &&
+    export SHELL_SESSIONS_DISABLE=1
+[[ $OSTYPE == linux-gnu ]] &&
+    export DEBIAN_PREVENT_KEYBOARD_CHANGES=1
 [[ $VENDOR == ubuntu ]] &&
     export skip_global_compinit=1

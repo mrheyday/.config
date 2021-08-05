@@ -1,12 +1,12 @@
 #!/bin/zsh
 # On macOS, this file is read automatically by /etc/zshrc
 typeset -gA key=(
+    Control-Space $'\0'
     Tab           $'\t'
     Shift-Tab     $'\e[Z'
     Return        $'\r'
     Backspace     $'\C-?'
     Delete        $'\e[3~'
-    Control-Space $'\0'
     Up            $'\e[A'
     Alt-Up        $'\e\e[A'
     Down          $'\e[B'

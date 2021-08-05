@@ -51,7 +51,7 @@ add-zsh-hook chpwd .prompt.chpwd
 setopt cdsilent pushdsilent # Suppress built-in output of cd and pushd.
 
 PS1='%F{%(?,10,9)}%#%f '
-# znap prompt                 # Make the left side of the primary prompt visible, immediately.
+znap prompt                 # Make the left side of the primary prompt visible, immediately.
 
 ZLE_RPROMPT_INDENT=0        # Right prompt margin
 setopt transientrprompt     # Auto-remove the right side of each prompt.
@@ -165,13 +165,20 @@ setopt autocd autopushd chaselinks pushdignoredups pushdminus
 # Completion config
 #
 
-# Additional completions
-fpath+=( ~[zsh-users/zsh-completions]/src )
+# Initialize $key codes for zsh-autocomplete and key bindings (below).
+[[ -v key ]] ||
+    source $ZDOTDIR/.zkbd/$TERM-$VENDOR
 
 # Real-time auto-completion
 znap source marlonrichert/zsh-autocomplete
 
-# Include Python version as comment, for cache invalidation.
+# Additional completions
+fpath+=( ~[zsh-users/zsh-completions]/src )
+
+# Include path for `znap eval` cache invalidation.
+znap eval pyenv-init ${${:-=pyenv}:A}' init -'
+
+# Include Python version as comment, for `znap eval` cache invalidation.
 znap eval    pip-completion "pip completion --zsh             # $PYENV_VERSION"
 znap eval   pipx-completion "register-python-argcomplete pipx # $PYENV_VERSION"
 znap eval pipenv-completion "pipenv --completion              # $PYENV_VERSION"
@@ -188,8 +195,22 @@ setopt NO_flowcontrol  # Enable ^Q and ^S.
 znap source marlonrichert/zsh-edit
 zstyle ':edit:*' word-chars '*?\'
 
-bindkey "$key[Home]" beginning-of-buffer
-bindkey "$key[End]"  end-of-buffer
+case $OSTYPE in
+  ( darwin* )
+    bindkey "$key[Home]" beginning-of-buffer
+    bindkey "$key[End]"  end-of-buffer
+  ;;
+  ( linux-gnu )
+    bindkey "$key[Control-Home]" beginning-of-buffer
+    bindkey "$key[Control-End]"  end-of-buffer
+    bindkey "$key[Home]" beginning-of-line
+    bindkey "$key[End]"  end-of-line
+    bindkey "$key[Control-Left]"  backward-subword
+    bindkey "$key[Control-Right]" forward-subword
+    bindkey "$key[Control-Backspace]" backward-kill-subword
+    bindkey "$key[Control-Delete]"    kill-subword
+  ;;
+esac
 
 bind '^Xp' 'cd .'
 bind '^Xo' 'open .'
@@ -216,6 +237,7 @@ alias which-command > /dev/null &&
 autoload -Uz which-command
 zle -N which-command
 
+
 ##
 # Miscellaneous
 #
@@ -240,8 +262,6 @@ znap source zsh-users/zsh-syntax-highlighting
 ##
 # Commands, aliases & functions
 #
-
-znap eval pyenv-init ${${:-=pyenv}:A}' init -'  # Abs path for cache invalidation
 
 # History editing tools
 znap source marlonrichert/zsh-hist
