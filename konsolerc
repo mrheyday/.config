@@ -1,0 +1,16 @@
+[Desktop Entry]
+DefaultProfile=Login shell.profile
+
+[DownloadDialog Settings]
+Height 1200=498
+Width 1920=700
+
+[Favorite Profiles]
+Favorites=Login shell.profile
+
+[MainWindow]
+Height 1200=1129
+State=AAAA/wAAAAD9AAAAAAAABygAAARPAAAABAAAAAQAAAAIAAAACPwAAAAA
+ToolBarsMovable=Disabled
+Width 1920=1832
+Window-Maximized 1200x1920=true

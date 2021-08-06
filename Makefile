@@ -24,6 +24,11 @@ vscode-settings = ~/Library/ApplicationSupport/Code/User/settings.json
 vscode-keybindings = ~/Library/ApplicationSupport/Code/User/keybindings.json
 dotfiles += $(vscode-settings) $(vscode-keybindings)
 endif
+ifeq (linux-gnu,$(shell print $$OSTYPE))
+konsole = $(HOME)/.local/share/konsole
+kxmlgui5 = $(HOME)/.local/share/kxmlgui5
+dotfiles += $(konsole) $(kxmlgui5)
+endif
 
 XDG_DATA_HOME = ~/.local/share
 zsh-datadir = $(XDG_DATA_HOME)/zsh/
@@ -50,6 +55,8 @@ APT = /usr/bin/apt
 DCONF = /usr/bin/dconf
 GETENT = /usr/bin/getent
 GIO = /usr/bin/gio
+SNAP = /usr/bin/snap
+WGET = /usr/bin/wget
 
 ifeq (linux-gnu,$(shell print $$OSTYPE))
 GIT = $(bindir)/git
@@ -132,7 +139,7 @@ else ifneq (,$(wildcard $(GIO)))
 endif
 endif
 
-install: all installdirs install-brew install-shell install-python install-code $(dotfiles:%=%~)
+install: all code konsole installdirs install-brew install-shell install-python $(dotfiles:%=%~)
 ifneq (,$(wildcard $(DCONF)))
 	$(DCONF) load /desktop/ibus/ < $(CURDIR)/ibus/dconf.txt
 	$(DCONF) load /org/gnome/terminal/ < $(CURDIR)/terminal/dconf.txt
@@ -142,6 +149,10 @@ ifneq (,$(wildcard $(DCONF)))
 	$(foreach p,$(filter-out list,\
 		$(shell $(DCONF) list /com/gexperts/Tilix/profiles/)),\
 		$(DCONF) write /com/gexperts/Tilix/profiles:/$(p)login-shell true;)
+endif
+ifeq (linux-gnu,$(shell print $$OSTYPE))
+	ln -fns $(CURDIR)/konsole $(konsole)
+	ln -fns $(CURDIR)/kxmlgui5 $(kxmlgui5)
 endif
 	ln -s $(CURDIR)/zsh/.zshenv $(zshenv)
 ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
@@ -255,15 +266,21 @@ ifeq (,$(findstring $(PYENV_VERSION),$(shell $(PYENV) versions --bare)))
 endif
 	PYENV_ROOT=$(PYENV_ROOT) $(PYENV) global $(PYENV_VERSION)
 
-$(python-dependencies): FORCE
+konsole $(python-dependencies): FORCE
 ifeq (linux-gnu,$(shell print $$OSTYPE))
-	$(APT) show $@ &> /dev/null || sudo $(APT) install $@
+ifneq (,$(shell $(APT) show $@ 2> /dev/null))
+	sudo $(APT) install $@
+endif
 endif
 
-install-code: FORCE
+code: FORCE
 ifeq (linux-gnu,$(shell print $$OSTYPE))
-	snap list code &> /dev/null && snap remove code || :
-	command -v code > /dev/null || ( TMPSUFFIX=.deb; sudo apt install =( wget -ncv --show-progress -O - 'https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64' ) )
+ifneq (,$(shell $(SNAP) list code $@ 2> /dev/null))
+	$(SNAP) list code &> /dev/null && $(SNAP) remove code
+endif
+	$(if command -v code > /dev/null,,\
+	( TMPSUFFIX=.deb; sudo $(APT) install =( $(WGET) -ncv --show-progress -O - 'https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64' ) )\
+	)
 endif
 
 $(dotfiles:%=%~): clean
