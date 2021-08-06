@@ -1,3 +1,18 @@
 // Place your key bindings in this file to override the defaultsauto[]
 [
+	{
+		"key": "ctrl+shift+backspace",
+		"command": "deleteAllLeft",
+		"when": "textInputFocus && !editorReadonly"
+	},
+	{
+		"key": "ctrl+shift+backspace",
+		"command": "-search.searchEditor.action.deleteFileResults",
+		"when": "inSearchEditor"
+	},
+	{
+		"key": "ctrl+shift+delete",
+		"command": "deleteAllRight",
+		"when": "textInputFocus && !editorReadonly"
+	}
 ]
