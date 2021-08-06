@@ -2,6 +2,7 @@
 menu-accelerator-enabled=false
 mnemonics-enabled=false
 new-terminal-mode='tab'
+shortcuts-enabled=true
 
 [legacy/keybindings]
 close-tab='<Super>w'
@@ -20,6 +21,8 @@ next-tab='<Super>Page_Down'
 paste='<Super>v'
 preferences='disabled'
 prev-tab='<Super>Page_Up'
+reset='disabled'
+reset-and-clear='<Super>k'
 select-all='<Super>a'
 switch-to-tab-1='disabled'
 switch-to-tab-10='disabled'
@@ -42,14 +45,11 @@ list=['b1dcc9dd-5262-4d8d-a863-c897e6d979b9']
 [legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9]
 background-color='rgb(46,52,54)'
 background-transparency-percent=10
-backspace-binding='auto'
 bold-is-bright=false
-cjk-utf8-ambiguous-width='narrow'
 cursor-shape='ibeam'
 custom-command='/bin/zsh -f'
 default-size-columns=165
 default-size-rows=49
-delete-binding='auto'
 exit-action='hold'
 foreground-color='rgb(211,215,207)'
 login-shell=true

@@ -166,11 +166,11 @@ setopt autocd autopushd chaselinks pushdignoredups pushdminus
 # Completion config
 #
 
-# Initialize $key codes for zsh-autocomplete and key bindings (below).
-[[ -v key ]] ||
-    source $ZDOTDIR/.zkbd/$TERM-$VENDOR
-
 # Real-time auto-completion
+if [[ $VENDOR == ubuntu ]]; then
+  key[Alt-Up]=$'\e[1;3A'
+  key[Alt-Down]=$'\e[1;3B'
+fi
 znap source marlonrichert/zsh-autocomplete
 
 # Additional completions
@@ -196,22 +196,10 @@ setopt NO_flowcontrol  # Enable ^Q and ^S.
 znap source marlonrichert/zsh-edit
 zstyle ':edit:*' word-chars '*?\'
 
-case $OSTYPE in
-  ( darwin* )
-    bindkey "$key[Home]" beginning-of-buffer
-    bindkey "$key[End]"  end-of-buffer
-  ;;
-  ( linux-gnu )
-    bindkey "$key[Control-Home]" beginning-of-buffer
-    bindkey "$key[Control-End]"  end-of-buffer
-    bindkey "$key[Home]" beginning-of-line
-    bindkey "$key[End]"  end-of-line
-    bindkey "$key[Control-Left]"  backward-subword
-    bindkey "$key[Control-Right]" forward-subword
-    bindkey "$key[Control-Backspace]" backward-kill-subword
-    bindkey "$key[Control-Delete]"    kill-subword
-  ;;
-esac
+if [[ $VENDOR == apple ]]; then
+  bindkey "$key[Home]" beginning-of-buffer
+  bindkey "$key[End]"  end-of-buffer
+fi
 
 bind '^Xp' 'cd .'
 bind '^Xo' 'open .'
@@ -270,7 +258,7 @@ znap source marlonrichert/zsh-hist
 # File type associations
 alias -s {gradle,json,md,patch,properties,txt,xml,yml}=$PAGER
 alias -s gz='gzip -l'
-if [[ $OSTYPE == darwin* ]]; then
+if [[ $VENDOR == apple ]]; then
     alias -s {log,out}='open -a Console'
 else
     alias -s {log,out}='tail -f'
@@ -297,7 +285,7 @@ zstyle ':completion:*:ls:*:options' ignored-patterns --width
 alias ls='ls --group-directories-first --color -AFvx'
 
 # Safer alternatives to `rm`
-if [[ $OSTYPE == darwin* ]]; then
+if [[ $VENDOR == apple ]]; then
   trash() {
     local -aU items=( $^@(N) )
     local -aU missing=( ${@:|items} )

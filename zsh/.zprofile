@@ -63,7 +63,5 @@ export QUOTING_STYLE=escape # Used by GNU ls
 
 [[ $OSTYPE == darwin* ]] &&
     export SHELL_SESSIONS_DISABLE=1
-[[ $OSTYPE == linux-gnu ]] &&
-    export DEBIAN_PREVENT_KEYBOARD_CHANGES=1
 [[ $VENDOR == ubuntu ]] &&
     export skip_global_compinit=1
