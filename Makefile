@@ -16,12 +16,12 @@ formulas += bash coreutils
 casks = karabiner-elements rectangle visual-studio-code
 endif
 
-zshenv = ~/.zshenv
-sshconfig = ~/.ssh/config
+zshenv = $(HOME)/.zshenv
+sshconfig = $(HOME)/.ssh/config
 dotfiles := $(zshenv) $(sshconfig)
 ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
-vscode-settings = ~/Library/ApplicationSupport/Code/User/settings.json
-vscode-keybindings = ~/Library/ApplicationSupport/Code/User/keybindings.json
+vscode-settings = $(HOME)/Library/ApplicationSupport/Code/User/settings.json
+vscode-keybindings = $(HOME)/Library/ApplicationSupport/Code/User/keybindings.json
 dotfiles += $(vscode-settings) $(vscode-keybindings)
 endif
 ifeq (linux-gnu,$(shell print $$OSTYPE))
@@ -30,12 +30,12 @@ kxmlgui5 = $(HOME)/.local/share/kxmlgui5
 dotfiles += $(konsole) $(kxmlgui5)
 endif
 
-XDG_DATA_HOME = ~/.local/share
+XDG_DATA_HOME = $(HOME)/.local/share
 zsh-datadir = $(XDG_DATA_HOME)/zsh/
 zsh-hist = $(zsh-datadir)history
-zsh-hist-old = ~/.zsh_history
+zsh-hist-old = $(HOME)/.zsh_history
 zsh-cdr = $(zsh-datadir).chpwd-recent-dirs
-zsh-cdr-old = ~/.chpwd-recent-dirs
+zsh-cdr-old = $(HOME)/.chpwd-recent-dirs
 
 prefix = /usr/local
 ifeq (linux-gnu,$(shell print $$OSTYPE))
@@ -66,7 +66,7 @@ endif
 GITFLAGS = -q
 
 ZSH = /bin/zsh
-ZNAP = ~/Git/zsh-snap/znap.zsh
+ZNAP = $(HOME)/Git/zsh-snap/znap.zsh
 
 BREW = $(bindir)/brew
 BREWFLAGS = -q
@@ -77,15 +77,15 @@ tapsdir = $(HOMEBREW_REPOSITORY)/Library/Taps/homebrew
 taps := $(taps:%=$(tapsdir)/homebrew-%)
 formulas := $(formulas:%=$(HOMEBREW_CELLAR)/%)
 
-PYENV_ROOT = ~/.pyenv
+PYENV_ROOT = $(HOME)/.pyenv
 PYENV = $(bindir)/pyenv
 PYENV_VERSION = 3.7.10
 PYENVFLAGS =
 PIP = $(PYENV_ROOT)/shims/pip
 PIPFLAGS = -q
-PIPX = ~/.local/bin/pipx
+PIPX = $(HOME)/.local/bin/pipx
 PIPXFLAGS =
-PIPENV = ~/.local/bin/pipenv
+PIPENV = $(HOME)/.local/bin/pipenv
 ifeq (linux-gnu,$(shell print $$OSTYPE))
 python-dependencies = bzip2 sqlite3 zlib1g-dev
 endif
@@ -176,7 +176,7 @@ ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
 ifneq (,$(wildcard $(HOME)/Library/ApplicationSupport))
 	$(OSASCRIPT) -e 'tell application "Finder" to delete every item of {(POSIX file "$(HOME)/Library/ApplicationSupport")}' &> /dev/null || :
 endif
-	ln -fns "$(HOME)/Library/Application Support" ~/Library/ApplicationSupport
+	ln -fns "$(HOME)/Library/Application Support" $(HOME)/Library/ApplicationSupport
 endif
 	mkdir -pm 0700 $(sort $(zsh-datadir) $(dir $(dotfiles)))
 
