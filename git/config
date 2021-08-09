@@ -29,7 +29,7 @@
 	HEAD = 14 normal italic
 	remotebranch = 13 normal
 	grafted = 1 normal italic
-	tag = 3 normal bold
+	tag = 3 normal
 	branch = 14 normal
 	stash = 8 normal
 [color "status"]
@@ -37,10 +37,10 @@
 	localbranch = 14 normal
 	remotebranch = 13 normal
 	branch = 14 normal
-	changed = 3 normal
-	unmerged = 1 normal
-	updated = 2 normal
-	added = 2 normal
+	changed = 11 normal
+	unmerged = 9 normal
+	updated = 10 normal
+	added = 10 normal
 	untracked = normal dim
 	header = normal
 [color "interactive"]
