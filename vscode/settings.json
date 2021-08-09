@@ -2,7 +2,6 @@
     "csscomb.preset": "../hiboxcentre/.csscomb.json",
     "diffEditor.ignoreTrimWhitespace": false,
     "diffEditor.renderSideBySide": false,
-    "editor.acceptSuggestionOnEnter": "off",
     "editor.accessibilitySupport": "off",
     "editor.dragAndDrop": false,
     "editor.emptySelectionClipboard": false,
@@ -19,6 +18,7 @@
     "editor.tabSize": 8,
     "editor.wordSeparators": " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~",
     "editor.wordWrapColumn": 99,
+    "explorer.confirmDelete": false,
     "explorer.confirmDragAndDrop": false,
     "files.associations": {
         "*.awk": "makefile",
@@ -60,5 +60,6 @@
         "*.ipynb": "jupyter.notebook.ipynb"
     },
     "workbench.fontAliasing": "antialiased",
+    "workbench.list.keyboardNavigation": "filter",
     "workbench.startupEditor": "none"
 }
