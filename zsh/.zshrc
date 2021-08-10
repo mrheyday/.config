@@ -32,9 +32,9 @@ autoload -Uz add-zsh-hook
 add-zsh-hook chpwd .prompt.chpwd
 .prompt.chpwd() {
   if zle; then
+    zle -I  # Prepare the line editor for our output.
     [[ $CONTEXT == start ]] &&
-        .prompt.git-status.async # Update git status, if on primary prompt.
-    zle -I  # Prepare the line editor for our output, below.
+        .prompt.git-status.async # Update git status if on primary prompt.
   fi
   print -P -- '\n%F{12}%~%f/'
   RPS1=
@@ -83,13 +83,14 @@ zle -N .prompt.git-status.callback
 TMOUT=2  # Update interval in seconds
 trap .prompt.git-status.sync ALRM
 .prompt.git-status.sync() {
-  [[ $CONTEXT == start ]] ||
-      return  # Update only on primary prompt.
+
+  (( TTYIDLE )) ||
+      return  # Avoid input lag.
 
   (
-    # Fetch only if no fetch has occured within the last 2 minutes.
-    local gitdir=$( git rev-parse --git-dir 2> /dev/null )
-    [[ -n $gitdir && -z $gitdir/FETCH_HEAD(Nmm-2) ]] &&
+    # Fetch only if there's no FETCH_HEAD or it is at least 2 minutes old.
+    local gitdir
+    gitdir=$( git rev-parse --git-dir 2> /dev/null ) && [[ -z $gitdir/FETCH_HEAD(Nmm-2) ]] &&
         git fetch -q &> /dev/null
   ) &|
   .prompt.git-status.repaint "$( .prompt.git-status.parse )"
@@ -97,10 +98,11 @@ trap .prompt.git-status.sync ALRM
 
 .prompt.git-status.repaint() {
   [[ $1 == $RPS1 ]] &&
-      return  # Don't repaint when there's no change.
+      return  # Do nothing when there's no change.
 
   RPS1=$1
-  zle .reset-prompt
+  zle && [[ $CONTEXT == start ]] &&
+      zle .reset-prompt  # Update on primary prompt only.
 }
 
 .prompt.git-status.parse() {
@@ -293,7 +295,7 @@ if [[ $VENDOR == apple ]]; then
         print -u2 "trash: no such file(s): $missing"
     (( $#items )) ||
         return 66
-    print Moving $( eval ls -d ${(q)items[@]%/} ) to Trash.
+    print Moving $( eval ls -d -- ${(q)items[@]%/} ) to Trash.
     items=( '(POSIX file "'${^items[@]:A}'")' )
     osascript -e 'tell application "Finder" to delete every item of {'${(j:, :)items}'}' \
         > /dev/null
