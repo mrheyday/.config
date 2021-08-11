@@ -1,6 +1,5 @@
 {
     "csscomb.preset": "../hiboxcentre/.csscomb.json",
-    "diffEditor.ignoreTrimWhitespace": false,
     "diffEditor.renderSideBySide": false,
     "editor.accessibilitySupport": "off",
     "editor.dragAndDrop": false,
