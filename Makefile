@@ -7,24 +7,23 @@ SHELL = /bin/zsh
 executables = aureliojargas/clitest ekalinin/github-markdown-toc
 formulas := asciinema bat less micro pyenv
 taps := services
-ifeq (linux-gnu,$(shell print $$OSTYPE))
-formulas += git grep
-endif
 ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
 taps += autoupdate cask cask-fonts cask-versions
 formulas += bash coreutils
 casks = karabiner-elements rectangle visual-studio-code
+else ifeq (linux-gnu,$(shell print $$OSTYPE))
+formulas += git grep
 endif
 
 zshenv = $(HOME)/.zshenv
 sshconfig = $(HOME)/.ssh/config
 dotfiles := $(zshenv) $(sshconfig)
 ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
+terminal-plist = $(HOME)/Library/Preferences/com.apple.Terminal.plist
 vscode-settings = $(HOME)/Library/ApplicationSupport/Code/User/settings.json
 vscode-keybindings = $(HOME)/Library/ApplicationSupport/Code/User/keybindings.json
-dotfiles += $(vscode-settings) $(vscode-keybindings)
-endif
-ifeq (linux-gnu,$(shell print $$OSTYPE))
+dotfiles += $(terminal-plist) $(vscode-settings) $(vscode-keybindings)
+else ifeq (linux-gnu,$(shell print $$OSTYPE))
 konsole = $(HOME)/.local/share/konsole
 kxmlgui5 = $(HOME)/.local/share/kxmlgui5
 dotfiles += $(konsole) $(kxmlgui5)
@@ -49,7 +48,9 @@ datadir = $(datarootdir)
 
 BASH = /bin/bash
 CURL = /usr/bin/curl
+DEFAULTS = /usr/bin/defaults
 OSASCRIPT = /usr/bin/osascript
+PLUTIL = /usr/bin/plutil
 DSCL = /usr/bin/dscl
 APT = /usr/bin/apt
 DCONF = /usr/bin/dconf
@@ -90,7 +91,11 @@ ifeq (linux-gnu,$(shell print $$OSTYPE))
 python-dependencies = bzip2 sqlite3 zlib1g-dev
 endif
 
-all: ibus terminal git
+all: ibus terminal git git-config git-remote git-branch
+	$(GIT) fetch $(GITFLAGS) -t upstream
+	$(GIT) branch $(GITFLAGS) -u upstream/main main
+	$(GIT) pull $(GITFLAGS) --autostash upstream > /dev/null
+	@$(GIT) remote set-head upstream -a > /dev/null
 
 ibus: FORCE
 ifneq (,$(wildcard $(DCONF)))
@@ -100,13 +105,9 @@ endif
 terminal: FORCE
 ifneq (,$(wildcard $(DCONF)))
 	$(DCONF) dump /org/gnome/terminal/ > $(CURDIR)/terminal/dconf.txt
+else ifneq (,$(wildcard $(PLUTIL)))
+	$(PLUTIL) -extract 'Window Settings.Dark Mode' xml1 -o '$(CURDIR)/terminal/Dark Mode.terminal' $(HOME)/Library/Preferences/com.apple.Terminal.plist
 endif
-
-git: git-config git-remote git-branch
-	$(GIT) fetch $(GITFLAGS) -t upstream
-	$(GIT) branch $(GITFLAGS) -u upstream/main main
-	$(GIT) pull $(GITFLAGS) --autostash upstream > /dev/null
-	@$(GIT) remote set-head upstream -a > /dev/null
 
 git-config: FORCE
 	@$(GIT) config remote.pushdefault origin
@@ -139,8 +140,14 @@ else ifneq (,$(wildcard $(GIO)))
 endif
 endif
 
-install: all code konsole installdirs install-brew install-shell install-python $(dotfiles:%=%~)
-ifneq (,$(wildcard $(DCONF)))
+install: all installdirs dotfiles code konsole brew shell python
+
+dotfiles: $(dotfiles:%=%~)
+ifneq (,$(wildcard $(DEFAULTS)))
+	$(DEFAULTS) write com.apple.Terminal 'Window Settings' -dict-add 'Dark Mode' "$( plutil -convert xml1 -o - '$(CURDIR)/terminal/Dark Mode.terminal' )"
+	$(DEFAULTS) write com.apple.Terminal 'Default Window Settings' 'Dark Mode'
+	$(DEFAULTS) write com.apple.Terminal 'Startup Window Settings' 'Dark Mode'
+else ifneq (,$(wildcard $(DCONF)))
 	$(DCONF) load /desktop/ibus/ < $(CURDIR)/ibus/dconf.txt
 	$(DCONF) load /org/gnome/terminal/ < $(CURDIR)/terminal/dconf.txt
 	$(foreach p,\
@@ -150,15 +157,15 @@ ifneq (,$(wildcard $(DCONF)))
 		$(shell $(DCONF) list /com/gexperts/Tilix/profiles/)),\
 		$(DCONF) write /com/gexperts/Tilix/profiles:/$(p)login-shell true;)
 endif
-ifeq (linux-gnu,$(shell print $$OSTYPE))
+	ln -fns $(CURDIR)/zsh/.zshenv $(zshenv)
+ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
+	ln -fns $(CURDIR)/ssh/config $(sshconfig)
+	ln -fns $(CURDIR)/terminal/com.apple.Terminal.plist $(terminal-plist)
+	ln -fns $(CURDIR)/vscode/settings.json $(vscode-settings)
+	ln -fns $(CURDIR)/vscode/keybindings.json $(vscode-keybindings)
+else ifeq (linux-gnu,$(shell print $$OSTYPE))
 	ln -fns $(CURDIR)/konsole $(konsole)
 	ln -fns $(CURDIR)/kxmlgui5 $(kxmlgui5)
-endif
-	ln -s $(CURDIR)/zsh/.zshenv $(zshenv)
-ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
-	ln -s $(CURDIR)/ssh/config $(sshconfig)
-	ln -s $(CURDIR)/vscode/settings.json $(vscode-settings)
-	ln -s $(CURDIR)/vscode/keybindings.json $(vscode-keybindings)
 endif
 ifeq (,$(wildcard $(zsh-hist)))
 ifneq (,$(wildcard $(zsh-hist-old)))
@@ -180,11 +187,11 @@ endif
 endif
 	mkdir -pm 0700 $(sort $(zsh-datadir) $(dir $(dotfiles)))
 
-install-brew: $(formulas) $(casks) $(taps) install-brew-autoupdate
+brew: $(formulas) $(casks) $(taps) brew-autoupdate
 	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) autoremove $(BREWFLAGS)
 	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) cleanup $(BREWFLAGS)
 
-$(formulas): install-brew-upgrade
+$(formulas): brew-upgrade
 ifneq (,$(wildcard $@))
 	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) install $(BREWFLAGS) --formula $(notdir $@)
 endif
@@ -196,30 +203,30 @@ ifneq (,$(wildcard $@))
 endif
 endif
 
-install-brew-autoupdate: $(tapsdir)/homebrew-autoupdate
+brew-autoupdate: $(tapsdir)/homebrew-autoupdate
 ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
 	-HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) autoupdate stop $(BREWFLAGS) > /dev/null
 	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) autoupdate start $(BREWFLAGS) --cleanup --upgrade > /dev/null
 endif
 
-$(taps): install-brew-upgrade
+$(taps): brew-upgrade
 ifneq (,$(wildcard $@))
 	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) tap $(BREWFLAGS) $(subst homebrew-,homebrew/,$(notdir $@))
 endif
 
-install-brew-upgrade: $(BREW)
+brew-upgrade: $(BREW)
 	$(BREW) update
 	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) upgrade $(BREWFLAGS)
 
 $(BREW):
 	$(BASH) -c "$$( $(CURL) -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh )"
 
-install-shell: install-shell-executables install-shell-change
+shell: shell-executables shell-change
 
-install-shell-executables: $(ZNAP)
+shell-executables: $(ZNAP)
 	source $(ZNAP) && znap install $(executables) > /dev/null
 
-install-shell-change: FORCE
+shell-change: FORCE
 ifneq (,$(wildcard $(DSCL)))
 ifneq (UserShell: $(SHELL),$(shell $(DSCL) . -read ~/ UserShell))
 	chsh -s $(SHELL)
@@ -234,32 +241,32 @@ $(ZNAP):
 	mkdir -pm 0700 $(abspath $(dir $@)..)
 	$(GIT) -C $(abspath $(dir $@)..) clone $(GITFLAGS) --depth=1 https://github.com/marlonrichert/zsh-snap.git
 
-install-python: install-python-pipenv
+python: python-pipenv
 
-install-python-pipenv: install-python-pipenv-brew install-python-pipenv-pipx
+python-pipenv: python-pipenv-brew python-pipenv-pipx
 
-install-python-pipenv-brew: FORCE
+python-pipenv-brew: FORCE
 ifneq (,$(wildcard $(HOMEBREW_CELLAR)/pipenv))
 	-HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) uninstall $(BREWFLAGS) --formula pipenv
 endif
 
-install-python-pipenv-pipx: install-python-pipx
+python-pipenv-pipx: python-pipx
 	$(PIPX) upgrade pipenv &> /dev/null || $(PIPX) install $(PIPXFLAGS) pipenv > /dev/null
 
-install-python-pipx: install-python-pipx-brew install-python-pipx-pip
+python-pipx: python-pipx-brew python-pipx-pip
 
-install-python-pipx-brew: FORCE
+python-pipx-brew: FORCE
 ifneq (,$(wildcard $(HOMEBREW_CELLAR)/pipx))
 	-HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) uninstall $(BREWFLAGS) --formula pipx
 endif
 
-install-python-pipx-pip: install-python-pip
+python-pipx-pip: python-pip
 	$(PIP) install $(PIPFLAGS) -U --user pipx
 
-install-python-pip: install-python-pyenv
+python-pip: python-pyenv
 	$(PIP) install $(PIPFLAGS) -U pip
 
-install-python-pyenv: $(HOMEBREW_CELLAR)/pyenv $(python-dependencies)
+python-pyenv: $(HOMEBREW_CELLAR)/pyenv $(python-dependencies)
 ifeq (,$(findstring $(PYENV_VERSION),$(shell $(PYENV) versions --bare)))
 	@print '\e[5;31;40mCompiling Python $(PYENV_VERSION). This might take a while! Please stand by...\e[0m' && :
 	PYENV_ROOT=$(PYENV_ROOT) $(PYENV) install $(PYENVFLAGS) -s $(PYENV_VERSION)

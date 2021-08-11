@@ -1,13 +1,12 @@
 # .config
-Properly managed dotfiles for macOS and Ubuntu.
+Properly managed, easy-to-grok dotfiles for macOS and Ubuntu.
 
-> Enjoy using this software? [Become a sponsor!](https://github.com/sponsors/marlonrichert).
+> Enjoy using this software? [Become a sponsor!](https://github.com/sponsors/marlonrichert)
 
 ![screenshot](screenshot.png)
 
 ## Installation
-0.  Depending on your OS, open a terminal, do one of the folowing and wait for the installation to
-    complete:
+0.  Open a terminal, do one of the folowing, and wait for the installation to complete:
     * macOS:
       ```shell
       xcode-select --install
@@ -31,16 +30,12 @@ Properly managed dotfiles for macOS and Ubuntu.
     % make -j install       # Run the installer to deploy your new dotfiles.
     ...
     % # Finally, update your fork with your changes:
-    % git add -f <file>...  # Choose which files you actually want to track in Git.
+    % git add -f <file> ... # All files have to be staged explicitly.
     % git commit
     % git push
     ...
     %
     ```
-1.  _(macOS only)_ In Terminal.app:
-    1. Go to Preferences.
-    1. Import [`terminal/Dark Mode.terminal`](terminal/Dark%20Mode.terminal).
-    1. Set it as the default.
 1.  Restart your terminal.
 
 ## Getting Updates
