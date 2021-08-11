@@ -83,14 +83,14 @@ zle -N .prompt.git-status.callback
 TMOUT=2  # Update interval in seconds
 trap .prompt.git-status.sync ALRM
 .prompt.git-status.sync() {
-
+  [[ $zsh_eval_context == 'trap shfunc' ]] ||
+      return 0  # Don't run inside other code.
   (( TTYIDLE )) ||
-      return  # Avoid input lag.
-
+      return 0  # Avoid input lag.
   (
-    # Fetch only if there's no FETCH_HEAD or it is at least 2 minutes old.
+    # Fetch only if there's no FETCH_HEAD or it is at least $TMOUT minutes old.
     local gitdir
-    gitdir=$( git rev-parse --git-dir 2> /dev/null ) && [[ -z $gitdir/FETCH_HEAD(Nmm-2) ]] &&
+    gitdir=$( git rev-parse --git-dir 2> /dev/null ) && [[ -z $gitdir/FETCH_HEAD(Nmm-$TMOUT) ]] &&
         git fetch -q &> /dev/null
   ) &|
   .prompt.git-status.repaint "$( .prompt.git-status.parse )"
