@@ -5,7 +5,7 @@ SHELL = /bin/zsh
 
 # Include only the software that we want on all machines.
 executables = aureliojargas/clitest ekalinin/github-markdown-toc
-formulas := asciinema bat less micro pyenv
+formulas := asciinema bat less nano pyenv
 taps := services
 ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
 taps += autoupdate cask cask-fonts cask-versions
