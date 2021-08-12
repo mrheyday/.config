@@ -106,7 +106,9 @@ terminal: FORCE
 ifneq (,$(wildcard $(DCONF)))
 	$(DCONF) dump /org/gnome/terminal/ > $(CURDIR)/terminal/dconf.txt
 else ifneq (,$(wildcard $(PLUTIL)))
-	$(PLUTIL) -extract 'Window Settings.Dark Mode' xml1 -o '$(CURDIR)/terminal/Dark Mode.terminal' $(HOME)/Library/Preferences/com.apple.Terminal.plist
+	$(PLUTIL) -extract 'Window Settings.Dark Mode' xml1 \
+		-o '$(CURDIR)/terminal/Dark Mode.terminal' \
+		$(HOME)/Library/Preferences/com.apple.Terminal.plist
 endif
 
 git-config: FORCE
@@ -134,17 +136,17 @@ endif
 clean: FORCE
 ifneq (,$(backups))
 ifneq (,$(wildcard $(OSASCRIPT)))
-	$(OSASCRIPT) -e 'tell application "Finder" to delete every item of {$(backups)}' &> /dev/null || :
+	$(OSASCRIPT) -e 'tell app "Finder" to delete every item of {$(backups)}' &> /dev/null || :
 else ifneq (,$(wildcard $(GIO)))
 	$(GIO) trash $(backups)
 endif
 endif
 
-install: all installdirs dotfiles code konsole brew shell python
-
-dotfiles: $(dotfiles:%=%~)
+# Calls to `defaults` fail when they're not in a top-level target.
+install: all installdirs dotfiles code konsole shell python brew
 ifneq (,$(wildcard $(DEFAULTS)))
-	$(DEFAULTS) write com.apple.Terminal 'Window Settings' -dict-add 'Dark Mode' "$( plutil -convert xml1 -o - '$(CURDIR)/terminal/Dark Mode.terminal' )"
+	$(DEFAULTS) write com.apple.Terminal 'Window Settings' -dict-add 'Dark Mode' \
+		"$$( $(PLUTIL) -convert xml1 -o - $(CURDIR)/terminal/Dark\ Mode.terminal )"
 	$(DEFAULTS) write com.apple.Terminal 'Default Window Settings' 'Dark Mode'
 	$(DEFAULTS) write com.apple.Terminal 'Startup Window Settings' 'Dark Mode'
 else ifneq (,$(wildcard $(DCONF)))
@@ -157,10 +159,11 @@ else ifneq (,$(wildcard $(DCONF)))
 		$(shell $(DCONF) list /com/gexperts/Tilix/profiles/)),\
 		$(DCONF) write /com/gexperts/Tilix/profiles:/$(p)login-shell true;)
 endif
+
+dotfiles: $(dotfiles:%=%~)
 	ln -fns $(CURDIR)/zsh/.zshenv $(zshenv)
 ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
 	ln -fns $(CURDIR)/ssh/config $(sshconfig)
-	ln -fns $(CURDIR)/terminal/com.apple.Terminal.plist $(terminal-plist)
 	ln -fns $(CURDIR)/vscode/settings.json $(vscode-settings)
 	ln -fns $(CURDIR)/vscode/keybindings.json $(vscode-keybindings)
 else ifeq (linux-gnu,$(shell print $$OSTYPE))
@@ -180,16 +183,11 @@ endif
 
 installdirs: FORCE
 ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
-ifneq (,$(wildcard $(HOME)/Library/ApplicationSupport))
-	$(OSASCRIPT) -e 'tell application "Finder" to delete every item of {(POSIX file "$(HOME)/Library/ApplicationSupport")}' &> /dev/null || :
-endif
 	ln -fns "$(HOME)/Library/Application Support" $(HOME)/Library/ApplicationSupport
 endif
 	mkdir -pm 0700 $(sort $(zsh-datadir) $(dir $(dotfiles)))
 
 brew: $(formulas) $(casks) $(taps) brew-autoupdate
-	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) autoremove $(BREWFLAGS)
-	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) cleanup $(BREWFLAGS)
 
 $(formulas): brew-upgrade
 ifneq (,$(wildcard $@))
@@ -205,13 +203,16 @@ endif
 
 brew-autoupdate: $(tapsdir)/homebrew-autoupdate
 ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
-	-HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) autoupdate stop $(BREWFLAGS) > /dev/null
-	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) autoupdate start $(BREWFLAGS) --cleanup --upgrade > /dev/null
+ifeq (,$(findstring running,$(shell HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) autoupdate status)))
+	HOMEBREW_NO_AUTO_UPDATE=1 \
+		$(BREW) autoupdate start $(BREWFLAGS) --cleanup --upgrade > /dev/null
+endif
 endif
 
 $(taps): brew-upgrade
 ifneq (,$(wildcard $@))
-	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) tap $(BREWFLAGS) $(subst homebrew-,homebrew/,$(notdir $@))
+	HOMEBREW_NO_AUTO_UPDATE=1 \
+		$(BREW) tap $(BREWFLAGS) $(subst homebrew-,homebrew/,$(notdir $@))
 endif
 
 brew-upgrade: $(BREW)
@@ -239,7 +240,8 @@ endif
 
 $(ZNAP):
 	mkdir -pm 0700 $(abspath $(dir $@)..)
-	$(GIT) -C $(abspath $(dir $@)..) clone $(GITFLAGS) --depth=1 https://github.com/marlonrichert/zsh-snap.git
+	$(GIT) -C $(abspath $(dir $@)..) clone $(GITFLAGS) --depth=1 -- \
+		https://github.com/marlonrichert/zsh-snap.git
 
 python: python-pipenv
 
@@ -268,7 +270,7 @@ python-pip: python-pyenv
 
 python-pyenv: $(HOMEBREW_CELLAR)/pyenv $(python-dependencies)
 ifeq (,$(findstring $(PYENV_VERSION),$(shell $(PYENV) versions --bare)))
-	@print '\e[5;31;40mCompiling Python $(PYENV_VERSION). This might take a while! Please stand by...\e[0m' && :
+	@print '\e[5;31;40mCompiling Python $(PYENV_VERSION). This might take a while! Please stand by...\e[0m'
 	PYENV_ROOT=$(PYENV_ROOT) $(PYENV) install $(PYENVFLAGS) -s $(PYENV_VERSION)
 endif
 	PYENV_ROOT=$(PYENV_ROOT) $(PYENV) global $(PYENV_VERSION)
@@ -286,7 +288,8 @@ ifneq (,$(shell $(SNAP) list code $@ 2> /dev/null))
 	$(SNAP) list code &> /dev/null && $(SNAP) remove code
 endif
 	$(if command -v code > /dev/null,,\
-	( TMPSUFFIX=.deb; sudo $(APT) install =( $(WGET) -ncv --show-progress -O - 'https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64' ) )\
+	( TMPSUFFIX=.deb; sudo $(APT) install =( $(WGET) -ncv --show-progress -O - \
+		'https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64' ) )\
 	)
 endif
 
