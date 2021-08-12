@@ -14,3 +14,9 @@ State=AAAA/wAAAAD9AAAAAAAABygAAARPAAAABAAAAAQAAAAIAAAACPwAAAAA
 ToolBarsMovable=Disabled
 Width 1920=1832
 Window-Maximized 1200x1920=true
+
+[TabBar]
+ExpandTabWidth=true
+NewTabBehavior=PutNewTabAfterCurrentTab
+TabBarPosition=Top
+TabBarVisibility=AlwaysShowTabBar
