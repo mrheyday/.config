@@ -67,7 +67,7 @@ zle -N .prompt.git-status.callback
 .prompt.git-status.callback() {
   local fd=$1 REPLY
   {
-    zle -F "$fd"  # Unhook this callback.
+    zle -F "$fd"  # Unhook this callback to avoid being called repeatedly.
 
     [[ $2 == (|hup) ]] ||
         return  # Error occured.
@@ -83,34 +83,43 @@ zle -N .prompt.git-status.callback
 TMOUT=2  # Update interval in seconds
 trap .prompt.git-status.sync ALRM
 .prompt.git-status.sync() {
-  [[ $zsh_eval_context == 'trap shfunc' ]] ||
-      return 0  # Don't run inside other code.
   (( TTYIDLE )) ||
-      return 0  # Avoid input lag.
-  (
-    # Fetch only if there's no FETCH_HEAD or it is at least $TMOUT minutes old.
-    local gitdir
-    gitdir=$( git rev-parse --git-dir 2> /dev/null ) && [[ -z $gitdir/FETCH_HEAD(Nmm-$TMOUT) ]] &&
-        git fetch -q &> /dev/null
-  ) &|
+      return 0  # This avoids input lag in the completion menu.
+
+  local gitdir
+  gitdir=$( git rev-parse --git-dir 2> /dev/null ) ||
+      return 0  # We're not in a Git repo.
+
   .prompt.git-status.repaint "$( .prompt.git-status.parse )"
+
+  # Fetch only if there's no FETCH_HEAD or it is at least $TMOUT minutes old.
+  [[ -z $gitdir/FETCH_HEAD(Nmm-$TMOUT) ]] &&
+      ( git fetch -q &> /dev/null ) &|
 }
 
 .prompt.git-status.repaint() {
   [[ $1 == $RPS1 ]] &&
-      return  # Do nothing when there's no change.
+      return  # Avoid repainting when there's no change.
 
   RPS1=$1
+
+  # If our trap is triggered while executing other code, we do want to update the value of $RPS1,
+  # but we don't want to force a repaint at that point.
+  [[ $zsh_eval_context == *' trap shfunc'* ]] &&
+      return 0
+
   zle && [[ $CONTEXT == start ]] &&
-      zle .reset-prompt  # Update on primary prompt only.
+      zle .reset-prompt  # Repaint only if $RPS1 is actually visible.
 }
 
 .prompt.git-status.parse() {
   local MATCH MBEGIN MEND
   local -a lines
 
-  lines=( ${(f)"$( git status -sbu 2> /dev/null )"} ) ||
-      { print; return } # Not a git repo
+  if ! lines=( ${(f)"$( git status -sbu 2> /dev/null )"} ); then
+    print   # Ensure we trigger possible `zle -F` callback.
+    return  # We're not in a Git repo.
+  fi
 
   local -aU symbols=( ${(@MSu)lines[2,-1]##[^[:blank:]]##} )
   print -r -- "${${lines[1]/'##'/$symbols}//(#m)$'\C-[['[;[:digit:]]#m/%{${MATCH}%\}}"
@@ -128,7 +137,7 @@ PROMPT_EOL_MARK='%F{cyan}%S%#%f%s'
 # Debugging prompt
 () {
   local -a indent=( '%('{1..36}"e,$( echoti cuf 2 ),)" )
-  local i=$'\t'${(j::)indent}
+  local i=$'\t\t'${(j::)indent}
   PS4=$'\r%(?,,'$i$'  -> %F{9}%?%f\n)%{\e[2m%}%F{10}%1N%f\r'$i$'%I%b %(1_,%F{11}%_%f ,)'
 }
 
