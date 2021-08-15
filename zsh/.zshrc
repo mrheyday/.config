@@ -30,24 +30,21 @@ setopt NO_autoparamslash interactivecomments
 # Call this hook whenever we change dirs...
 autoload -Uz add-zsh-hook
 add-zsh-hook chpwd .prompt.chpwd
+setopt cdsilent pushdsilent # Suppress built-in output of cd and pushd.
 .prompt.chpwd() {
-  if zle; then
+  zle &&
     zle -I  # Prepare the line editor for our output.
-    [[ $CONTEXT == start ]] &&
-        .prompt.git-status.async # Update git status if on primary prompt.
-  fi
   print -P -- '\n%F{12}%~%f/'
   RPS1=
-  (
     local upstream
-    upstream=${$( git rev-parse --abbrev-ref @{u} 2> /dev/null )%%/*} &&
-        git fetch -qt $upstream '+refs/heads/*:refs/remotes/'$upstream'/*' &> /dev/null &&
+  if upstream=${$( git rev-parse --abbrev-ref @{u} 2> /dev/null )%%/*}; then
+    zle && [[ $CONTEXT == start ]] &&
+        .prompt.git-status.async # Update git status only if on primary prompt.
         git remote set-branches $upstream '*' &> /dev/null
-  ) &|
+    ( git fetch -qt $upstream '+refs/heads/*:refs/remotes/'$upstream'/*' ) &> /dev/null &|
+  fi
 }
-.prompt.chpwd               # ...and once on startup, immediately.
-
-setopt cdsilent pushdsilent # Suppress built-in output of cd and pushd.
+.prompt.chpwd # ...and once on startup, immediately.
 
 PS1='%F{%(?,10,9)}%#%f '
 znap prompt                 # Make the left side of the primary prompt visible, immediately.
@@ -83,18 +80,15 @@ zle -N .prompt.git-status.callback
 TMOUT=2  # Update interval in seconds
 trap .prompt.git-status.sync ALRM
 .prompt.git-status.sync() {
-  (( TTYIDLE )) ||
-      return 0  # This avoids input lag in the completion menu.
-
   local gitdir
   gitdir=$( git rev-parse --git-dir 2> /dev/null ) ||
       return 0  # We're not in a Git repo.
 
-  .prompt.git-status.repaint "$( .prompt.git-status.parse )"
-
   # Fetch only if there's no FETCH_HEAD or it is at least $TMOUT minutes old.
   [[ -z $gitdir/FETCH_HEAD(Nmm-$TMOUT) ]] &&
       ( git fetch -q &> /dev/null ) &|
+
+  .prompt.git-status.repaint "$( .prompt.git-status.parse )"
 }
 
 .prompt.git-status.repaint() {
