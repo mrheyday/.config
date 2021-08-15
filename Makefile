@@ -143,7 +143,7 @@ endif
 endif
 
 # Calls to `defaults` fail when they're not in a top-level target.
-install: all installdirs dotfiles code konsole shell python brew
+install: installdirs dotfiles code konsole shell python brew
 ifneq (,$(wildcard $(DEFAULTS)))
 	$(DEFAULTS) write com.apple.Terminal 'Window Settings' -dict-add 'Dark Mode' \
 		"$$( $(PLUTIL) -convert xml1 -o - $(CURDIR)/terminal/Dark\ Mode.terminal )"
