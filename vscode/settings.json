@@ -1,5 +1,4 @@
 {
-    "csscomb.preset": "../hiboxcentre/.csscomb.json",
     "diffEditor.renderSideBySide": false,
     "editor.accessibilitySupport": "off",
     "editor.dragAndDrop": false,
@@ -28,6 +27,7 @@
         "_*": "shellscript",
         ".*": "shellscript"
     },
+    "files.autoSave": "afterDelay",
     "files.defaultLanguage": "shellscript",
     "files.exclude": {
         "**/.classpath": true,
