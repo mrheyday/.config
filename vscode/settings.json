@@ -1,5 +1,4 @@
 {
-    "diffEditor.renderSideBySide": false,
     "editor.accessibilitySupport": "off",
     "editor.dragAndDrop": false,
     "editor.emptySelectionClipboard": false,
@@ -50,15 +49,16 @@
     "shell-syntax.defaultShell": "zsh",
     "terminal.explorerKind": "external",
     "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
-    "window.autoDetectColorScheme": true,
     "workbench.editor.enablePreview": false,
-    "workbench.editor.limit.value": 16,
     "workbench.editor.showTabs": false,
-    "workbench.editor.tabCloseButton": "left",
     "workbench.editorAssociations": {
         "*.ipynb": "jupyter.notebook.ipynb"
     },
     "workbench.fontAliasing": "antialiased",
     "workbench.list.keyboardNavigation": "filter",
-    "workbench.startupEditor": "none"
+    "workbench.settings.openDefaultKeybindings": true,
+    "workbench.settings.openDefaultSettings": true,
+    "workbench.settings.useSplitJSON": true,
+    "workbench.startupEditor": "none",
+    "diffEditor.renderSideBySide": false,
 }
