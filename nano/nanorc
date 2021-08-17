@@ -1,4 +1,4 @@
-include /usr/local/share/nano/**.nanorc
+include /usr/share/nano/**.nanorc /usr/local/share/nano/**.nanorc
 
 set guidestripe 80
 set stripecolor normal,lightblack
