@@ -4,7 +4,7 @@ upstream = https://github.com/marlonrichert/.config.git
 SHELL = /bin/zsh
 
 # Include only the software that we want on all machines.
-executables = aureliojargas/clitest ekalinin/github-markdown-toc
+repos = aureliojargas/clitest ekalinin/github-markdown-toc zsh-users/zsh-completions
 formulas := asciinema bat less nano pyenv
 taps := services
 ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
@@ -103,12 +103,12 @@ ifneq (,$(wildcard $(DCONF)))
 endif
 
 terminal: FORCE
-ifneq (,$(wildcard $(DCONF)))
-	$(DCONF) dump /org/gnome/terminal/ > $(CURDIR)/terminal/dconf.txt
-else ifneq (,$(wildcard $(PLUTIL)))
+ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
 	$(PLUTIL) -extract 'Window Settings.Dark Mode' xml1 \
 		-o '$(CURDIR)/terminal/Dark Mode.terminal' \
 		$(HOME)/Library/Preferences/com.apple.Terminal.plist
+else ifneq (,$(wildcard $(DCONF)))
+	$(DCONF) dump /org/gnome/terminal/ > $(CURDIR)/terminal/dconf.txt
 endif
 
 git-config: FORCE
@@ -144,7 +144,7 @@ endif
 
 # Calls to `defaults` fail when they're not in a top-level target.
 install: installdirs dotfiles code konsole shell python brew
-ifneq (,$(wildcard $(DEFAULTS)))
+ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
 	$(DEFAULTS) write com.apple.Terminal 'Window Settings' -dict-add 'Dark Mode' \
 		"$$( $(PLUTIL) -convert xml1 -o - $(CURDIR)/terminal/Dark\ Mode.terminal )"
 	$(DEFAULTS) write com.apple.Terminal 'Default Window Settings' 'Dark Mode'
@@ -222,10 +222,10 @@ brew-upgrade: $(BREW)
 $(BREW):
 	$(BASH) -c "$$( $(CURL) -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh )"
 
-shell: shell-executables shell-change
+shell: shell-repos shell-change
 
-shell-executables: $(ZNAP)
-	source $(ZNAP) && znap install $(executables) > /dev/null
+shell-repos: $(ZNAP)
+	source $(ZNAP) && znap install $(repos) > /dev/null
 
 shell-change: FORCE
 ifneq (,$(wildcard $(DSCL)))
