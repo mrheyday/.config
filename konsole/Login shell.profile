@@ -1,6 +1,6 @@
 [Appearance]
 BoldIntense=true
-ColorScheme=Tango+solarized_dark
+ColorScheme=Dark Mode
 Font=monospace,11,-1,2,50,0,0,0,0,0
 
 [Cursor Options]
