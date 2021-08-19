@@ -4,7 +4,7 @@ upstream = https://github.com/marlonrichert/.config.git
 SHELL = /bin/zsh
 
 # Include only the software that we want on all machines.
-repos = aureliojargas/clitest ekalinin/github-markdown-toc zsh-users/zsh-completions
+repos = aureliojargas/clitest zsh-users/zsh-completions
 formulas := asciinema bat less nano pyenv
 taps := services
 ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
