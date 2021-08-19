@@ -178,8 +178,8 @@ if [[ $VENDOR == ubuntu ]]; then
 fi
 znap source marlonrichert/zsh-autocomplete
 
-# Include path for `znap eval` cache invalidation.
-znap eval pyenv-init ${${:-=pyenv}:A}' init -'
+# Include absolute path for `znap eval` cache invalidation.
+znap eval pyenv-init ${${:-=pyenv}:P}' init - --no-rehash'
 
 # Include Python version as comment, for `znap eval` cache invalidation.
 znap eval    pip-completion "pip completion --zsh             # $PYENV_VERSION"
