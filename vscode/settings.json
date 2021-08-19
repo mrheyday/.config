@@ -44,10 +44,17 @@
         {
             "pattern": "^#!/bin/*$",
             "language": "shellscript"
-        }
+        },
+        {
+            "pattern": "^#autoload$",
+            "language": "shellscript"
+        },
+        {
+            "pattern": "^#compdef *$",
+            "language": "shellscript"
+        },
     ],
     "shell-syntax.defaultShell": "zsh",
-    "terminal.explorerKind": "external",
     "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
     "workbench.editor.enablePreview": false,
     "workbench.editor.showTabs": false,
