@@ -33,17 +33,17 @@ add-zsh-hook chpwd .prompt.chpwd
 setopt cdsilent pushdsilent # Suppress built-in output of cd and pushd.
 .prompt.chpwd() {
   zle &&
-    zle -I  # Prepare the line editor for our output.
+      zle -I  # Prepare the line editor for our output.
   print -P -- '\n%F{12}%~%f/'
   RPS1=
-    zle && [[ $CONTEXT == start ]] &&
-        .prompt.git-status.async # Update git status only if on primary prompt.
+  zle && [[ $CONTEXT == start ]] &&
+      .prompt.git-status.async # Update git status only if on primary prompt.
   (
     local upstream
     if upstream=${$( git rev-parse --abbrev-ref @{u} 2> /dev/null )%%/*}; then
         git remote set-branches $upstream '*' &> /dev/null
         git fetch -qt $upstream '+refs/heads/*:refs/remotes/'$upstream'/*' &> /dev/null
-  fi
+    fi
   ) &|
 }
 .prompt.chpwd # ...and once on startup, immediately.
@@ -279,10 +279,8 @@ autoload -Uz zmv
 alias zmv='zmv -v' zcp='zmv -Cv' zln='zmv -Lv'
 
 # Paging & colors for `ls`
-[[ $OSTYPE != linux-gnu ]] &&
-    hash ls==gls  # GNU coreutils ls
 ls() {
-  command ls --width=$COLUMNS "$@" | $PAGER
+  command ${${OSTYPE:#linux-gnu}:+g}ls --width=$COLUMNS "$@" | $PAGER
   return $pipestatus[1]  # Return exit status of ls, not $PAGER
 }
 zstyle ':completion:*:ls:*:options' ignored-patterns --width

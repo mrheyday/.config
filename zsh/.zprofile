@@ -42,7 +42,7 @@ path=(
 [[ $OSTYPE == linux-gnu ]] &&
     fpath+=( $HOMEBREW_PREFIX/share/zsh/site-functions )
 
-[[ $OSTYPE == darwin* ]] &&
+[[ $VENDOR == apple ]] &&
     export JAVA_HOME=$( /usr/libexec/java_home -v 1.8 )
 export CATALINA_HOME=$HOMEBREW_PREFIX/opt/tomcat@9/libexec
 export CATALINA_BASE=~/Tomcat9
@@ -54,14 +54,14 @@ export READNULLCMD=bat
 export PAGER=less
 
 export MANPAGER='bat -l man'
-[[ $OSTYPE == darwin* ]] &&
+[[ $VENDOR == apple ]] &&
     MANPAGER="col -bpx | $MANPAGER"
 
 export LESS='-FiMr -j.5 --incsearch'
 export LESSHISTFILE=$XDG_DATA_HOME/less/lesshst
 export QUOTING_STYLE=escape # Used by GNU ls
 
-[[ $OSTYPE == darwin* ]] &&
+[[ $VENDOR == apple ]] &&
     export SHELL_SESSIONS_DISABLE=1
 [[ $VENDOR == ubuntu ]] &&
     export skip_global_compinit=1
