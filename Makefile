@@ -48,7 +48,6 @@ datadir = $(datarootdir)
 
 BASH = /bin/bash
 CURL = /usr/bin/curl
-DEFAULTS = /usr/bin/defaults
 OSASCRIPT = /usr/bin/osascript
 PLUTIL = /usr/bin/plutil
 DSCL = /usr/bin/dscl
@@ -143,12 +142,14 @@ endif
 endif
 
 # Calls to `defaults` fail when they're not in a top-level target.
-install: installdirs dotfiles code konsole shell python brew
+install: #installdirs dotfiles code konsole shell python brew
 ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
-	$(DEFAULTS) write com.apple.Terminal 'Window Settings' -dict-add 'Dark Mode' \
-		"$$( $(PLUTIL) -convert xml1 -o - $(CURDIR)/terminal/Dark\ Mode.terminal )"
-	$(DEFAULTS) write com.apple.Terminal 'Default Window Settings' 'Dark Mode'
-	$(DEFAULTS) write com.apple.Terminal 'Startup Window Settings' 'Dark Mode'
+	$(OSASCRIPT) -e 'tell app "Terminal" to open POSIX file "$(CURDIR)/terminal/Dark Mode.terminal"'
+	$(OSASCRIPT) -e 'tell app "Terminal" to set current settings of windows to settings set "Dark Mode"'
+	$(OSASCRIPT) -e 'tell app "Terminal" to set default settings to settings set "Dark Mode"'
+	$(OSASCRIPT) -e 'tell app "Terminal" to set startup settings to settings set "Dark Mode"'
+	$(OSASCRIPT) -e 'tell app "Terminal" to do script "exit" in window 1' \
+		-e 'tell app "Terminal" to close window 1'
 else ifneq (,$(wildcard $(DCONF)))
 	$(DCONF) load /desktop/ibus/ < $(CURDIR)/ibus/dconf.txt
 	$(DCONF) load /org/gnome/terminal/ < $(CURDIR)/terminal/dconf.txt
