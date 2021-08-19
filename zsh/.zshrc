@@ -36,13 +36,15 @@ setopt cdsilent pushdsilent # Suppress built-in output of cd and pushd.
     zle -I  # Prepare the line editor for our output.
   print -P -- '\n%F{12}%~%f/'
   RPS1=
-    local upstream
-  if upstream=${$( git rev-parse --abbrev-ref @{u} 2> /dev/null )%%/*}; then
     zle && [[ $CONTEXT == start ]] &&
         .prompt.git-status.async # Update git status only if on primary prompt.
+  (
+    local upstream
+    if upstream=${$( git rev-parse --abbrev-ref @{u} 2> /dev/null )%%/*}; then
         git remote set-branches $upstream '*' &> /dev/null
-    ( git fetch -qt $upstream '+refs/heads/*:refs/remotes/'$upstream'/*' ) &> /dev/null &|
+        git fetch -qt $upstream '+refs/heads/*:refs/remotes/'$upstream'/*' &> /dev/null
   fi
+  ) &|
 }
 .prompt.chpwd # ...and once on startup, immediately.
 
