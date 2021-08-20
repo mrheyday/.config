@@ -142,7 +142,7 @@ endif
 endif
 
 # Calls to `defaults` fail when they're not in a top-level target.
-install: #installdirs dotfiles code konsole shell python brew
+install: installdirs dotfiles code konsole shell python brew
 ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
 	$(OSASCRIPT) -e 'tell app "Terminal" to open POSIX file "$(CURDIR)/terminal/Dark Mode.terminal"'
 	$(OSASCRIPT) -e 'tell app "Terminal" to set current settings of windows to settings set "Dark Mode"'
