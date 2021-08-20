@@ -41,10 +41,10 @@ setopt cdsilent pushdsilent # Suppress built-in output of cd and pushd.
   (
     local upstream
     if upstream=${$( git rev-parse --abbrev-ref @{u} 2> /dev/null )%%/*}; then
-        git remote set-branches $upstream '*' &> /dev/null
-        git fetch -qt $upstream '+refs/heads/*:refs/remotes/'$upstream'/*' &> /dev/null
+        git remote set-branches $upstream '*'
+        git fetch -qt $upstream '+refs/heads/*:refs/remotes/'$upstream'/*'
     fi
-  ) &|
+  ) &> /dev/null &|
 }
 .prompt.chpwd # ...and once on startup, immediately.
 
@@ -82,13 +82,19 @@ zle -N .prompt.git-status.callback
 TMOUT=2  # Update interval in seconds
 trap .prompt.git-status.sync ALRM
 .prompt.git-status.sync() {
+  (( KEYS_QUEUED_COUNT || PENDING )) &&
+      return  # Avoid lag.
+  [[ $zsh_eval_context != 'trap shfunc' ]] &&
+      return 0  # Don't run inside other code.
+  (
   local gitdir
   gitdir=$( git rev-parse --git-dir 2> /dev/null ) ||
       return 0  # We're not in a Git repo.
 
   # Fetch only if there's no FETCH_HEAD or it is at least $TMOUT minutes old.
   [[ -z $gitdir/FETCH_HEAD(Nmm-$TMOUT) ]] &&
-      ( git fetch -q &> /dev/null ) &|
+        git fetch -q
+  ) &> /dev/null &|
 
   .prompt.git-status.repaint "$( .prompt.git-status.parse )"
 }
@@ -98,11 +104,6 @@ trap .prompt.git-status.sync ALRM
       return  # Avoid repainting when there's no change.
 
   RPS1=$1
-
-  # If our trap is triggered while executing other code, we do want to update the value of $RPS1,
-  # but we don't want to force a repaint at that point.
-  [[ $zsh_eval_context == *' trap shfunc'* ]] &&
-      return 0
 
   zle && [[ $CONTEXT == start ]] &&
       zle .reset-prompt  # Repaint only if $RPS1 is actually visible.
