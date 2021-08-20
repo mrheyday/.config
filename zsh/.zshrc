@@ -111,16 +111,23 @@ trap .prompt.git-status.sync ALRM
 }
 
 .prompt.git-status.parse() {
-  local MATCH MBEGIN MEND
-  local -a lines
+  local -aU lines symbols
+  local branch_info status_line MATCH MBEGIN MEND
 
-  if ! lines=( ${(f)"$( git status -sbu 2> /dev/null )"} ); then
+  if ! lines=( ${(f)"$( git status -sbunormal --no-renames 2> /dev/null )"} ); then
     print   # Ensure we trigger possible `zle -F` callback.
     return  # We're not in a Git repo.
   fi
 
-  local -aU symbols=( ${(@MSu)lines[2,-1]##[^[:blank:]]##} )
-  print -r -- "${${lines[1]/'##'/$symbols}//(#m)$'\C-[['[;[:digit:]]#m/%{${MATCH}%\}}"
+  branch_info=$lines[1]
+  shift lines
+
+  # Capture the left-most group of non-blank characters of each line, discarding duplicates.
+  symbols=( ${(@MSu)lines[@]##[^[:blank:]]##} )
+  status_line=${branch_info/'##'/$symbols}  # Replace `##` with those characters.
+
+  # Wrap ANSI codes in %{prompt escapes%}, so they're not counted as printable characters.
+  print -r -- "${status_line//(#m)$'\C-[['[;[:digit:]]#m/%{${MATCH}%\}}"
 }
 
 # Shown after output that doesn't end in a newline.
