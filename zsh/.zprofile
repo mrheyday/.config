@@ -8,11 +8,8 @@
 # profile that a new window/tab opens a login shell. Otherwise, .zprofile will not get sourced!
 #
 
-# We need to set $path here and not in .zshenv, else /etc/zprofile will override it.
-export -U PATH path FPATH fpath MANPATH manpath  # Remove duplicates.
-export -TU INFOPATH infopath
-
 export XDG_CONFIG_HOME  # Value is set in .zshenv
+export XDG_CACHE_HOME=~/.cache
 export XDG_DATA_HOME=~/.local/share
 export GRADLE_USER_HOME=$XDG_CONFIG_HOME/gradle
 
@@ -20,13 +17,22 @@ export HOMEBREW_BAT=1
 export HOMEBREW_COLOR=1
 export HOMEBREW_NO_AUTO_UPDATE=1
 path=( /home/linuxbrew/.linuxbrew/bin(N) $path[@] )
-eval "$( brew shellenv )"
+() {
+  local brew_shellenv=~/.local/bin/brew-shellenv
+  [[ -r brew_shellenv ]] ||
+      brew shellenv >| $brew_shellenv
+  source $brew_shellenv
+}
+
+export ANDROID_SDK_ROOT=$HOMEBREW_PREFIX/share/android-commandlinetools
 
 export PYENV_VERSION=3.7.10
 export PYENV_ROOT=~/.pyenv
 export PIPX_BIN_DIR=~/.local/bin
 
-export ANDROID_SDK_ROOT=$HOMEBREW_PREFIX/share/android-commandlinetools
+# We need to set $path here and not in .zshenv, else /etc/zprofile will override it.
+export -U PATH path FPATH fpath MANPATH manpath  # -U remove duplicates.
+export -TU INFOPATH infopath
 
 # (N) deletes the item if it doesn't exist.
 path=(
@@ -38,9 +44,10 @@ path=(
   $path[@]
   .
 )
-
-[[ $OSTYPE == linux-gnu ]] &&
-    fpath+=( $HOMEBREW_PREFIX/share/zsh/site-functions )
+fpath=(
+    $HOMEBREW_PREFIX/share/zsh/site-functions
+    $fpath[@]
+)
 
 [[ $VENDOR == apple ]] &&
     export JAVA_HOME=$( /usr/libexec/java_home -v 1.8 )
@@ -52,7 +59,6 @@ export VISUAL=code
 export EDITOR=micro
 export READNULLCMD=bat
 export PAGER=less
-
 export MANPAGER='bat -l man'
 [[ $VENDOR == apple ]] &&
     MANPAGER="col -bpx | $MANPAGER"
