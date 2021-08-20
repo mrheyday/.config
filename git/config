@@ -48,11 +48,11 @@
 	help = 8 normal
 	header = normal
 [color "branch"]
-	remote = 13 normal dim
+	remote = 13 normal
 	upstream = 13 normal
-	plain = 14 normal dim
-	current = 14 normal
-	local = 14 normal dim
+	plain = 14 normal
+	current = 14 normal reverse
+	local = 14 normal
 [color "grep"]
 	function = 10 normal
 	filename = 7 normal
