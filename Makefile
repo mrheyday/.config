@@ -94,7 +94,7 @@ all: ibus terminal git git-config git-remote git-branch
 	$(GIT) fetch $(GITFLAGS) -t upstream
 	$(GIT) branch $(GITFLAGS) -u upstream/main main
 	$(GIT) pull $(GITFLAGS) --autostash upstream > /dev/null
-	@$(GIT) remote set-head upstream -a > /dev/null
+	$(GIT) remote set-head upstream -a > /dev/null
 
 ibus: FORCE
 ifneq (,$(wildcard $(DCONF)))
@@ -111,13 +111,13 @@ else ifneq (,$(wildcard $(DCONF)))
 endif
 
 git-config: FORCE
-	@$(GIT) config remote.pushdefault origin
-	@$(GIT) config push.default current
+	$(GIT) config remote.pushdefault origin
+	$(GIT) config push.default current
 
 git-remote: FORCE
 ifneq ($(upstream),$(shell $(GIT) remote get-url upstream 2> /dev/null))
-	@-$(GIT) remote add upstream $(upstream)
-	@$(GIT) remote set-url upstream $(upstream)
+	-$(GIT) remote add upstream $(upstream)
+	$(GIT) remote set-url upstream $(upstream)
 endif
 
 git-branch: FORCE
@@ -144,12 +144,13 @@ endif
 # Calls to `defaults` fail when they're not in a top-level target.
 install: installdirs dotfiles code konsole shell python brew
 ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
+	-$(OSASCRIPT) -e 'tell app "Terminal" to delete settings set "Dark Mode"'
 	$(OSASCRIPT) -e 'tell app "Terminal" to open POSIX file "$(CURDIR)/terminal/Dark Mode.terminal"'
+	$(OSASCRIPT) -e $$'tell app "Terminal" to do script "sleep 1; exit" in window 1'
 	$(OSASCRIPT) -e 'tell app "Terminal" to set current settings of windows to settings set "Dark Mode"'
 	$(OSASCRIPT) -e 'tell app "Terminal" to set default settings to settings set "Dark Mode"'
 	$(OSASCRIPT) -e 'tell app "Terminal" to set startup settings to settings set "Dark Mode"'
-	$(OSASCRIPT) -e 'tell app "Terminal" to do script "exit" in window 1' \
-		-e 'tell app "Terminal" to close window 1'
+	$(OSASCRIPT) -e 'tell app "Terminal" to close window 1'
 else ifneq (,$(wildcard $(DCONF)))
 	$(DCONF) load /desktop/ibus/ < $(CURDIR)/ibus/dconf.txt
 	$(DCONF) load /org/gnome/terminal/ < $(CURDIR)/terminal/dconf.txt
