@@ -50,6 +50,7 @@ setopt cdsilent pushdsilent # Suppress built-in output of cd and pushd.
 
 PS1='%F{%(?,10,9)}%#%f '
 znap prompt                 # Make the left side of the primary prompt visible, immediately.
+# print $SECONDS
 
 ZLE_RPROMPT_INDENT=0        # Right prompt margin
 setopt transientrprompt     # Auto-remove the right side of each prompt.
@@ -87,12 +88,12 @@ trap .prompt.git-status.sync ALRM
   [[ $zsh_eval_context != 'trap shfunc' ]] &&
       return 0  # Don't run inside other code.
   (
-  local gitdir
-  gitdir=$( git rev-parse --git-dir 2> /dev/null ) ||
-      return 0  # We're not in a Git repo.
+    local gitdir
+    gitdir=$( git rev-parse --git-dir 2> /dev/null ) ||
+        return 0  # We're not in a Git repo.
 
-  # Fetch only if there's no FETCH_HEAD or it is at least $TMOUT minutes old.
-  [[ -z $gitdir/FETCH_HEAD(Nmm-$TMOUT) ]] &&
+    # Fetch only if there's no FETCH_HEAD or it is at least $TMOUT minutes old.
+    [[ -z $gitdir/FETCH_HEAD(Nmm-$TMOUT) ]] &&
         git fetch -q
   ) &> /dev/null &|
 
@@ -308,3 +309,11 @@ elif command -v gio > /dev/null; then
   # gio is available for macOS, but gio trash DOES NOT WORK correctly there.
   alias trash='gio trash'
 fi
+
+# zprof() {
+#   builtin zprof
+#   print $SECONDS
+#   echoti sc
+#   add-zle-hook-widget -d line-init zprof
+# }
+# add-zle-hook-widget line-init zprof

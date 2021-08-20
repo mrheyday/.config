@@ -8,6 +8,9 @@
 # profile that a new window/tab opens a login shell. Otherwise, .zprofile will not get sourced!
 #
 
+# zmodload zsh/zprof
+# typeset -F SECONDS
+
 export XDG_CONFIG_HOME  # Value is set in .zshenv
 export XDG_CACHE_HOME=~/.cache
 export XDG_DATA_HOME=~/.local/share
@@ -36,13 +39,13 @@ export -TU INFOPATH infopath
 
 # (N) deletes the item if it doesn't exist.
 path=(
-  $PIPX_BIN_DIR(N)
-  $PYENV_ROOT/{bin,shims}(N)
-  $ANDROID_SDK_ROOT/{emulator,platform-tools}(N)
-  $HOMEBREW_PREFIX/opt/{mariadb@10.3,ncurses,tomcat@9}/bin(N)
-  /opt/local/{,s}bin(N) # MacPorts
-  $path[@]
-  .
+    $PIPX_BIN_DIR(N)
+    $PYENV_ROOT/{bin,shims}(N)
+    $ANDROID_SDK_ROOT/{emulator,platform-tools}(N)
+    $HOMEBREW_PREFIX/opt/{mariadb@10.3,ncurses,tomcat@9}/bin(N)
+    /opt/local/{,s}bin(N) # MacPorts
+    $path[@]
+    .
 )
 fpath=(
     $HOMEBREW_PREFIX/share/zsh/site-functions
