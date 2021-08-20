@@ -180,6 +180,9 @@ if [[ $VENDOR == ubuntu ]]; then
 fi
 znap source marlonrichert/zsh-autocomplete
 
+# Auto-installed by Brew, but far worse than the one supplied by Zsh
+rm -f $HOMEBREW_PREFIX/share/zsh/site-functions/_git{,.zwc}
+
 # Include absolute path for `znap eval` cache invalidation.
 znap eval pyenv-init ${${:-=pyenv}:P}' init - --no-rehash'
 
