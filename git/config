@@ -23,47 +23,63 @@
 [merge]
 	autoStash = true
 	tool = opendiff
+[diff]
+	colorMoved = zebra
 [color]
 	ui = always
 [color "decorate"]
+	branch = 14 normal
+	grafted = 1 normal italic
 	HEAD = 14 normal italic
 	remotebranch = 13 normal
-	grafted = 1 normal italic
-	tag = 3 normal
-	branch = 14 normal
 	stash = 8 normal
+	tag = 3 normal
 [color "status"]
-	nobranch = 1 normal italic
-	localbranch = 14 normal
-	remotebranch = 13 normal
+	added = 10 normal
 	branch = 14 normal
 	changed = 11 normal
-	unmerged = 9 normal
-	updated = 10 normal
-	added = 10 normal
-	untracked = normal dim
 	header = normal
+	localbranch = 14 normal
+	nobranch = 1 normal italic
+	remotebranch = 13 normal
+	unmerged = 9 normal
+	untracked = normal dim
+	updated = 10 normal
 [color "interactive"]
 	error = 1 normal italic
+	header = 8 normal bold
 	help = 8 normal
-	header = normal
+	prompt = 15 4
 [color "branch"]
-	remote = 13 normal
-	upstream = 13 normal
-	plain = 14 normal
 	current = 14 normal reverse
 	local = 14 normal
-[color "grep"]
-	function = 10 normal
-	filename = 7 normal
-	column = 8 normal
-	linenumber = 8 normal
+	plain = 14 normal
+	remote = 13 normal
+	upstream = 13 normal
 [color "remote"]
-	success = 2 normal
 	error = 1 normal
-	warning = 3 normal
 	hint = normal dim
+	success = 2 normal
+	warning = 3 normal
 [color "diff"]
 	commit = 3 normal
-	func = 10 normal
-	whitespace = normal
+	context = normal
+	contextBold = normal bold
+	frag = 3 normal ul
+	func = normal
+	meta = 3 normal
+	new = 10 normal
+	newBold = 10 normal bold
+	newDimmed = 2 normal
+	newMoved = 14 normal
+	newMovedAlternative = 12 normal
+	newMovedAlternativeDimmed = 4 normal
+	newMovedDimmed = 6 normal
+	old = 9 normal dim
+	oldBold = 9 normal dim bold
+	oldDimmed = 1 normal dim
+	oldMoved = 14 normal dim
+	oldMovedAlternative = 12 normal dim
+	oldMovedAlternativeDimmed = 4 normal dim
+	oldMovedDimmed = 6 normal dim
+	whitespace = normal reverse
