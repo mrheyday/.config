@@ -60,7 +60,11 @@ autoload -Uz add-zsh-hook
 add-zsh-hook precmd .prompt.git-status.async
 .prompt.git-status.async() {
   local fd
-  exec {fd}< <( .prompt.git-status.parse )
+  exec {fd}< <(
+    local REPLY
+    .prompt.git-status.parse
+    print -r -- "$REPLY"
+  )
   zle -Fw "$fd" .prompt.git-status.callback
 }
 zle -N .prompt.git-status.callback
@@ -97,7 +101,9 @@ trap .prompt.git-status.sync ALRM
         git fetch -q
   ) &> /dev/null &|
 
-  .prompt.git-status.repaint "$( .prompt.git-status.parse )"
+  local REPLY
+  .prompt.git-status.parse
+  .prompt.git-status.repaint "$REPLY"
 }
 
 .prompt.git-status.repaint() {
@@ -112,22 +118,25 @@ trap .prompt.git-status.sync ALRM
 
 .prompt.git-status.parse() {
   local -aU lines symbols
-  local branch_info status_line MATCH MBEGIN MEND
+  local branch MATCH MBEGIN MEND
 
-  if ! lines=( ${(f)"$( git status -sbunormal --no-renames 2> /dev/null )"} ); then
-    print   # Ensure we trigger possible `zle -F` callback.
-    return  # We're not in a Git repo.
-  fi
+  lines=( ${(f)"$( git status -sbunormal 2> /dev/null )"} ) ||
+      return  # We're not in a Git repo.
 
-  branch_info=$lines[1]
+  branch=$lines[1]
   shift lines
 
-  # Capture the left-most group of non-blank characters of each line, discarding duplicates.
-  symbols=( ${(@MSu)lines[@]##[^[:blank:]]##} )
-  status_line=${branch_info/'##'/$symbols}  # Replace `##` with those characters.
+  # Capture the left-most group of non-blank characters of each line.
+  REPLY=${(SMj::)lines[@]##[^[:blank:]]##}
+
+  # Split on color reset escape code, discard duplicates and sort.
+  symbols=( ${(ps:\e[m:ui)REPLY//'??'/?} )
+
+  # Join with color resets and insert before branch info.
+  REPLY=${branch/'##'/${(pj:\e[m :)symbols}$'\e[m'}
 
   # Wrap ANSI codes in %{prompt escapes%}, so they're not counted as printable characters.
-  print -r -- "${status_line//(#m)$'\C-[['[;[:digit:]]#m/%{${MATCH}%\}}"
+  REPLY="${REPLY//(#m)$'\e['[;[:digit:]]#m/%{${MATCH}%\}}"
 }
 
 # Shown after output that doesn't end in a newline.
@@ -220,7 +229,7 @@ fi
 bind '^Xp' 'cd .'
 bind '^Xo' 'open .'
 bind '^Xc' 'code .'
-bind '^Xs' 'git status -Mu --show-stash'
+bind '^Xs' 'git status -sbunormal'
 bind '^Xl' 'git log'
 bind "$key[PageUp]"   'git push && git fetch'
 bind "$key[PageDown]" 'git fetch && git pull --autostash'
