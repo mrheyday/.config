@@ -91,6 +91,11 @@ trap .prompt.git-status.sync ALRM
       return  # Avoid lag.
   [[ $zsh_eval_context != 'trap shfunc' ]] &&
       return 0  # Don't run inside other code.
+
+  local REPLY
+  .prompt.git-status.parse
+  .prompt.git-status.repaint "$REPLY"
+
   (
     local gitdir
     gitdir=$( git rev-parse --git-dir 2> /dev/null ) ||
@@ -100,10 +105,6 @@ trap .prompt.git-status.sync ALRM
     [[ -z $gitdir/FETCH_HEAD(Nmm-$TMOUT) ]] &&
         git fetch -q
   ) &> /dev/null &|
-
-  local REPLY
-  .prompt.git-status.parse
-  .prompt.git-status.repaint "$REPLY"
 }
 
 .prompt.git-status.repaint() {
@@ -258,7 +259,7 @@ zle -N which-command
 
 # Generate theme colors for Git & Zsh.
 znap source marlonrichert/zcolors
-znap eval zcolors "zcolors ${(q)LS_COLORS}"
+znap eval zcolors zcolors
 
 # In-line suggestions
 ZSH_AUTOSUGGEST_ACCEPT_WIDGETS=()
