@@ -51,10 +51,10 @@
 	help = 8 normal
 	prompt = 15 4
 [color "branch"]
-	current = 14 normal reverse
-	local = 14 normal
-	plain = 14 normal
-	remote = 13 normal
+	current = 14 normal
+	local = 14 normal dim
+	plain = 14 normal dim
+	remote = 13 normal dim
 	upstream = 13 normal
 [color "remote"]
 	error = 1 normal
@@ -83,3 +83,8 @@
 	oldMovedAlternativeDimmed = 4 normal dim
 	oldMovedDimmed = 6 normal dim
 	whitespace = normal reverse
+[color "grep"]
+	filename = 7 normal
+	function = 10 normal
+	linenumber = 8 normal
+	column = 8 normal
