@@ -37,6 +37,11 @@
     },
     "files.trimTrailingWhitespace": true,
     "git.autofetch": true,
+    "highlight.regexes": {
+        "(private)": [
+            { "color": "#569CD6" },
+        ]
+    },
     "java.autobuild.enabled": false,
     "java.semanticHighlighting.enabled": true,
     "search.useReplacePreview": false,
