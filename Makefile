@@ -163,16 +163,16 @@ else ifneq (,$(wildcard $(DCONF)))
 endif
 
 dotfiles: $(dotfiles:%=%~)
-	ln -fhs $(CURDIR)/zsh/.zshenv $(zshenv)
+	ln -fns $(CURDIR)/zsh/.zshenv $(zshenv)
 ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
-	ln -fhs $(CURDIR)/ssh/config $(sshconfig)
-	ln -fhs $(CURDIR)/vscode/settings.json $(vscode-settings)
-	ln -fhs $(CURDIR)/vscode/keybindings.json $(vscode-keybindings)
-	ln -fhs /usr/local/share/nano $(CURDIR)/nano/syntax-highlighting
+	ln -fns $(CURDIR)/ssh/config $(sshconfig)
+	ln -fns $(CURDIR)/vscode/settings.json $(vscode-settings)
+	ln -fns $(CURDIR)/vscode/keybindings.json $(vscode-keybindings)
+	ln -fns /usr/local/share/nano $(CURDIR)/nano/syntax-highlighting
 else ifeq (linux-gnu,$(shell print $$OSTYPE))
-	ln -fhs $(CURDIR)/konsole $(konsole)
-	ln -fhs $(CURDIR)/kxmlgui5 $(kxmlgui5)
-	ln -fhs /usr/share/nano $(CURDIR)/nano/syntax-highlighting
+	ln -fns $(CURDIR)/konsole $(konsole)
+	ln -fns $(CURDIR)/kxmlgui5 $(kxmlgui5)
+	ln -fns /usr/share/nano $(CURDIR)/nano/syntax-highlighting
 endif
 ifeq (,$(wildcard $(zsh-hist)))
 ifneq (,$(wildcard $(zsh-hist-old)))
@@ -187,7 +187,7 @@ endif
 
 installdirs: FORCE
 ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
-	ln -fhs "$(HOME)/Library/Application Support" $(HOME)/Library/ApplicationSupport
+	ln -fns "$(HOME)/Library/Application Support" $(HOME)/Library/ApplicationSupport
 endif
 	mkdir -pm 0700 $(sort $(zsh-datadir) $(dir $(dotfiles)))
 
