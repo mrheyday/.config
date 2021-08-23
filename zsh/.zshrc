@@ -241,16 +241,20 @@ bindkey '^[q'   push-line-or-edit
 bindkey '^V'    vi-quoted-insert
 
 # Alt-H: Open `man` page (or other help) for current command.
-alias run-help > /dev/null &&
-    unalias run-help
+unalias run-help 2> /dev/null
 autoload +X -Uz run-help
 autoload -Uz $functions_source[run-help]-*~*.zwc
 
-# Alt-Shift-/: Show definition of current command.
-alias which-command > /dev/null &&
-    unalias which-command
-autoload -Uz which-command
-zle -N which-command
+# Alt-Shift-/: Show description and origin of current command.
+unalias which-command 2> /dev/null
+zle -C which-command list-choices which-command
+which-command() {
+  zle -I
+  whatis -- $words[@] 2> /dev/null
+  whence -aSv -- $words[@] 2> /dev/null
+  compstate[insert]=
+  compstate[list]=
+}
 
 
 ##
@@ -328,9 +332,14 @@ elif command -v gio > /dev/null; then
 fi
 
 # zprof() {
-#   builtin zprof
-#   print $SECONDS
-#   echoti sc
-#   add-zle-hook-widget -d line-init zprof
+#   zprof() {
+#     unfunction zprof
+#     builtin zprof
+#     print $SECONDS
+#     echoti sc
+#     add-zle-hook-widget -d line-init zprof
+#   }
+#   add-zsh-hook -d precmd zprof
+#   add-zle-hook-widget line-init zprof
 # }
-# add-zle-hook-widget line-init zprof
+# add-zsh-hook precmd zprof
