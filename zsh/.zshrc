@@ -227,11 +227,15 @@ if [[ $VENDOR == apple ]]; then
   bindkey "$key[End]"  end-of-buffer
 fi
 
-bind '^Xp' 'cd .'
-bind '^Xo' 'open .'
-bind '^Xc' 'code .'
-bind '^Xs' 'git status -sbunormal'
-bind '^Xl' 'git log'
+bind '^[p' 'cd .'
+if [[ $VENDOR == apple ]]; then
+  bind '^[o' 'open .'
+else
+  bind '^[o' 'nemo . &|'
+fi
+bind '^[c' 'code .'
+bind '^[s' 'git status -unormal'
+bind '^[l' 'git log'
 bind "$key[PageUp]"   'git push && git fetch'
 bind "$key[PageDown]" 'git fetch && git pull --autostash'
 
