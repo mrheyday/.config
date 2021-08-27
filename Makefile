@@ -146,10 +146,11 @@ install: installdirs dotfiles code konsole shell python brew
 ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
 	-$(OSASCRIPT) -e 'tell app "Terminal" to delete settings set "Dark Mode"'
 	$(OSASCRIPT) -e 'tell app "Terminal" to open POSIX file "$(CURDIR)/terminal/Dark Mode.terminal"'
-	$(OSASCRIPT) -e $$'tell app "Terminal" to do script "sleep 1; exit" in window 1'
+	$(OSASCRIPT) -e $$'tell app "Terminal" to do script "\C-C\C-D" in window 1'
 	$(OSASCRIPT) -e 'tell app "Terminal" to set current settings of windows to settings set "Dark Mode"'
 	$(OSASCRIPT) -e 'tell app "Terminal" to set default settings to settings set "Dark Mode"'
 	$(OSASCRIPT) -e 'tell app "Terminal" to set startup settings to settings set "Dark Mode"'
+	sleep 1
 	$(OSASCRIPT) -e 'tell app "Terminal" to close window 1'
 else ifneq (,$(wildcard $(DCONF)))
 	$(DCONF) load /desktop/ibus/ < $(CURDIR)/ibus/dconf.txt
