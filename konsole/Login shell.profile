@@ -8,14 +8,16 @@ CursorShape=1
 
 [General]
 Command=/bin/zsh -l
+LocalTabTitleFormat=%D - %n
 Name=Login shell
 Parent=FALLBACK/
+RemoteTabTitleFormat=%U%h
 
 [Interaction Options]
 CopyTextAsHTML=false
 
 [Keyboard]
-KeyBindings=Natural text editing
+KeyBindings=Default++
 
 [Scrolling]
 HistoryMode=2
