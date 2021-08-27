@@ -10,16 +10,14 @@ Favorites=Login shell.profile
 
 [MainWindow]
 Height 1200=1129
-State=AAAA/wAAAAD9AAAAAAAABygAAARPAAAABAAAAAQAAAAIAAAACPwAAAAA
+State=AAAA/wAAAAD9AAAAAAAABzgAAARPAAAABAAAAAQAAAAIAAAACPwAAAAA
 ToolBarsMovable=Disabled
-Width 1920=1832
+Width 1920=1848
 Window-Maximized 1200x1920=true
 
 [SearchSettings]
 SearchReverseSearch=false
 
 [TabBar]
-ExpandTabWidth=true
 NewTabBehavior=PutNewTabAfterCurrentTab
-TabBarPosition=Top
 TabBarVisibility=AlwaysShowTabBar
