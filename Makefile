@@ -103,7 +103,7 @@ endif
 
 terminal: FORCE
 ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
-	$(PLUTIL) -extract 'Window Settings.Dark Mode' xml1 \
+	-$(PLUTIL) -extract 'Window Settings.Dark Mode' xml1 \
 		-o '$(CURDIR)/terminal/Dark Mode.terminal' \
 		$(HOME)/Library/Preferences/com.apple.Terminal.plist
 else ifneq (,$(wildcard $(DCONF)))
@@ -193,7 +193,7 @@ endif
 
 brew: $(formulas) $(casks) $(taps) brew-autoupdate
 
-$(formulas): brew-upgrade
+$(formulas):
 ifneq (,$(wildcard $@))
 	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) install $(BREWFLAGS) --formula $(notdir $@)
 endif
@@ -213,15 +213,11 @@ ifeq (,$(findstring running,$(shell HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) autoupdate
 endif
 endif
 
-$(taps): brew-upgrade
+$(taps):
 ifneq (,$(wildcard $@))
 	HOMEBREW_NO_AUTO_UPDATE=1 \
 		$(BREW) tap $(BREWFLAGS) $(subst homebrew-,homebrew/,$(notdir $@))
 endif
-
-brew-upgrade: $(BREW)
-	$(BREW) update
-	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) upgrade $(BREWFLAGS)
 
 $(BREW):
 	$(BASH) -c "$$( $(CURL) -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh )"
