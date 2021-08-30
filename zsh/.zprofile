@@ -11,10 +11,12 @@
 # zmodload zsh/zprof
 # typeset -F SECONDS
 
-export XDG_CONFIG_HOME  # Value is set in .zshenv
+export LANG=en_US.UTF-8    # Need to set this manually on macOS.
+export LC_COLLATE=C.UTF-8  # Other UTF-8 locales on Linux give weird whitespace sorting.
+
+export XDG_CONFIG_HOME     # Value is set in .zshenv
 export XDG_CACHE_HOME=~/.cache
 export XDG_DATA_HOME=~/.local/share
-export GRADLE_USER_HOME=$XDG_CONFIG_HOME/gradle
 
 export HOMEBREW_BAT=1
 export HOMEBREW_COLOR=1
@@ -28,16 +30,22 @@ path=( /home/linuxbrew/.linuxbrew/bin(N) $path[@] )
 }
 
 export ANDROID_SDK_ROOT=$HOMEBREW_PREFIX/share/android-commandlinetools
+export GRADLE_USER_HOME=$XDG_CONFIG_HOME/gradle
 
 export PYENV_VERSION=3.7.10
 export PYENV_ROOT=~/.pyenv
 export PIPX_BIN_DIR=~/.local/bin
 
+[[ $VENDOR == apple ]] &&
+    export JAVA_HOME=$( /usr/libexec/java_home -v 1.8 )
+export CATALINA_HOME=$HOMEBREW_PREFIX/opt/tomcat@9/libexec
+export CATALINA_BASE=~/Tomcat9
+
 # We need to set $path here and not in .zshenv, else /etc/zprofile will override it.
 export -U PATH path FPATH fpath MANPATH manpath  # -U remove duplicates.
 export -TU INFOPATH infopath
 
-# (N) deletes the item if it doesn't exist.
+# (N) omits the item if it doesn't exist.
 path=(
     $PIPX_BIN_DIR(N)
     $PYENV_ROOT/{bin,shims}(N)
@@ -52,12 +60,6 @@ fpath=(
     $fpath[@]
 )
 
-[[ $VENDOR == apple ]] &&
-    export JAVA_HOME=$( /usr/libexec/java_home -v 1.8 )
-export CATALINA_HOME=$HOMEBREW_PREFIX/opt/tomcat@9/libexec
-export CATALINA_BASE=~/Tomcat9
-
-export LANG=en_US.UTF-8
 export VISUAL=code
 export EDITOR=micro
 export READNULLCMD=bat
