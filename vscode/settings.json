@@ -60,6 +60,7 @@
         },
     ],
     "shell-syntax.defaultShell": "zsh",
+    "terminal.external.linuxExec": "konsole",
     "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
     "workbench.editor.enablePreview": false,
     "workbench.editor.showTabs": false,
