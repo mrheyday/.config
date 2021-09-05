@@ -1,5 +1,5 @@
 [Background]
-Color=0,0,0
+Color=19,19,19
 
 [BackgroundFaint]
 Color=0,0,0
@@ -17,58 +17,58 @@ Color=0,0,0
 Color=89,89,89
 
 [Color1]
-Color=255,86,50
+Color=255,126,73
 
 [Color1Faint]
-Color=203,0,0
+Color=237,16,0
 
 [Color1Intense]
-Color=255,133,89
+Color=255,195,142
 
 [Color2]
-Color=0,203,0
+Color=0,191,0
 
 [Color2Faint]
-Color=0,113,0
+Color=0,140,0
 
 [Color2Intense]
-Color=0,247,0
+Color=0,239,0
 
 [Color3]
-Color=222,161,0
+Color=204,157,0
 
 [Color3Faint]
-Color=126,81,0
+Color=158,111,0
 
 [Color3Intense]
-Color=255,201,30
+Color=250,203,0
 
 [Color4]
-Color=0,144,255
+Color=99,163,255
 
 [Color4Faint]
-Color=0,68,255
+Color=43,107,255
 
 [Color4Intense]
-Color=118,184,255
+Color=150,214,255
 
 [Color5]
-Color=255,67,255
+Color=255,105,228
 
 [Color5Faint]
-Color=186,0,191
+Color=253,54,177
 
 [Color5Intense]
-Color=255,121,255
+Color=255,182,255
 
 [Color6]
-Color=0,194,195
+Color=0,176,220
 
 [Color6Faint]
-Color=0,108,111
+Color=0,128,172
 
 [Color6Intense]
-Color=0,237,237
+Color=84,255,255
 
 [Color7]
 Color=212,212,212
@@ -92,5 +92,5 @@ Color=255,255,255
 Blur=false
 ColorRandomization=false
 Description=Dark Mode
-Opacity=0.9
+Opacity=0.95
 Wallpaper=
