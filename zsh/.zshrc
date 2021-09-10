@@ -286,6 +286,12 @@ znap source zsh-users/zsh-syntax-highlighting
 # Commands, aliases & functions
 #
 
+alias \
+    diff='diff --color' \
+    grep='grep --color' \
+    make='make -j' \
+    {\$,%}=  # For pasting command line examples
+
 # History editing tools
 znap source marlonrichert/zsh-hist
 
@@ -295,12 +301,10 @@ alias -s gz='gzip -l'
 if [[ $VENDOR == apple ]]; then
     alias -s {log,out}='open -a Console'
 else
-    alias -s {log,out}='tail -f'
-    alias -s deb='sudo apt install'
+  alias -s \
+      {log,out}='code' \
+      deb='sudo apt install'
 fi
-
-alias \$= %=  # For pasting command line examples
-alias grep='grep --color' make='make -j'
 
 # Pattern matching support for `cp`, `ln` and `mv`
 # See http://zsh.sourceforge.net/Doc/Release/User-Contributions.html#index-zmv
