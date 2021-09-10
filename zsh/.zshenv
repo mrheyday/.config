@@ -12,3 +12,12 @@ TMPDIR=$TMPDIR:A  # Needed to make ~TMPDIR work with autonamedirs + chaselinks
 
 XDG_CONFIG_HOME=~/.config
 ZDOTDIR=$XDG_CONFIG_HOME/zsh
+
+case $VENDOR in
+  ( apple )
+    SHELL_SESSIONS_DISABLE=1
+  ;;
+  ( ubuntu )
+    skip_global_compinit=1
+  ;;
+esac

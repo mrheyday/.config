@@ -5,17 +5,28 @@
 #
 
 
-##
-# Essentials
-#
+# zmodload zsh/zprof
+# typeset -F SECONDS
+
 
 # Set these first, so history is preserved, no matter what happens.
+XDG_DATA_HOME=~/.local/share
 HISTFILE=$XDG_DATA_HOME/zsh/history
 SAVEHIST=$(( 50 * 1000 ))       # For readability
 HISTSIZE=$(( 1.2 * SAVEHIST ))  # Zsh recommended value
 
-# Plugin manager
-source ~/Git/zsh-snap/znap.zsh
+
+for __file__ in $ZDOTDIR/zshrc.d/*.zsh; do
+  . $__file__
+done
+unset __file__
+
+
+##
+# Essentials
+#
+
+source ~/Git/zsh-snap/znap.zsh  # Plugin manager
 
 # Shell options
 setopt histfcntllock histignorealldups histsavenodups sharehistory
