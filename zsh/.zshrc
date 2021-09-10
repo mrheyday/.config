@@ -77,7 +77,7 @@ add-zsh-hook precmd .prompt.git-status.async
       local -a lines=() symbols=()
       local -i ahead= behind=
       local REPLY= MATCH= MBEGIN= MEND= head= gitdir= push= upstream=
-  {
+      {
         gitdir="$( git rev-parse --git-dir )" ||
             return
 
@@ -143,11 +143,11 @@ zle -N .prompt.git-status.callback
     [[ $RPS1 == $REPLY ]] &&
         return              # Avoid repainting when there's no change.
     RPS1=$REPLY
-  zle && [[ $CONTEXT == start ]] &&
+    zle && [[ $CONTEXT == start ]] &&
         zle .reset-prompt   # Repaint only if $RPS1 is actually visible.
   } always {
     exec {fd}<&-            # Close the file descriptor.
-}
+  }
 }
 
 # Shown after output that doesn't end in a newline.
@@ -155,7 +155,7 @@ PROMPT_EOL_MARK='%F{cyan}%S%#%f%s'
 
 # Continuation prompt
 indent=( '%('{1..36}'_,  ,)' )
-  PS2="${(j::)indent}" RPS2='%F{11}%^'
+PS2="${(j::)indent}" RPS2='%F{11}%^'
 
 # Debugging prompt
 indent=( '%('{1..36}"e,$( echoti cuf 2 ),)" )
@@ -169,32 +169,27 @@ unset indent
 ##
 # Directory config
 #
+zmodload -F zsh/parameter p:dirstack
 setopt autocd autopushd chaselinks pushdignoredups pushdminus
 
 # Load dir stack from file, excl. current dir, temp dirs & non-existing dirs.
-() {
-  zmodload -F zsh/parameter p:dirstack
-  local cdr=$XDG_DATA_HOME/zsh/chpwd-recent-dirs
-
-  [[ -r $cdr ]] ||
-      return
-
-  typeset -gaU dirstack=( ${(u)^${(f@Q)"$( < $cdr )"}[@]:#($PWD|${TMPDIR:-/tmp}/*)}(N-/) )
-}
+cdr=$XDG_DATA_HOME/zsh/chpwd-recent-dirs
+[[ -r $cdr ]] &&
+    typeset -gaU dirstack=( ${(u)^${(f@Q)"$( < $cdr )"}[@]:#($PWD|${TMPDIR:-/tmp}/*)}(N-/) )
+unset cdr
 
 # Needed by VTE-based terminals (Gnome Terminal, Tilix) to preserve $PWD on new windows/tabs.
 [[ $VENDOR == ubuntu ]] &&
     source /etc/profile.d/vte-*.*.sh
 
 # Both Apple & VTE attach their function to the wrong hook!
-() {
-  local f=$precmd_functions[(R)(__vte_osc7|update_terminal_cwd)]
-  if [[ -n $f ]]; then
-    add-zsh-hook -d precmd $f  # Does not need to run before each prompt.
-    add-zsh-hook chpwd $f      # Run it when we change dirs...
-    $f                         # ...and once for our initial dir.
-  fi
-}
+__func__=$precmd_functions[(R)(__vte_osc7|update_terminal_cwd)]
+if [[ -n $__func__ ]]; then
+  add-zsh-hook -d precmd $__func__  # Does not need to run before each prompt.
+  add-zsh-hook chpwd $__func__      # Run it when we change dirs...
+  $__func__                         # ...and once for our initial dir.
+fi
+unset __func__
 
 
 ##
@@ -217,9 +212,9 @@ znap eval pipenv-completion "pipenv --completion              # $PYENV_VERSION"
 
 
 ##
-# Key bindings
+# Keybindings
 #
-zmodload -F zsh/parameter p:functions p:functions_source  # Used below
+zmodload -F zsh/parameter p:functions_source
 
 setopt NO_flowcontrol  # Enable ^Q and ^S.
 
@@ -294,14 +289,13 @@ znap source zsh-users/zsh-syntax-highlighting
 # Commands, aliases & functions
 #
 
+znap source marlonrichert/zsh-hist  # History editing tools
+
 alias \
     diff='diff --color' \
     grep='grep --color' \
     make='make -j' \
     {\$,%}=  # For pasting command line examples
-
-# History editing tools
-znap source marlonrichert/zsh-hist
 
 # File type associations
 alias -s \
@@ -353,6 +347,7 @@ elif command -v gio > /dev/null; then
   alias \
       trash='gio trash'
 fi
+
 
 # zprof() {
 #   zprof() {
