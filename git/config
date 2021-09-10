@@ -7,6 +7,8 @@
 [core]
 	autocrlf = false
 	editor = code --wait
+[column]
+	ui = row dense
 [checkout]
 	workers = -1
 	defaultRemote = upstream
@@ -25,6 +27,10 @@
 	tool = opendiff
 [diff]
 	colorMoved = zebra
+[stash]
+	showPatch = true
+[status]
+	showStash = true
 [color]
 	ui = always
 [color "decorate"]
