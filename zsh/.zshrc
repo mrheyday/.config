@@ -193,10 +193,6 @@ setopt autocd autopushd chaselinks pushdignoredups pushdminus
 #
 
 # Real-time auto-completion
-if [[ $VENDOR == ubuntu ]]; then
-  key[Alt-Up]=$'\e[1;3A'
-  key[Alt-Down]=$'\e[1;3B'
-fi
 znap source marlonrichert/zsh-autocomplete
 
 # Auto-installed by Brew, but far worse than the one supplied by Zsh
@@ -222,27 +218,30 @@ setopt NO_flowcontrol  # Enable ^Q and ^S.
 znap source marlonrichert/zsh-edit
 zstyle ':edit:*' word-chars '*?\'
 
-if [[ $VENDOR == apple ]]; then
-  bindkey "$key[Home]" beginning-of-buffer
-  bindkey "$key[End]"  end-of-buffer
-fi
+bind \
+    '^[p' 'cd .' \
+    '^[c' 'code .' \
+    '^[s' 'git branch -vv --points-at=@ && git status -s && git log --oneline @...@{push}' \
+    '^[l' 'git log' \
+    "$key[PageUp]"    'git push && git fetch' \
+    "$key[PageDown]"  'git fetch && git pull --autostash'
 
-bind '^[p' 'cd .'
 if [[ $VENDOR == apple ]]; then
-  bind '^[o' 'open .'
+  bindkey \
+      "$key[Home]" beginning-of-buffer \
+      "$key[End]" end-of-buffer
+  bind \
+      '^[o' 'open .'
 else
-  bind '^[o' 'nemo . &|'
+  bind \
+      '^[o' 'nemo . &|'
 fi
-bind '^[c' 'code .'
-bind '^[s' 'git status -unormal'
-bind '^[l' 'git log'
-bind "$key[PageUp]"   'git push && git fetch'
-bind "$key[PageDown]" 'git fetch && git pull --autostash'
 
 # Replace some default keybindings with better built-in widgets.
-bindkey '^[^_'  copy-prev-shell-word
-bindkey '^[q'   push-line-or-edit
-bindkey '^V'    vi-quoted-insert
+bindkey \
+    '^[^_'  copy-prev-shell-word \
+    '^[q'   push-line-or-edit \
+    '^V'    vi-quoted-insert
 
 # Alt-H: Open `man` page (or other help) for current command.
 unalias run-help 2> /dev/null
@@ -251,10 +250,10 @@ autoload -Uz $functions_source[run-help]-*~*.zwc
 
 # Alt-Shift-/: Show description and origin of current command.
 unalias which-command 2> /dev/null
-zle -C which-command list-choices which-command
+zle -C  which-command list-choices which-command
 which-command() {
   zle -I
-  whatis -- $words[@] 2> /dev/null
+  whatis      -- $words[@] 2> /dev/null
   whence -aSv -- $words[@] 2> /dev/null
   compstate[insert]=
   compstate[list]=
@@ -296,10 +295,12 @@ alias \
 znap source marlonrichert/zsh-hist
 
 # File type associations
-alias -s {gradle,json,md,patch,properties,txt,xml,yml}=$PAGER
-alias -s gz='gzip -l'
+alias -s \
+    gz='gzip -l' \
+    {gradle,json,md,patch,properties,txt,xml,yml}=$PAGER
 if [[ $VENDOR == apple ]]; then
-    alias -s {log,out}='open -a Console'
+  alias -s \
+      {log,out}='open -a Console'
 else
   alias -s \
       {log,out}='code' \
@@ -310,7 +311,10 @@ fi
 # See http://zsh.sourceforge.net/Doc/Release/User-Contributions.html#index-zmv
 # Tip: Use -n for no execution. (Print what would happen, but don’t do it.)
 autoload -Uz zmv
-alias zmv='zmv -v' zcp='zmv -Cv' zln='zmv -Lv'
+alias \
+    zmv='zmv -v' \
+    zcp='zmv -Cv' \
+    zln='zmv -Lv'
 
 # Paging & colors for `ls`
 ls() {
@@ -318,7 +322,8 @@ ls() {
   return $pipestatus[1]  # Return exit status of ls, not $PAGER
 }
 zstyle ':completion:*:ls:*:options' ignored-patterns --width
-alias ls='ls --group-directories-first --color -AFvx'
+alias \
+    ls='ls --group-directories-first --color -AFvx'
 
 # Safer alternatives to `rm`
 if [[ $VENDOR == apple ]]; then
@@ -336,7 +341,8 @@ if [[ $VENDOR == apple ]]; then
   }
 elif command -v gio > /dev/null; then
   # gio is available for macOS, but gio trash DOES NOT WORK correctly there.
-  alias trash='gio trash'
+  alias \
+      trash='gio trash'
 fi
 
 # zprof() {
