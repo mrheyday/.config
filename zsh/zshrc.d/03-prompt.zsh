@@ -66,7 +66,7 @@ add-zsh-hook precmd .prompt.git-status.async
 
         head=$( git rev-parse --abbrev-ref @ )
         if [[ $head == HEAD ]]; then
-          REPLY+="%F{1}${${$( git branch --points-at=@ )#*\(no branch, }%\)*}"
+          REPLY+="%F{1}${${$( git branch --points-at=@ )##*\((no branch, |)}%\)*}"
         else
           REPLY+="%F{14}$head%f"
 

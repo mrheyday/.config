@@ -72,7 +72,7 @@
 	context = normal
 	contextBold = normal bold
 	frag = 3 normal ul
-	func = normal
+	func = normal ul
 	meta = 3 normal
 	new = 10 normal
 	newBold = 10 normal bold
