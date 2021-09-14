@@ -4,14 +4,12 @@ ColorScheme=Dark Mode
 Font=monospace,11,-1,2,50,0,0,0,0,0
 
 [Cursor Options]
-CursorShape=1
 CustomCursorColor=255,255,255
 UseCustomCursorColor=true
 
 [General]
-Command=/bin/zsh -l
 LocalTabTitleFormat=%D - %n
-Name=Login shell
+Name=Default
 Parent=FALLBACK/
 RemoteTabTitleFormat=%U%h
 

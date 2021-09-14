@@ -19,10 +19,9 @@ zshenv = $(HOME)/.zshenv
 sshconfig = $(HOME)/.ssh/config
 dotfiles := $(zshenv) $(sshconfig)
 ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
-terminal-plist = $(HOME)/Library/Preferences/com.apple.Terminal.plist
 vscode-settings = $(HOME)/Library/ApplicationSupport/Code/User/settings.json
 vscode-keybindings = $(HOME)/Library/ApplicationSupport/Code/User/keybindings.json
-dotfiles += $(terminal-plist) $(vscode-settings) $(vscode-keybindings)
+dotfiles += $(vscode-settings) $(vscode-keybindings)
 else ifeq (linux-gnu,$(shell print $$OSTYPE))
 konsole = $(HOME)/.local/share/konsole
 kxmlgui5 = $(HOME)/.local/share/kxmlgui5
@@ -104,10 +103,10 @@ endif
 terminal: FORCE
 ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
 	-$(PLUTIL) -extract 'Window Settings.Dark Mode' xml1 \
-		-o '$(CURDIR)/terminal/Dark Mode.terminal' \
+		-o '$(CURDIR)/terminal-apple/Dark Mode.terminal' \
 		$(HOME)/Library/Preferences/com.apple.Terminal.plist
 else ifneq (,$(wildcard $(DCONF)))
-	$(DCONF) dump /org/gnome/terminal/ > $(CURDIR)/terminal/dconf.txt
+	$(DCONF) dump /org/gnome/terminal/ > $(CURDIR)/terminal-gnome/dconf.txt
 endif
 
 git-config: FORCE
@@ -145,7 +144,7 @@ endif
 install: installdirs dotfiles code konsole shell python brew
 ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
 	-$(OSASCRIPT) -e 'tell app "Terminal" to delete settings set "Dark Mode"'
-	$(OSASCRIPT) -e 'tell app "Terminal" to open POSIX file "$(CURDIR)/terminal/Dark Mode.terminal"'
+	$(OSASCRIPT) -e 'tell app "Terminal" to open POSIX file "$(CURDIR)/terminal-apple/Dark Mode.terminal"'
 	$(OSASCRIPT) -e $$'tell app "Terminal" to do script "\C-C\C-D" in window 1'
 	$(OSASCRIPT) -e 'tell app "Terminal" to set current settings of windows to settings set "Dark Mode"'
 	$(OSASCRIPT) -e 'tell app "Terminal" to set default settings to settings set "Dark Mode"'
@@ -154,13 +153,7 @@ ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
 	$(OSASCRIPT) -e 'tell app "Terminal" to close window 1'
 else ifneq (,$(wildcard $(DCONF)))
 	$(DCONF) load /desktop/ibus/ < $(CURDIR)/ibus/dconf.txt
-	$(DCONF) load /org/gnome/terminal/ < $(CURDIR)/terminal/dconf.txt
-	$(foreach p,\
-		$(filter-out list,$(shell $(DCONF) list /org/gnome/terminal/legacy/profiles:/)),\
-		$(DCONF) write /org/gnome/terminal/legacy/profiles:/$(p)login-shell true;)
-	$(foreach p,$(filter-out list,\
-		$(shell $(DCONF) list /com/gexperts/Tilix/profiles/)),\
-		$(DCONF) write /com/gexperts/Tilix/profiles:/$(p)login-shell true;)
+	$(DCONF) load /org/gnome/terminal/ < $(CURDIR)/terminal-gnome/dconf.txt
 endif
 
 dotfiles: $(dotfiles:%=%~)

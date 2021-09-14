@@ -1,12 +1,12 @@
 [Desktop Entry]
-DefaultProfile=Login shell.profile
+DefaultProfile=Default.profile
 
 [DownloadDialog Settings]
 Height 1200=498
 Width 1920=700
 
 [Favorite Profiles]
-Favorites=Login shell.profile
+Favorites=
 
 [MainWindow]
 Height 1200=1129
