@@ -5,9 +5,12 @@ SHELL = /bin/zsh
 
 # Include only the software that we want on all machines.
 repos = aureliojargas/clitest zsh-users/zsh-completions
+extensions = bmalehorn.shell-syntax davidhewitt.shebang-language-associator DotJoshJohnson.xml \
+	fabiospampinato.vscode-highlight foxundermoon.shell-format \
+	jeff-hykin.better-shellscript-syntax ms-vscode.cpptools
 formulas := asciinema bat less nano pyenv
 taps := services
-ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
+ifeq (apple,$(shell print $$VENDOR))
 taps += autoupdate cask cask-fonts cask-versions
 formulas += bash coreutils
 casks = karabiner-elements rectangle visual-studio-code
@@ -18,7 +21,7 @@ endif
 zshenv = $(HOME)/.zshenv
 sshconfig = $(HOME)/.ssh/config
 dotfiles := $(zshenv) $(sshconfig)
-ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
+ifeq (apple,$(shell print $$VENDOR))
 vscode-settings = $(HOME)/Library/ApplicationSupport/Code/User/settings.json
 vscode-keybindings = $(HOME)/Library/ApplicationSupport/Code/User/keybindings.json
 dotfiles += $(vscode-settings) $(vscode-keybindings)
@@ -46,6 +49,7 @@ datarootdir = $(prefix)/share
 datadir = $(datarootdir)
 
 BASH = /bin/bash
+CODE = /usr/bin/code
 CURL = /usr/bin/curl
 OSASCRIPT = /usr/bin/osascript
 PLUTIL = /usr/bin/plutil
@@ -101,7 +105,7 @@ ifneq (,$(wildcard $(DCONF)))
 endif
 
 terminal: FORCE
-ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
+ifeq (apple,$(shell print $$VENDOR))
 	-$(PLUTIL) -extract 'Window Settings.Dark Mode' xml1 \
 		-o '$(CURDIR)/terminal-apple/Dark Mode.terminal' \
 		$(HOME)/Library/Preferences/com.apple.Terminal.plist
@@ -142,7 +146,7 @@ endif
 
 # Calls to `defaults` fail when they're not in a top-level target.
 install: installdirs dotfiles code konsole shell python brew
-ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
+ifeq (apple,$(shell print $$VENDOR))
 	-$(OSASCRIPT) -e 'tell app "Terminal" to delete settings set "Dark Mode"'
 	$(OSASCRIPT) -e 'tell app "Terminal" to open POSIX file "$(CURDIR)/terminal-apple/Dark Mode.terminal"'
 	$(OSASCRIPT) -e $$'tell app "Terminal" to do script "\C-C\C-D" in window 1'
@@ -158,7 +162,7 @@ endif
 
 dotfiles: $(dotfiles:%=%~)
 	ln -fns $(CURDIR)/zsh/.zshenv $(zshenv)
-ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
+ifeq (apple,$(shell print $$VENDOR))
 	ln -fns $(CURDIR)/ssh/config $(sshconfig)
 	ln -fns $(CURDIR)/vscode/settings.json $(vscode-settings)
 	ln -fns $(CURDIR)/vscode/keybindings.json $(vscode-keybindings)
@@ -180,7 +184,7 @@ endif
 endif
 
 installdirs: FORCE
-ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
+ifeq (apple,$(shell print $$VENDOR))
 	ln -fns "$(HOME)/Library/Application Support" $(HOME)/Library/ApplicationSupport
 endif
 	mkdir -pm 0700 $(sort $(zsh-datadir) $(dir $(dotfiles)))
@@ -193,14 +197,14 @@ ifneq (,$(wildcard $@))
 endif
 
 $(casks): $(tapsdir)/homebrew-cask
-ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
+ifeq (apple,$(shell print $$VENDOR))
 ifneq (,$(wildcard $@))
 	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) install $(BREWFLAGS) --cask $@ 2> /dev/null
 endif
 endif
 
 brew-autoupdate: $(tapsdir)/homebrew-autoupdate
-ifeq (darwin,$(findstring darwin,$(shell print $$OSTYPE)))
+ifeq (apple,$(shell print $$VENDOR))
 ifeq (,$(findstring running,$(shell HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) autoupdate status)))
 	HOMEBREW_NO_AUTO_UPDATE=1 \
 		$(BREW) autoupdate start $(BREWFLAGS) --cleanup --upgrade > /dev/null
@@ -276,14 +280,28 @@ ifneq (,$(shell $(APT) show $@ 2> /dev/null))
 endif
 endif
 
-code: FORCE
-ifeq (linux-gnu,$(shell print $$OSTYPE))
+code: $(extensions)
+
+$(extensions): $(CODE)
+ifeq (,$(wildcard $(HOME)/.vscode/extensions/$@*))
+	$(CODE) --install-extension $@
+endif
+
+ifeq (apple,$(shell print $$VENDOR))
+$(CODE): $(visual-studio-code)
+else ifeq (linux-gnu,$(shell print $$OSTYPE))
+$(CODE): FORCE
 ifneq (,$(shell $(SNAP) list code $@ 2> /dev/null))
 	$(SNAP) list code &> /dev/null && $(SNAP) remove code
 endif
 	$(if command -v code > /dev/null,,\
-	( TMPSUFFIX=.deb; sudo $(APT) install =( $(WGET) -ncv --show-progress -O - \
-		'https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64' ) )\
+	( \
+		TMPSUFFIX=.deb; sudo $(APT) install \
+			=( \
+			$(WGET) -ncv --show-progress -O - \
+			'https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64' \
+			) \
+	)\
 	)
 endif
 
