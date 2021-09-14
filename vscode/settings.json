@@ -12,7 +12,7 @@
     ],
     "editor.semanticHighlighting.enabled": true,
     "editor.suggestSelection": "first",
-    "editor.tabSize": 2,
+    "editor.tabSize": 8,
     "editor.wordSeparators": " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~",
     "editor.wordWrapColumn": 99,
     "explorer.confirmDelete": false,
@@ -75,5 +75,4 @@
     "workbench.settings.useSplitJSON": true,
     "workbench.startupEditor": "none",
     "diffEditor.renderSideBySide": false,
-    "editor.detectIndentation": false,
 }
