@@ -21,3 +21,5 @@ case $VENDOR in
     skip_global_compinit=1
   ;;
 esac
+[[ $OSTYPE == linux-gnu ]] &&
+    DEBIAN_PREVENT_KEYBOARD_CHANGES=1

@@ -10,17 +10,17 @@ znap source marlonrichert/zsh-edit
 zstyle ':edit:*' word-chars '*?\'
 
 bind \
-    '^[p' 'cd .' \
-    '^[c' 'code .' \
-    '^[s' 'git branch -vv --points-at=@ && git status -s && git log --oneline @...@{push}' \
-    '^[l' 'git log' \
-    "$key[PageUp]"    'git push && git fetch' \
-    "$key[PageDown]"  'git fetch && git pull --autostash'
+    '^[p'   'cd .' \
+    '^[c'   'code .' \
+    '^[s'   'git branch -vv --points-at=@ && git status -s && git log --oneline @...@{push}' \
+    '^[l'   'git log' \
+    '^[[5~' 'git push && git fetch' \
+    '^[[6~' 'git fetch && git pull --autostash'
 
 if [[ $VENDOR == apple ]]; then
   bindkey \
-      "$key[Home]" beginning-of-buffer \
-      "$key[End]" end-of-buffer
+      '^[[H' beginning-of-buffer  '^[OH' beginning-of-buffer \
+      '^[[F' end-of-buffer        '^[OF' end-of-buffer
   bind \
       '^[o' 'open .'
 else
