@@ -12,7 +12,7 @@ zstyle ':edit:*' word-chars '*?\'
 bind \
     '^[p'   'cd .' \
     '^[c'   'code .' \
-    '^[s'   'git branch -vv --points-at=@ && git status -s && git log --oneline @...@{push}' \
+    '^[s'   'git status' \
     '^[l'   'git log' \
     '^[[5~' 'git push && git fetch' \
     '^[[6~' 'git fetch && git pull --autostash'
