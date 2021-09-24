@@ -17,15 +17,17 @@
     "editor.wordWrapColumn": 99,
     "explorer.confirmDelete": false,
     "explorer.confirmDragAndDrop": false,
+    "explorer.openEditors.sortOrder": "alphabetical",
     "extensions.ignoreRecommendations": true,
     "files.associations": {
+        "*.tcc": "c",
         "*.awk": "makefile",
         "*.in": "makefile",
         "*.mdd": "makefile",
         "Make*": "makefile",
         "*.ztst": "plaintext",
         "_*": "shellscript",
-        ".*": "shellscript"
+        ".*": "shellscript",
     },
     "files.autoSave": "afterDelay",
     "files.defaultLanguage": "shellscript",
@@ -65,6 +67,7 @@
     "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
     "workbench.editor.enablePreview": false,
     "workbench.editor.showTabs": false,
+    "workbench.editor.untitled.hint": "hidden",
     "workbench.editorAssociations": {
         "*.ipynb": "jupyter.notebook.ipynb"
     },
