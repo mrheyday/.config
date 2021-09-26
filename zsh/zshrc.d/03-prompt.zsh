@@ -36,66 +36,68 @@ setopt transientrprompt  # Auto-remove the right side of each prompt.
 add-zsh-hook precmd .prompt.git-status.async
 .prompt.git-status.async() {
   local fd=
-  exec {fd}< <(
-    () {
-      local -a lines=() symbols=()
-      local -i ahead= behind=
-      local REPLY= MATCH= MBEGIN= MEND= head= gitdir= push= upstream=
-      {
-        gitdir="$( git rev-parse --git-dir )" ||
-            return
+  exec {fd}< <( .promp.git-status.parse )
+  zle -Fw "$fd" .prompt.git-status.callback
+}
 
-        if upstream=$( git rev-parse --abbrev-ref @{u} ); then
-            git remote set-branches $upstream:h '*'
-            git config --local \
-                remote.$upstream:h.fetch '+refs/heads/*:refs/remotes/'$upstream:h'/*'
-        fi
+.promp.git-status.parse() {
+  local -a lines=() symbols=() tmp=()
+  local REPLY= MATCH= MBEGIN= MEND= head= gitdir= push= upstream= ahead= behind=
+  {
+    gitdir="$( git rev-parse -q --git-dir 2> /dev/null )" ||
+        return
+
+    # Capture the left-most group of non-blank characters on each line.
+    lines=( ${(f)"$( git status -sunormal )"} )
+    REPLY=${(SMj::)lines[@]##[^[:blank:]]##}
+
+    # Split on color reset escape code, discard duplicates and sort.
+    symbols=( ${(ps:\e[m:ui)REPLY//'??'/?} )
+
+    REPLY=${(pj:\e[m :)symbols}$'\e[m'  # Join with color resets.
+    REPLY+=" %F{12}${$( git rev-parse -q --show-toplevel ):t}%f:"  # Add repo root dir
+
+    if head=$( git branch --show-current 2> /dev/null ) && [[ $head != HEAD ]]; then
+      REPLY+="%F{14}$head%f"
+
+      if upstream=$( git rev-parse -q --abbrev-ref @{u} 2> /dev/null ) && [[ -n $upstream ]]; then
+        git config --local \
+            remote.$upstream:h.fetch '+refs/heads/*:refs/remotes/'$upstream:h'/*'
         [[ -z $gitdir/FETCH_HEAD(Nmm-1) ]] &&
             git fetch -qt  # Fetch if there's no FETCH_HEAD or it is at least 1 minute old.
 
+        upstream=${${upstream%/$head}#upstream/}
+        behind=${$( git rev-list --count --right-only @...@{u} ):#0}
+        REPLY+=" %F{13}${behind:+%B$behind}%f<-"
 
-        # Capture the left-most group of non-blank characters on each line.
-        lines=( ${(f)"$( git status -sunormal )"} )
-        REPLY=${(SMj::)lines[@]##[^[:blank:]]##}
-
-        # Split on color reset escape code, discard duplicates and sort.
-        symbols=( ${(ps:\e[m:ui)REPLY//'??'/?} )
-
-        REPLY=${(pj:\e[m :)symbols}$'\e[m'  # Join with color resets.
-        REPLY+=" %F{12}${$( git rev-parse --show-toplevel ):t}%f:"  # Add repo root dir
-
-        head=$( git rev-parse --abbrev-ref @ )
-        if [[ $head == HEAD ]]; then
-          REPLY+="%F{1}${${$( git branch --points-at=@ )##*\((no branch, |)}%\)*}"
-        else
-          REPLY+="%F{14}$head%f"
-
-          if [[ -n $upstream ]]; then
-            upstream=${${upstream%/$head}#upstream/}
-            behind=$( git rev-list --count --right-only @...@{u} )
-            REPLY+=" ${${behind:#0}:+%B%F{13\}}$behind%f<"
-
-            push=$( git rev-parse --abbrev-ref @{push} )
-            push=${${push%/$head}#origin/}
-            if [[ $push != $upstream ]]; then
-              ahead=$( git rev-list --count --left-only @...@{push} )
-              REPLY+="%F{13}$upstream%b%f ${${ahead:#0}:+%B%F{14\}}$ahead%f>%F{13}$push"
+        if push=${${"$( git rev-parse -q --abbrev-ref @{push} 2> /dev/null )"%/$head}#origin/}
+        then
+          if [[ $push != $upstream ]]; then
+            ahead=${$( git rev-list --count --left-only @...@{push} ):#0}
+            REPLY+="%F{13}$upstream%b%f %F{14}${ahead:+%B$ahead}%f->%F{13}$push%b%f"
+          else
+            ahead=${$( git rev-list --count --left-only @...@{u} ):#0}
+            if [[ -z $ahead && -z $behind ]]; then
+              REPLY+="> %F{13}$upstream%b%f"
             else
-              ahead=$( git rev-list --count --left-only @...@{u} )
-              REPLY+="%b%f ${${ahead:#0}:+%B%F{14\}}$ahead%f> %F{13}$upstream"
+              REPLY+="%b%f %F{14}${ahead:+%B$ahead}%f-> %F{13}$upstream%b%f"
             fi
           fi
+        else
+          REPLY+="%F{13}$upstream%b%f"
         fi
-        REPLY+='%b%f' # Don't leak colors to command output.
+      fi
+    elif head="$( git branch -q --no-color --points-at=@ 2> /dev/null )"; then
+      REPLY+="%F{1}${${head##*\((no branch, |)}%\)*}"
+    else
+      REPLY+="%F{14}${"$( < $gitdir/HEAD )":t}%f"
+    fi
 
-        # Wrap ANSI codes in %{prompt escapes%}, so they're not counted as printable characters.
-        REPLY="${REPLY//(#m)$'\e['[;[:digit:]]#m/%{${MATCH}%\}}"
-      } always {
-        print -r -- "$REPLY"
-      }
-    } 2> /dev/null  # Suppress all error output.
-  )
-  zle -Fw "$fd" .prompt.git-status.callback
+    # Wrap ANSI codes in %{prompt escapes%}, so they're not counted as printable characters.
+    REPLY="${REPLY//(#m)$'\e['[;[:digit:]]#m/%{${MATCH}%\}}"
+  } always {
+    print -r -- "$REPLY"
+  }
 }
 
 zle -N .prompt.git-status.callback
