@@ -8,14 +8,14 @@ repos = aureliojargas/clitest zsh-users/zsh-completions
 extensions = bmalehorn.shell-syntax davidhewitt.shebang-language-associator DotJoshJohnson.xml \
 	fabiospampinato.vscode-highlight foxundermoon.shell-format \
 	jeff-hykin.better-shellscript-syntax ms-vscode.cpptools
-formulas := asciinema bat less nano pyenv
+formulas := asciinema bat git less nano pyenv
 taps := services
 ifeq (apple,$(shell print $$VENDOR))
 taps += autoupdate cask cask-fonts cask-versions
 formulas += bash coreutils
 casks = karabiner-elements rectangle visual-studio-code
 else ifeq (linux-gnu,$(shell print $$OSTYPE))
-formulas += git grep
+formulas += grep
 endif
 
 zshenv = $(HOME)/.zshenv
