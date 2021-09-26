@@ -71,9 +71,9 @@
 	commit = 3 normal
 	context = normal
 	contextBold = normal bold
-	frag = 3 normal ul
-	func = normal ul
-	meta = 3 normal
+	frag = 8 normal ul
+	func = 8 normal ul
+	meta = 8 normal
 	new = 10 normal
 	newBold = 10 normal bold
 	newDimmed = 2 normal
@@ -94,3 +94,21 @@
 	function = 10 normal
 	linenumber = 8 normal
 	column = 8 normal
+[maintenance]
+	repo = /Users/marlon/.config
+	repo = /Users/marlon/Git/clitest
+	repo = /Users/marlon/Git/gitlab-tools
+	repo = /Users/marlon/Git/hiboxcentre
+	repo = /Users/marlon/Git/hiboxmeet
+	repo = /Users/marlon/Git/KE-complex_modifications
+	repo = /Users/marlon/Git/raise-ergo
+	repo = /Users/marlon/Git/zcolors
+	repo = /Users/marlon/Git/zsh
+	repo = /Users/marlon/Git/zsh-autocomplete
+	repo = /Users/marlon/Git/zsh-autosuggestions
+	repo = /Users/marlon/Git/zsh-completions
+	repo = /Users/marlon/Git/zsh-edit
+	repo = /Users/marlon/Git/zsh-hist
+	repo = /Users/marlon/Git/zsh-plugin-manager-benchmark
+	repo = /Users/marlon/Git/zsh-snap
+	repo = /Users/marlon/Git/zsh-syntax-highlighting
