@@ -1,3 +1,5 @@
+[include]
+	path = ~/.config/git/maintenance
 [user]
 	name = Marlon Richert
 	email = marlonrichert@users.noreply.github.com
@@ -94,21 +96,3 @@
 	function = 10 normal
 	linenumber = 8 normal
 	column = 8 normal
-[maintenance]
-	repo = /Users/marlon/.config
-	repo = /Users/marlon/Git/clitest
-	repo = /Users/marlon/Git/gitlab-tools
-	repo = /Users/marlon/Git/hiboxcentre
-	repo = /Users/marlon/Git/hiboxmeet
-	repo = /Users/marlon/Git/KE-complex_modifications
-	repo = /Users/marlon/Git/raise-ergo
-	repo = /Users/marlon/Git/zcolors
-	repo = /Users/marlon/Git/zsh
-	repo = /Users/marlon/Git/zsh-autocomplete
-	repo = /Users/marlon/Git/zsh-autosuggestions
-	repo = /Users/marlon/Git/zsh-completions
-	repo = /Users/marlon/Git/zsh-edit
-	repo = /Users/marlon/Git/zsh-hist
-	repo = /Users/marlon/Git/zsh-plugin-manager-benchmark
-	repo = /Users/marlon/Git/zsh-snap
-	repo = /Users/marlon/Git/zsh-syntax-highlighting
