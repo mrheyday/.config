@@ -11,7 +11,11 @@
 
 # Set these first, so history is preserved, no matter what happens.
 XDG_DATA_HOME=~/.local/share
-HISTFILE=$XDG_DATA_HOME/zsh/history
+if [[ $VENDOR == apple ]]; then
+  HISTFILE=~/Library/Mobile\ Documents/com\~apple\~CloudDocs/zsh_history
+else
+  HISTFILE=$XDG_DATA_HOME/zsh/history
+fi
 SAVEHIST=$(( 50 * 1000 ))       # For readability
 HISTSIZE=$(( 1.2 * SAVEHIST ))  # Zsh recommended value
 
