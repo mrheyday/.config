@@ -1,5 +1,3 @@
-[include]
-	path = ~/.config/git/maintenance
 [user]
 	name = Marlon Richert
 	email = marlonrichert@users.noreply.github.com
@@ -27,6 +25,9 @@
 [merge]
 	autoStash = true
 	tool = opendiff
+[filter "git-maintenance"]
+	clean = grep -v '/\\[maintenance\\]|repo = /'
+	smudge = cat
 [diff]
 	colorMoved = zebra
 [stash]
