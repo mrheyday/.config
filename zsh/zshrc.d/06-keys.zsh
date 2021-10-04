@@ -11,21 +11,22 @@ zstyle ':edit:*' word-chars '*?\'
 
 bind \
     '^[p'   'cd .' \
-    '^[c'   'code .' \
     '^[s'   'git status' \
     '^[l'   'git log' \
     '^[[5~' 'git push && git fetch' \
-    '^[[6~' 'git fetch && git pull --autostash'
+    '^[[6~' 'git fetch && git pull --autostash' \
+    '^[c'   'code .'
+code() {
+  command code "${@:/./${${$( git rev-parse --git-dir 2>/dev/null ):P:h}:-.}}"
+}
 
 if [[ $VENDOR == apple ]]; then
   bindkey \
       '^[[H' beginning-of-buffer  '^[OH' beginning-of-buffer \
       '^[[F' end-of-buffer        '^[OF' end-of-buffer
-  bind \
-      '^[o' 'open .'
+  bind '^[o' 'open .'
 else
-  bind \
-      '^[o' 'nemo . &|'
+  bind '^[o' 'nemo . &|'
 fi
 
 # Replace some default keybindings with better built-in widgets.
@@ -33,6 +34,9 @@ bindkey \
     '^[^_'  copy-prev-shell-word \
     '^[q'   push-line-or-edit \
     '^V'    vi-quoted-insert
+
+# Alt-V: Show the next key combo's terminal code and state what it does.
+bindkey '^[v' describe-key-briefly
 
 # Alt-H: Open `man` page (or other help) for current command.
 unalias run-help 2> /dev/null
