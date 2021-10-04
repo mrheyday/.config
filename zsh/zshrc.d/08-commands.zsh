@@ -20,7 +20,10 @@ if [[ $VENDOR == apple ]]; then
 else
   alias -s \
       {log,out}='code' \
-      deb='sudo apt install'
+      deb='deb'
+  deb() {
+    sudo apt install "$@[1,-2]" "$@[-1]:P"
+  }
 fi
 
 # Pattern matching support for `cp`, `ln` and `mv`
