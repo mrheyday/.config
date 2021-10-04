@@ -8,6 +8,7 @@ CustomCursorColor=255,255,255
 UseCustomCursorColor=true
 
 [General]
+Command=/bin/zsh
 LocalTabTitleFormat=%D - %n
 Name=Default
 Parent=FALLBACK/
