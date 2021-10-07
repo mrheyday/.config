@@ -2,6 +2,11 @@
 # Environment variables
 #
 
+# _After_ setting `autonamedirs`, each param set to an absolute path becomes a ~named dir.
+# That's why we need to set it here, before any params are set.
+setopt autonamedirs
+TMPDIR=$TMPDIR:P  # Needed to make ~TMPDIR work with autonamedirs + chaselinks
+
 export LANG=en_US.UTF-8    # Need to set this manually on macOS.
 export LC_COLLATE=C.UTF-8  # Other UTF-8 locales on Linux give weird whitespace sorting.
 
@@ -58,3 +63,6 @@ if [[ $VENDOR == apple ]]; then
   MANPAGER="col -bpx | $MANPAGER"
   export JAVA_HOME=$( /usr/libexec/java_home -v 1.8 )
 fi
+
+# Turn it off again, so we don't get random named dirs.
+unsetopt autonamedirs
