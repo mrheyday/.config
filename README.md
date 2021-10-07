@@ -42,10 +42,10 @@ Properly managed, easy-to-grok dotfiles for macOS and Ubuntu.
 To get new updates to your fork from my repo, do the following:
 ```zsh
 % cd ~/.config
-% make -j               # Pull in updates from upstream (my repo), but don't install them yet.
+% make -jr              # Pull in updates from upstream (my repo), but don't install them yet.
 ...
 📝 Review the incoming changes and make any adjustments you like.
-% make -j install       # Run the installer to deploy your changes.
+% make -jr install      # Run the installer to deploy your changes.
 ...
 % # Finally, update your fork with your changes:
 % git add -f <file>...  # Choose which files you actually want to track in Git.

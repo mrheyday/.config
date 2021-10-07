@@ -5,10 +5,19 @@ SHELL = /bin/zsh
 
 # Include only the software that we want on all machines.
 repos = aureliojargas/clitest zsh-users/zsh-completions
-extensions = bmalehorn.shell-syntax davidhewitt.shebang-language-associator DotJoshJohnson.xml \
-	fabiospampinato.vscode-highlight foxundermoon.shell-format \
-	jeff-hykin.better-shellscript-syntax ms-vscode.cpptools
-formulas := asciinema bat git less nano pyenv
+extensions = \
+	bmalehorn.shell-syntax \
+	davidhewitt.shebang-language-associator \
+	DotJoshJohnson.xml \
+	jeff-hykin.better-shellscript-syntax \
+	jock.svg \
+	kaiwood.center-editor-window \
+	ms-python.python \
+	ms-python.vscode-pylance \
+	ms-vscode.cpptools \
+	ms-vsliveshare.vsliveshare \
+	stylelint.vscode-stylelint
+formulas := asciinema bat diffutils git less nano pyenv
 taps := services
 ifeq (apple,$(shell print $$VENDOR))
 taps += autoupdate cask cask-fonts cask-versions
@@ -49,7 +58,11 @@ datarootdir = $(prefix)/share
 datadir = $(datarootdir)
 
 BASH = /bin/bash
+ifeq (apple,$(shell print $$VENDOR))
+CODE = /usr/local/bin/code
+else
 CODE = /usr/bin/code
+endif
 CURL = /usr/bin/curl
 OSASCRIPT = /usr/bin/osascript
 PLUTIL = /usr/bin/plutil
@@ -161,7 +174,7 @@ else ifneq (,$(wildcard $(DCONF)))
 endif
 
 dotfiles: $(dotfiles:%=%~)
-	ln -fns $(CURDIR)/zsh/.zshenv $(zshenv)
+	ln -fns $(CURDIR)/zsh/env $(zshenv)
 ifeq (apple,$(shell print $$VENDOR))
 	ln -fns $(CURDIR)/ssh/config $(sshconfig)
 	ln -fns $(CURDIR)/vscode/settings.json $(vscode-settings)
@@ -282,17 +295,17 @@ endif
 
 code: $(extensions)
 
-$(extensions): $(CODE)
-ifeq (,$(wildcard $(HOME)/.vscode/extensions/$@*))
-	$(CODE) --install-extension $@
-endif
+$(extensions): $(CODE) FORCE
+	$(ifeq $(wildcard $(HOME)/.vscode/extensions/$@-*),,\
+		$(CODE) --install-extension $@\
+	)
 
 ifeq (apple,$(shell print $$VENDOR))
 $(CODE): $(visual-studio-code)
 else ifeq (linux-gnu,$(shell print $$OSTYPE))
 $(CODE): FORCE
 ifneq (,$(shell $(SNAP) list code $@ 2> /dev/null))
-	$(SNAP) list code &> /dev/null && $(SNAP) remove code
+	$(SNAP) remove code
 endif
 	$(if command -v code > /dev/null,,\
 	( \
@@ -308,5 +321,5 @@ endif
 $(dotfiles:%=%~): clean
 	$(if $(wildcard $(@:%~=%)), mv $(@:%~=%) $@,)
 
-.SUFFIXES:
 FORCE:
+.SUFFIXES:
