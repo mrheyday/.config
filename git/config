@@ -25,9 +25,6 @@
 [merge]
 	autoStash = true
 	tool = opendiff
-[filter "git-maintenance"]
-	clean = grep -v '/\\[maintenance\\]|repo = /'
-	smudge = cat
 [diff]
 	colorMoved = zebra
 [stash]
@@ -97,3 +94,5 @@
 	function = 10 normal
 	linenumber = 8 normal
 	column = 8 normal
+[filter "maintenance"]
+	clean = grep -v '^\\[maintenance\\]$\n^\trepo = /'
