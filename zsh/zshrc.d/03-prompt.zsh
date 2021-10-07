@@ -4,9 +4,11 @@
 autoload -Uz add-zsh-hook
 
 add-zsh-hook precmd  .prompt.cursor.blinking-bar
-.prompt.cursor.blinking-bar()       { print -n '\e[5 q' }
+.prompt.cursor.blinking-bar()       { print -n '\e[5 q'; true }
+
 add-zsh-hook preexec .prompt.cursor.blinking-underline
-.prompt.cursor.blinking-underline() { print -n '\e[3 q' }
+.prompt.cursor.blinking-underline() { print -n '\e[3 q'; true }
+
 .prompt.cursor.blinking-bar
 
 # Call this hook whenever we change dirs...
@@ -20,6 +22,8 @@ add-zsh-hook chpwd .prompt.chpwd
   # If the primary prompt is already showing, then update the git status.
   zle && [[ $CONTEXT == start ]] &&
       .prompt.git-status.async
+
+  true  # Otherwise, the next hook might not run.
 }
 .prompt.chpwd # ...and once on startup, immediately.
 
@@ -38,6 +42,8 @@ add-zsh-hook precmd .prompt.git-status.async
   local fd=
   exec {fd}< <( .promp.git-status.parse )
   zle -Fw "$fd" .prompt.git-status.callback
+
+  true  # Otherwise, the next hook might not run.
 }
 
 .promp.git-status.parse() {
