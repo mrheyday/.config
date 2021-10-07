@@ -57,7 +57,7 @@ add-zsh-hook precmd .prompt.git-status.async
     REPLY=${(pj:\e[m :)symbols}$'\e[m'  # Join with color resets.
     REPLY+=" %F{12}${$( git rev-parse -q --show-toplevel ):t}%f:"  # Add repo root dir
 
-    if head=$( git branch --show-current 2> /dev/null ) && [[ $head != HEAD ]]; then
+    if head=$( git branch --show-current 2> /dev/null ) && [[ -n $head ]]; then
       REPLY+="%F{14}$head%f"
 
       if upstream=$( git rev-parse -q --abbrev-ref @{u} 2> /dev/null ) && [[ -n $upstream ]]; then
