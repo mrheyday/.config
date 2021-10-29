@@ -49,6 +49,8 @@
     },
     "java.autobuild.enabled": false,
     "java.semanticHighlighting.enabled": true,
+    "scm.inputFontFamily": "editor",
+    "search.sortOrder": "fileNames",
     "search.useReplacePreview": false,
     "shebang.associations": [
         {
