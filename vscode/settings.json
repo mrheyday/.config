@@ -5,7 +5,7 @@
 	"editor.fontFamily": "'SF Mono','Droid Sans Mono', 'monospace', monospace, 'Droid Sans Fallback'",
 	"editor.minimap.enabled": false,
 	"editor.renderControlCharacters": true,
-	"editor.renderWhitespace": "boundary",
+	"editor.renderWhitespace": "all",
 	"editor.rulers": [
 		79,
 		99
@@ -57,6 +57,8 @@
 	},
 	"java.autobuild.enabled": false,
 	"java.semanticHighlighting.enabled": true,
+	"reflowMarkdown.doubleSpaceBetweenSentences": true,
+	"reflowMarkdown.preferredLineLength": 79,
 	"scm.inputFontFamily": "editor",
 	"search.sortOrder": "fileNames",
 	"search.useReplacePreview": false,

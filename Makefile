@@ -13,6 +13,7 @@ extensions = \
 	jeff-hykin.better-shellscript-syntax \
 	jock.svg \
 	kaiwood.center-editor-window \
+	marvhen.reflow-markdown \
 	ms-python.python \
 	ms-python.vscode-pylance \
 	ms-vscode.cpptools \
