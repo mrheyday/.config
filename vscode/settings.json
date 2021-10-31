@@ -41,11 +41,18 @@
 	},
 	"files.trimTrailingWhitespace": true,
 	"git.autofetch": true,
+	"git.confirmSync": false,
+	"githubIssues.queries": [
+		{
+			"label": "Open Issues",
+			"query": "state:open repo:${owner}/${repository} sort:created-desc"
+		}
+	],
 	"highlight.regexes": {
 		"(private)": [
 			{
 				"color": "#569CD6"
-			},
+			}
 		]
 	},
 	"java.autobuild.enabled": false,

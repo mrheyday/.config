@@ -9,6 +9,7 @@ extensions = \
 	bmalehorn.shell-syntax \
 	davidhewitt.shebang-language-associator \
 	DotJoshJohnson.xml \
+	github.vscode-pull-request-github \
 	jeff-hykin.better-shellscript-syntax \
 	jock.svg \
 	kaiwood.center-editor-window \
