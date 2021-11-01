@@ -1,0 +1,3 @@
+#!/bin/zsh
+git fetch -q && git diff --check @ &&
+    { [[ ! -x run-tests.zsh ]] || run-tests.zsh }

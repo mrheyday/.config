@@ -7,6 +7,7 @@
 [core]
 	autocrlf = false
 	editor = code --wait
+	hooksPath = /Users/marlon/.config/git/hooks
 [column]
 	ui = row dense
 [checkout]
@@ -27,6 +28,8 @@
 	tool = opendiff
 [diff]
 	colorMoved = zebra
+[format]
+	suffix = .txt
 [stash]
 	showPatch = true
 [status]
@@ -88,7 +91,7 @@
 	oldMovedAlternative = 12 normal dim
 	oldMovedAlternativeDimmed = 4 normal dim
 	oldMovedDimmed = 6 normal dim
-	whitespace = normal reverse
+	whitespace = normal 1
 [color "grep"]
 	filename = 7 normal
 	function = 10 normal
