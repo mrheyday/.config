@@ -60,6 +60,7 @@
 	"reflowMarkdown.doubleSpaceBetweenSentences": true,
 	"reflowMarkdown.preferredLineLength": 79,
 	"scm.inputFontFamily": "editor",
+	"scm.inputFontSize": 11,
 	"search.sortOrder": "fileNames",
 	"search.useReplacePreview": false,
 	"shebang.associations": [
