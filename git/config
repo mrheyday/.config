@@ -91,7 +91,7 @@
 	oldMovedAlternative = 12 normal dim
 	oldMovedAlternativeDimmed = 4 normal dim
 	oldMovedDimmed = 6 normal dim
-	whitespace = normal 1
+	whitespace = normal 9
 [color "grep"]
 	filename = 7 normal
 	function = 10 normal
