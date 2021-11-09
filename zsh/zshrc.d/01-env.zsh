@@ -54,7 +54,10 @@ fpath=(
 )
 
 export VISUAL=code EDITOR=nano PAGER=less MANPAGER='bat -l man' READNULLCMD=bat
+
 export LESS='-FiMr -j.5 --incsearch' LESSHISTFILE=$XDG_DATA_HOME/less/lesshst
+mkdir -pm 0700 $LESSHISTFILE:h
+
 export QUOTING_STYLE=escape # Used by GNU ls
 
 if [[ $VENDOR == apple ]]; then
