@@ -54,7 +54,7 @@ if [[ $VENDOR == apple ]]; then
     (( $#items )) ||
         return 66
     print Moving $( eval ls -d -- ${(q)items[@]%/} ) to Trash.
-    items=( '(POSIX file "'${^items[@]:A}'")' )
+    items=( '(POSIX file "'${^items[@]:a}'")' )
     osascript -e 'tell application "Finder" to delete every item of {'${(j:, :)items}'}' \
         > /dev/null
   }
