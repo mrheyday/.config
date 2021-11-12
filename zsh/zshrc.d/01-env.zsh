@@ -13,8 +13,10 @@ setopt autonamedirs
 [[ -n $TMPPREFIX ]] &&
     TMPPREFIX=$TMPPREFIX:P
 
-export LANG=en_US.UTF-8    # Not set on macOS.
-export LC_COLLATE=C.UTF-8  # Other UTF-8 locales on Linux give weird whitespace sorting.
+export LANG=en_US.UTF-8 # Not set on macOS.
+
+[[ $OSTYPE == linux-gnu ]] &&
+    export LC_COLLATE=C.UTF-8 # Other UTF-8 locales on Linux give weird whitespace sorting.
 
 export HOMEBREW_BAT=1 HOMEBREW_COLOR=1 HOMEBREW_NO_AUTO_UPDATE=1
 path=( /home/linuxbrew/.linuxbrew/bin(N) $path[@] )
