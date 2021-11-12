@@ -46,7 +46,6 @@ path=(
     $HOMEBREW_PREFIX/opt/{mariadb@10.3,ncurses,tomcat@9}/bin(N)
     /opt/local/{,s}bin(N) # MacPorts
     $path[@]
-    .
 )
 fpath=(
     $HOMEBREW_PREFIX/share/zsh/site-functions
