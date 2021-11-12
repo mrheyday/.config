@@ -8,7 +8,7 @@ repos = aureliojargas/clitest zsh-users/zsh-completions
 extensions = \
 	bmalehorn.shell-syntax \
 	davidhewitt.shebang-language-associator \
-	DotJoshJohnson.xml \
+	dotjoshjohnson.xml \
 	github.vscode-pull-request-github \
 	jeff-hykin.better-shellscript-syntax \
 	jock.svg \
@@ -297,8 +297,8 @@ endif
 
 code: $(extensions)
 
-$(extensions): $(CODE) FORCE
-	$(ifeq $(wildcard $(HOME)/.vscode/extensions/$@-*),,\
+$(extensions): $(CODE)
+	$(if $(wildcard $(HOME)/.vscode/extensions/$@-*),,\
 		$(CODE) --install-extension $@\
 	)
 
