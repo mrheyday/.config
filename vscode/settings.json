@@ -87,7 +87,7 @@
 			"editor.background": "#00000042",
 			"editorWhitespace.foreground": "#ffffff61",
 			"sideBar.background": "#00000061",
-	}
+		}
 	},
 	"workbench.editor.enablePreview": false,
 	"workbench.editor.limit.enabled": true,
@@ -98,9 +98,6 @@
 	},
 	"workbench.fontAliasing": "antialiased",
 	"workbench.list.keyboardNavigation": "filter",
-	"workbench.settings.openDefaultKeybindings": true,
-	"workbench.settings.openDefaultSettings": true,
-	"workbench.settings.useSplitJSON": true,
 	"workbench.startupEditor": "none",
 	"diffEditor.renderSideBySide": false,
 }
