@@ -84,8 +84,9 @@
 	"vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
 	"workbench.colorCustomizations": {
 		"[*]": {
-			"editor.background": "#00000061",
+			"editor.background": "#00000042",
 			"editorWhitespace.foreground": "#ffffff61",
+			"sideBar.background": "#00000061",
 	}
 	},
 	"workbench.editor.enablePreview": false,
