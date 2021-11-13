@@ -3,35 +3,28 @@
 #
 autoload -Uz add-zsh-hook
 
-add-zsh-hook precmd  .prompt.cursor.blinking-bar
-.prompt.cursor.blinking-bar()       { print -n '\e[5 q'; true }
-
-add-zsh-hook preexec .prompt.cursor.blinking-underline
+# Cursor style
 .prompt.cursor.blinking-underline() { print -n '\e[3 q'; true }
-
+.prompt.cursor.blinking-bar()       { print -n '\e[5 q'; true }
+add-zsh-hook preexec .prompt.cursor.blinking-underline  # when executing a command
+add-zsh-hook precmd  .prompt.cursor.blinking-bar        # when the command line is active
 .prompt.cursor.blinking-bar
 
-# Call this hook whenever we change dirs...
-add-zsh-hook chpwd .prompt.chpwd
-.prompt.chpwd() {
-  zle &&
-      zle -I  # Prepare the line editor for our output.
-  print -P -- '\n%F{12}%~%f/'
-  RPS1=
-
-  # If the primary prompt is already showing, then update the git status.
-  zle && [[ $CONTEXT == start ]] &&
-      .prompt.git-status.async
-
-  true  # Otherwise, the next hook might not run.
-}
-.prompt.chpwd # ...and once on startup, immediately.
-
+# Whenever we change dirs, prompt the new directory.
 setopt cdsilent pushdsilent  # Suppress built-in output of cd and pushd.
+.prompt.chpwd() {
+  zle && zle -I                 # Prepare the line editor for our output.
+  print -P -- '\n%F{12}%~%f/'   # -P expands prompt escape codes.
+  RPS1=
+  zle && [[ $CONTEXT == start ]] &&
+      .prompt.git-status.async  # Update git status, if on primary prompt.
+  true  # Always return true; otherwise, the next hook will not run.
+}
+add-zsh-hook chpwd .prompt.chpwd
+.prompt.chpwd
 
 PS1='%F{%(?,10,9)}%#%f '
-znap prompt  # Make the left side of the primary prompt visible immediately.
-# print $SECONDS
+znap prompt               # Make the left side of the primary prompt visible immediately.
 
 ZLE_RPROMPT_INDENT=0     # Right prompt margin
 setopt transientrprompt  # Auto-remove the right side of each prompt.
@@ -43,7 +36,7 @@ add-zsh-hook precmd .prompt.git-status.async
   exec {fd}< <( .promp.git-status.parse )
   zle -Fw "$fd" .prompt.git-status.callback
 
-  true  # Otherwise, the next hook might not run.
+  true  # Always return true; otherwise, the next hook will not run.
 }
 
 .promp.git-status.parse() {
@@ -133,6 +126,6 @@ PS2="${(j::)indent}" RPS2='%F{11}%^'
 indent=( '%('{1..36}"e,$( echoti cuf 2 ),)" )
 i=${(j::)indent}
 PS4=$'%(?,,\t\t-> %F{9}%?%f\n)'
-PS4+=$'%2<< %{\e[2m%}%e%14<<             %F{10}%N%<<%f %3<<  %I%<<%b %(1_,%F{11}%_%f ,)'
+PS4+=$'%2<< %{\e[2m%}%e%22<<             %F{10}%N%<<%f %3<<  %I%<<%b %(1_,%F{11}%_%f ,)'
 
 unset indent
