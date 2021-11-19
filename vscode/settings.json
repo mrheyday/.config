@@ -1,5 +1,6 @@
 {
 	"editor.accessibilitySupport": "off",
+	"editor.autoClosingQuotes": "beforeWhitespace",
 	"editor.bracketPairColorization.enabled": true,
 	"editor.dragAndDrop": false,
 	"editor.emptySelectionClipboard": false,
