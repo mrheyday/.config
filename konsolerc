@@ -9,11 +9,14 @@ Width 1920=700
 Favorites=
 
 [MainWindow]
-Height 1200=1129
+Height 1200=837
+Height 1440=1369
 State=AAAA/wAAAAD9AAAAAAAABzgAAARPAAAABAAAAAQAAAAIAAAACPwAAAAA
 ToolBarsMovable=Disabled
-Width 1920=1848
+Width 1920=924
+Width 2560=2488
 Window-Maximized 1200x1920=true
+Window-Maximized 1440x2560=true
 
 [SearchSettings]
 SearchReverseSearch=false

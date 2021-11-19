@@ -1,7 +1,7 @@
 [Appearance]
 BoldIntense=true
 ColorScheme=Dark Mode
-Font=monospace,11,-1,2,50,0,0,0,0,0
+Font=Cascadia Code,11,-1,5,50,0,0,0,0,0
 
 [Cursor Options]
 CustomCursorColor=255,255,255
