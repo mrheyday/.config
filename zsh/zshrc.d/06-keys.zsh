@@ -17,7 +17,7 @@ bind \
     '^[[6~' 'git fetch && git pull --autostash' \
     '^[c'   'code .'
 code() {
-  command code "${@:/./${${$( git rev-parse --git-dir 2>/dev/null ):P:h}:-.}}"
+  command code ${@:/./${${$( git rev-parse --git-dir 2>/dev/null ):P:h}:-.}}
 }
 
 if [[ $VENDOR == apple ]]; then
@@ -26,7 +26,7 @@ if [[ $VENDOR == apple ]]; then
       '^[[F' end-of-buffer        '^[OF' end-of-buffer
   bind '^[o' 'open .'
 else
-  bind '^[o' 'nemo . &|'
+  bind '^[o' 'nautilus . &> /dev/null &|'
 fi
 
 # Replace some default keybindings with better built-in widgets.
