@@ -13,8 +13,8 @@ bind \
     '^[p'   'cd .' \
     '^[s'   'git status' \
     '^[l'   'git log' \
-    '^[[5~' 'git push && git fetch' \
-    '^[[6~' 'git fetch && git pull --autostash' \
+    '^[[5~' 'git push && git fetch --all' \
+    '^[[6~' 'git fetch --all && git pull --autostash' \
     '^[c'   'code .'
 code() {
   command code ${@:/./${${$( git rev-parse --git-dir 2>/dev/null ):P:h}:-.}}
