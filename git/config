@@ -39,7 +39,7 @@
 [color "decorate"]
 	branch = 14 normal
 	grafted = 1 normal italic
-	HEAD = 14 normal italic
+	HEAD = 14 normal dim
 	remotebranch = 13 normal
 	stash = 8 normal
 	tag = 3 normal
