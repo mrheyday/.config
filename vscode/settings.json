@@ -5,10 +5,11 @@
 	"editor.dragAndDrop": false,
 	"editor.emptySelectionClipboard": false,
 	"editor.fontFamily": "'SF Mono','Droid Sans Mono', 'monospace', monospace, 'Droid Sans Fallback'",
+	"editor.guides.indentation": false,
 	"editor.inlineSuggest.enabled": true,
 	"editor.minimap.enabled": false,
 	"editor.renderControlCharacters": true,
-	"editor.renderWhitespace": "all",
+	"editor.renderWhitespace": "boundary",
 	"editor.rulers": [
 		79,
 		99
@@ -61,7 +62,7 @@
 	"java.autobuild.enabled": false,
 	"java.semanticHighlighting.enabled": true,
 	"reflowMarkdown.doubleSpaceBetweenSentences": true,
-	"reflowMarkdown.preferredLineLength": 79,
+	"reflowMarkdown.preferredLineLength": 99,
 	"scm.inputFontFamily": "editor",
 	"scm.inputFontSize": 11,
 	"search.sortOrder": "fileNames",
@@ -85,9 +86,17 @@
 	"vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
 	"workbench.colorCustomizations": {
 		"[*]": {
-			"editor.background": "#00000042",
-			"editorWhitespace.foreground": "#ffffff61",
-			"sideBar.background": "#00000061",
+			"editor.background": "#0000001e",
+			"editor.findMatchBackground": "#0000",
+			"editor.findMatchBorder": "#eaea0080",
+			"editor.findMatchHighlightBackground": "#0000",
+			"editor.findMatchHighlightBorder": "#eaea0055",
+			"editor.inactiveSelectionBackground": "#36363680",
+			"editor.selectionBackground": "#314f7880",
+			"editor.selectionHighlightBackground": "#0000",
+			"editor.selectionHighlightBorder": "#ffffff55",
+			"editorWhitespace.foreground": "#e3e4e280",
+			"sideBar.background": "#0000001e",
 		}
 	},
 	"workbench.editor.enablePreview": false,
@@ -101,4 +110,5 @@
 	"workbench.list.keyboardNavigation": "filter",
 	"workbench.startupEditor": "none",
 	"diffEditor.renderSideBySide": false,
+	"editor.renderLineHighlight": "all",
 }
