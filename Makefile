@@ -93,9 +93,6 @@ BREWFLAGS = -q
 HOMEBREW_PREFIX = $(exec_prefix)
 HOMEBREW_CELLAR = $(HOMEBREW_PREFIX)/Cellar
 HOMEBREW_REPOSITORY = $(HOMEBREW_PREFIX)/Homebrew
-tapsdir = $(HOMEBREW_REPOSITORY)/Library/Taps/homebrew
-taps := $(taps:%=$(tapsdir)/homebrew-%)
-formulas := $(formulas:%=$(HOMEBREW_CELLAR)/%)
 
 PYENV_ROOT = $(HOME)/.pyenv
 PYENV = $(bindir)/pyenv
@@ -205,6 +202,10 @@ ifeq (apple,$(VENDOR))
 	ln -fns "$(HOME)/Library/Application Support" $(HOME)/Library/ApplicationSupport
 endif
 	mkdir -pm 0700 $(sort $(zsh-datadir) $(dir $(dotfiles)))
+
+tapsdir = $(HOMEBREW_REPOSITORY)/Library/Taps/homebrew
+taps := $(taps:%=$(tapsdir)/homebrew-%)
+formulas := $(formulas:%=$(HOMEBREW_CELLAR)/%)
 
 brew: $(formulas) $(casks) $(taps) brew-autoupdate
 
