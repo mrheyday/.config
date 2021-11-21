@@ -30,6 +30,7 @@ formulas += bash coreutils
 casks = karabiner-elements rectangle visual-studio-code
 else ifeq (linux-gnu,$(OSTYPE))
 formulas += grep
+packages = konsole
 endif
 
 zshenv = $(HOME)/.zshenv
@@ -110,18 +111,23 @@ PIPX = $(PIPX_BIN_DIR)/pipx
 PIPXFLAGS =
 PIPENV = $(HOME)/.local/bin/pipenv
 
-all: ibus terminal git git-config git-remote git-branch
+phony :=
+
+phony += all
+all : | ibus terminal git
 	$(GIT) fetch $(GITFLAGS) -t upstream
 	$(GIT) branch $(GITFLAGS) -u upstream/main main
 	$(GIT) pull $(GITFLAGS) --autostash upstream > /dev/null
 	$(GIT) remote set-head upstream -a > /dev/null
 
-ibus: FORCE
+phony += ibus
+ibus :
 ifneq (,$(wildcard $(DCONF)))
 	$(DCONF) dump /desktop/ibus/ > $(CURDIR)/ibus/dconf.txt
 endif
 
-terminal: FORCE
+phony += terminal
+terminal :
 ifeq (apple,$(VENDOR))
 	-$(PLUTIL) -extract 'Window Settings.Dark Mode' xml1 \
 		-o '$(CURDIR)/terminal-apple/Dark Mode.terminal' \
@@ -130,17 +136,14 @@ else ifneq (,$(wildcard $(DCONF)))
 	$(DCONF) dump /org/gnome/terminal/ > $(CURDIR)/terminal-gnome/dconf.txt
 endif
 
-git-config: FORCE
+phony += git
+git :
 	$(GIT) config remote.pushdefault origin
 	$(GIT) config push.default current
-
-git-remote: FORCE
 ifneq ($(upstream),$(shell $(GIT) remote get-url upstream 2> /dev/null))
 	-$(GIT) remote add upstream $(upstream)
 	$(GIT) remote set-url upstream $(upstream)
 endif
-
-git-branch: FORCE
 ifeq (,$(shell $(GIT) branch -l main))
 	-$(GIT) branch $(GITFLAGS) -m master main
 endif
@@ -152,7 +155,8 @@ replace = ), (
 backups := $(subst $(find),$(replace),$(foreach f,$(backups),(POSIX file "$(f)")))
 endif
 
-clean: FORCE
+phony += clean
+clean :
 ifneq (,$(backups))
 ifneq (,$(wildcard $(OSASCRIPT)))
 	$(OSASCRIPT) -e 'tell app "Finder" to delete every item of {$(backups)}' &> /dev/null || :
@@ -162,7 +166,8 @@ endif
 endif
 
 # Calls to `defaults` fail when they're not in a top-level target.
-install: installdirs dotfiles code konsole shell python brew
+phony += install
+install : | installdirs dotfiles $(packages) brew $(casks) shell python $(extensions)
 ifeq (apple,$(VENDOR))
 	-$(OSASCRIPT) -e 'tell app "Terminal" to delete settings set "Dark Mode"'
 	$(OSASCRIPT) -e 'tell app "Terminal" to open POSIX file "$(CURDIR)/terminal-apple/Dark Mode.terminal"'
@@ -177,7 +182,8 @@ else ifneq (,$(wildcard $(DCONF)))
 	$(DCONF) load /org/gnome/terminal/ < $(CURDIR)/terminal-gnome/dconf.txt
 endif
 
-dotfiles: $(dotfiles:%=%~)
+phony += dotfiles
+dotfiles : | $(dotfiles:%=%~)
 	ln -fns $(CURDIR)/zsh/env $(zshenv)
 ifeq (apple,$(VENDOR))
 	ln -fns $(CURDIR)/ssh/config $(sshconfig)
@@ -200,31 +206,29 @@ ifneq (,$(wildcard $(zsh-cdr-old)))
 endif
 endif
 
-installdirs: FORCE
+$(dotfiles:%=%~) : | clean
+	$(if $(wildcard $(@:%~=%)), mv $(@:%~=%) $@,)
+
+dirs = $(sort $(zsh-datadir) $(dir $(dotfiles)))
+$(dirs) :
+	mkdir -pm 0700 $@
+
 ifeq (apple,$(VENDOR))
-	ln -fns "$(HOME)/Library/Application Support" $(HOME)/Library/ApplicationSupport
+$(HOME)/Library/ApplicationSupport :
+	ln -fns "$(HOME)/Library/Application Support" $@
+
+installdirs : | $(dirs) $(HOME)/Library/ApplicationSupport
+else
+installdirs : | $(dirs)
 endif
-	mkdir -pm 0700 $(sort $(zsh-datadir) $(dir $(dotfiles)))
+phony += installdirs
 
 tapsdir = $(HOMEBREW_REPOSITORY)/Library/Taps/homebrew
 taps := $(taps:%=$(tapsdir)/homebrew-%)
 formulas := $(formulas:%=$(HOMEBREW_CELLAR)/%)
 
-brew: $(formulas) $(casks) $(taps) brew-autoupdate
-
-$(formulas):
-ifneq (,$(wildcard $@))
-	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) install $(BREWFLAGS) --formula $(notdir $@)
-endif
-
-$(casks): $(tapsdir)/homebrew-cask
-ifeq (apple,$(VENDOR))
-ifneq (,$(wildcard $@))
-	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) install $(BREWFLAGS) --cask $@ 2> /dev/null
-endif
-endif
-
-brew-autoupdate: $(tapsdir)/homebrew-autoupdate
+phony += brew
+brew : | $(taps) $(formulas) $(tapsdir)/homebrew-autoupdate
 ifeq (apple,$(VENDOR))
 ifeq (,$(findstring running,$(shell HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) autoupdate status)))
 	HOMEBREW_NO_AUTO_UPDATE=1 \
@@ -232,21 +236,27 @@ ifeq (,$(findstring running,$(shell HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) autoupdate
 endif
 endif
 
-$(taps):
-ifneq (,$(wildcard $@))
-	HOMEBREW_NO_AUTO_UPDATE=1 \
-		$(BREW) tap $(BREWFLAGS) $(subst homebrew-,homebrew/,$(notdir $@))
+$(formulas) : | $(BREW)
+	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) install $(BREWFLAGS) --formula $(notdir $@)
+
+ifeq (apple,$(VENDOR))
+phony += $(casks)
+$(casks) : | $(tapsdir)/homebrew-cask
+	$(if $(findstring $@,$(shell $(BREW) list --cask)),,\
+	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) install $(BREWFLAGS) --cask $@ 2> /dev/null )
 endif
 
-$(BREW):
-	$(BASH) -c "$$( $(CURL) -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh )"
+$(taps) : | $(BREW)
+	HOMEBREW_NO_AUTO_UPDATE=1 \
+		$(BREW) tap $(BREWFLAGS) $(subst homebrew-,homebrew/,$(notdir $@))
 
-shell: shell-repos shell-change
+$(BREW) :
+	$(BASH) -c "$$( $(CURL) -fsSL \
+		https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh )"
 
-shell-repos: $(ZNAP)
+phony += shell
+shell : | $(ZNAP)
 	source $(ZNAP) && znap install $(repos) > /dev/null
-
-shell-change: FORCE
 ifneq (,$(wildcard $(DSCL)))
 ifneq (UserShell: $(SHELL),$(shell $(DSCL) . -read ~/ UserShell))
 	chsh -s $(SHELL)
@@ -262,72 +272,59 @@ $(ZNAP):
 	$(GIT) -C $(abspath $(dir $@)..) clone $(GITFLAGS) --depth=1 -- \
 		https://github.com/marlonrichert/zsh-snap.git
 
-python: python-pipenv
-
-python-pipenv: python-pipenv-brew python-pipenv-pipx
-
-python-pipenv-brew: FORCE
+phony += python
+python : | $(HOMEBREW_CELLAR)/pyenv $(PYTHON) $(PIPX) $(PIPENV)
 ifneq (,$(wildcard $(HOMEBREW_CELLAR)/pipenv))
 	-HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) uninstall $(BREWFLAGS) --formula pipenv
 endif
-
-python-pipenv-pipx: python-pipx
-	$(PIPX) upgrade pipenv &> /dev/null || $(PIPX) install $(PIPXFLAGS) pipenv > /dev/null
-
-python-pipx: python-pipx-brew python-pipx-pip
-
-python-pipx-brew: FORCE
 ifneq (,$(wildcard $(HOMEBREW_CELLAR)/pipx))
 	-HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) uninstall $(BREWFLAGS) --formula pipx
 endif
-
-python-pipx-pip: python-pip
-	$(PIP) install $(PIPFLAGS) -U --user pipx
-
-python-pip: $(PYTHON)
+	PYENV_ROOT=$(PYENV_ROOT) $(PYENV) global $(PYENV_VERSION)
 	$(PIP) install $(PIPFLAGS) -U pip
+	$(PIP) install $(PIPFLAGS) -U --user pipx
+	$(PIPX) upgrade pipenv &> /dev/null
 
-$(PYTHON): $(HOMEBREW_CELLAR)/pyenv $(python-build)
+$(PIPENV) : | $(PIPX)
+	$(PIPX) install $(PIPXFLAGS) pipenv > /dev/null
+
+$(PIPX) : | $(PYTHON)
+	$(PIP) install $(PIPFLAGS) --user pipx
+
+$(PYTHON) : | $(HOMEBREW_CELLAR)/pyenv $(python-build)
 ifeq (,$(findstring $(PYENV_VERSION),$(shell $(PYENV) versions --bare)))
-	@print '\e[5;31;40mCompiling Python $(PYENV_VERSION). This might take a while! Please stand by...\e[0m'
+	$(info $(shell print \
+	$$'\e[5;31;40mCompiling Python $(PYENV_VERSION). This might take a while! Please stand by...\e[0m'\
+	))
 	PYENV_ROOT=$(PYENV_ROOT) $(PYENV) install $(PYENVFLAGS) -s $(PYENV_VERSION)
 endif
-	PYENV_ROOT=$(PYENV_ROOT) $(PYENV) global $(PYENV_VERSION)
 
-konsole $(python-build): FORCE
 ifeq (linux-gnu,$(OSTYPE))
-ifneq (,$(shell $(APT) show $@ 2> /dev/null))
-	sudo $(APT) install $@
-endif
-endif
-
-code: $(extensions)
-
-$(extensions): $(CODE)
-	$(if $(wildcard $(HOME)/.vscode/extensions/$@-*),,\
-		$(CODE) --install-extension $@\
+phony += $(packages) $(python-build)
+$(packages) $(python-build) :
+	$(if $(shell $(APT) show $@ 2> /dev/null),,\
+	sudo $(APT) install $@\
 	)
+endif
+
+phony += $(extensions)
+$(extensions) : | $(CODE)
+	$(if $(findstring $@,$(shell $(CODE) --list-extensions)),,\
+	$(CODE) --install-extension $@)
 
 ifeq (apple,$(VENDOR))
-$(CODE): $(visual-studio-code)
+$(CODE) : | visual-studio-code
 else ifeq (linux-gnu,$(OSTYPE))
-$(CODE): FORCE
-ifneq (,$(shell $(SNAP) list code $@ 2> /dev/null))
+ifneq (,$(shell $(SNAP) list code 2> /dev/null))
+phony += $(CODE)
+$(CODE) :
 	$(SNAP) remove code
+else
+$(CODE) :
 endif
-	$(if command -v code > /dev/null,,\
-	( \
-		TMPSUFFIX=.deb; sudo $(APT) install \
-			=( \
-			$(WGET) -ncv --show-progress -O - \
-			'https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64' \
-			) \
-	)\
-	)
+	( TMPSUFFIX=.deb; sudo $(APT) install =( $(WGET) -ncv --show-progress -O - \
+		'https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64' ))
 endif
 
-$(dotfiles:%=%~): clean
-	$(if $(wildcard $(@:%~=%)), mv $(@:%~=%) $@,)
-
-FORCE:
-.SUFFIXES:
+.PHONY : $(phony)
+.SUFFIXES :
