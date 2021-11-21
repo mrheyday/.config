@@ -231,25 +231,23 @@ formulas := $(formulas:%=$(HOMEBREW_CELLAR)/%)
 phony += brew
 brew : | $(taps) $(formulas) $(tapsdir)/homebrew-autoupdate
 ifeq (apple,$(VENDOR))
-ifeq (,$(findstring running,$(shell HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) autoupdate status)))
-	HOMEBREW_NO_AUTO_UPDATE=1 \
-		$(BREW) autoupdate start $(BREWFLAGS) --cleanup --upgrade > /dev/null
+ifeq (,$(findstring running,$(shell $(BREW) autoupdate status)))
+	$(BREW) autoupdate start $(BREWFLAGS) --cleanup --upgrade > /dev/null
 endif
 endif
 
 $(formulas) : | $(BREW)
-	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) install $(BREWFLAGS) --formula $(notdir $@)
+	$(BREW) install $(BREWFLAGS) --formula $(notdir $@)
 
 ifeq (apple,$(VENDOR))
 phony += $(casks)
 $(casks) : | $(tapsdir)/homebrew-cask
 	$(if $(findstring $@,$(shell $(BREW) list --cask)),,\
-	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) install $(BREWFLAGS) --cask $@ 2> /dev/null )
+	$(BREW) install $(BREWFLAGS) --cask $@ 2> /dev/null )
 endif
 
 $(taps) : | $(BREW)
-	HOMEBREW_NO_AUTO_UPDATE=1 \
-		$(BREW) tap $(BREWFLAGS) $(subst homebrew-,homebrew/,$(notdir $@))
+	$(BREW) tap $(BREWFLAGS) $(subst homebrew-,homebrew/,$(notdir $@))
 
 $(BREW) :
 	$(BASH) -c "$$( $(CURL) -fsSL \
@@ -276,10 +274,10 @@ $(ZNAP):
 phony += python
 python : | $(HOMEBREW_CELLAR)/pyenv $(PYTHON) $(PIPX) $(PIPENV)
 ifneq (,$(wildcard $(HOMEBREW_CELLAR)/pipenv))
-	-HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) uninstall $(BREWFLAGS) --formula pipenv
+	-$(BREW) uninstall $(BREWFLAGS) --formula pipenv
 endif
 ifneq (,$(wildcard $(HOMEBREW_CELLAR)/pipx))
-	-HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) uninstall $(BREWFLAGS) --formula pipx
+	-$(BREW) uninstall $(BREWFLAGS) --formula pipx
 endif
 	PYENV_ROOT=$(PYENV_ROOT) $(PYENV) global $(PYENV_VERSION)
 	$(PIP) install $(PIPFLAGS) -U pip
