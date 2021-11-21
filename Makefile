@@ -2,6 +2,8 @@
 
 upstream = https://github.com/marlonrichert/.config.git
 SHELL = /bin/zsh
+VENDOR = $(shell print $$VENDOR)
+OSTYPE = $(shell print $$OSTYPE)
 
 # Include only the software that we want on all machines.
 repos = aureliojargas/clitest zsh-users/zsh-completions
@@ -21,22 +23,22 @@ extensions = \
 	stylelint.vscode-stylelint
 formulas := asciinema bat diffutils git less nano pyenv
 taps := services
-ifeq (apple,$(shell print $$VENDOR))
+ifeq (apple,$(VENDOR))
 taps += autoupdate cask cask-fonts cask-versions
 formulas += bash coreutils
 casks = karabiner-elements rectangle visual-studio-code
-else ifeq (linux-gnu,$(shell print $$OSTYPE))
+else ifeq (linux-gnu,$(OSTYPE))
 formulas += grep
 endif
 
 zshenv = $(HOME)/.zshenv
 sshconfig = $(HOME)/.ssh/config
 dotfiles := $(zshenv) $(sshconfig)
-ifeq (apple,$(shell print $$VENDOR))
+ifeq (apple,$(VENDOR))
 vscode-settings = $(HOME)/Library/ApplicationSupport/Code/User/settings.json
 vscode-keybindings = $(HOME)/Library/ApplicationSupport/Code/User/keybindings.json
 dotfiles += $(vscode-settings) $(vscode-keybindings)
-else ifeq (linux-gnu,$(shell print $$OSTYPE))
+else ifeq (linux-gnu,$(OSTYPE))
 konsole = $(HOME)/.local/share/konsole
 kxmlgui5 = $(HOME)/.local/share/kxmlgui5
 dotfiles += $(konsole) $(kxmlgui5)
@@ -50,7 +52,7 @@ zsh-cdr = $(zsh-datadir).chpwd-recent-dirs
 zsh-cdr-old = $(HOME)/.chpwd-recent-dirs
 
 prefix = /usr/local
-ifeq (linux-gnu,$(shell print $$OSTYPE))
+ifeq (linux-gnu,$(OSTYPE))
 exec_prefix = /home/linuxbrew/.linuxbrew
 else
 exec_prefix = $(prefix)
@@ -60,7 +62,7 @@ datarootdir = $(prefix)/share
 datadir = $(datarootdir)
 
 BASH = /bin/bash
-ifeq (apple,$(shell print $$VENDOR))
+ifeq (apple,$(VENDOR))
 CODE = /usr/local/bin/code
 else
 CODE = /usr/bin/code
@@ -76,7 +78,7 @@ GIO = /usr/bin/gio
 SNAP = /usr/bin/snap
 WGET = /usr/bin/wget
 
-ifeq (linux-gnu,$(shell print $$OSTYPE))
+ifeq (linux-gnu,$(OSTYPE))
 GIT = $(bindir)/git
 else
 GIT = /usr/bin/git
@@ -104,7 +106,7 @@ PIPFLAGS = -q
 PIPX = $(HOME)/.local/bin/pipx
 PIPXFLAGS =
 PIPENV = $(HOME)/.local/bin/pipenv
-ifeq (linux-gnu,$(shell print $$OSTYPE))
+ifeq (linux-gnu,$(OSTYPE))
 python-dependencies = bzip2 sqlite3 zlib1g-dev
 endif
 
@@ -120,7 +122,7 @@ ifneq (,$(wildcard $(DCONF)))
 endif
 
 terminal: FORCE
-ifeq (apple,$(shell print $$VENDOR))
+ifeq (apple,$(VENDOR))
 	-$(PLUTIL) -extract 'Window Settings.Dark Mode' xml1 \
 		-o '$(CURDIR)/terminal-apple/Dark Mode.terminal' \
 		$(HOME)/Library/Preferences/com.apple.Terminal.plist
@@ -161,7 +163,7 @@ endif
 
 # Calls to `defaults` fail when they're not in a top-level target.
 install: installdirs dotfiles code konsole shell python brew
-ifeq (apple,$(shell print $$VENDOR))
+ifeq (apple,$(VENDOR))
 	-$(OSASCRIPT) -e 'tell app "Terminal" to delete settings set "Dark Mode"'
 	$(OSASCRIPT) -e 'tell app "Terminal" to open POSIX file "$(CURDIR)/terminal-apple/Dark Mode.terminal"'
 	$(OSASCRIPT) -e $$'tell app "Terminal" to do script "\C-C\C-D" in window 1'
@@ -177,12 +179,12 @@ endif
 
 dotfiles: $(dotfiles:%=%~)
 	ln -fns $(CURDIR)/zsh/env $(zshenv)
-ifeq (apple,$(shell print $$VENDOR))
+ifeq (apple,$(VENDOR))
 	ln -fns $(CURDIR)/ssh/config $(sshconfig)
 	ln -fns $(CURDIR)/vscode/settings.json $(vscode-settings)
 	ln -fns $(CURDIR)/vscode/keybindings.json $(vscode-keybindings)
 	ln -fns /usr/local/share/nano $(CURDIR)/nano/syntax-highlighting
-else ifeq (linux-gnu,$(shell print $$OSTYPE))
+else ifeq (linux-gnu,$(OSTYPE))
 	ln -fns $(CURDIR)/konsole $(konsole)
 	ln -fns $(CURDIR)/kxmlgui5 $(kxmlgui5)
 	ln -fns /usr/share/nano $(CURDIR)/nano/syntax-highlighting
@@ -199,7 +201,7 @@ endif
 endif
 
 installdirs: FORCE
-ifeq (apple,$(shell print $$VENDOR))
+ifeq (apple,$(VENDOR))
 	ln -fns "$(HOME)/Library/Application Support" $(HOME)/Library/ApplicationSupport
 endif
 	mkdir -pm 0700 $(sort $(zsh-datadir) $(dir $(dotfiles)))
@@ -212,14 +214,14 @@ ifneq (,$(wildcard $@))
 endif
 
 $(casks): $(tapsdir)/homebrew-cask
-ifeq (apple,$(shell print $$VENDOR))
+ifeq (apple,$(VENDOR))
 ifneq (,$(wildcard $@))
 	HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) install $(BREWFLAGS) --cask $@ 2> /dev/null
 endif
 endif
 
 brew-autoupdate: $(tapsdir)/homebrew-autoupdate
-ifeq (apple,$(shell print $$VENDOR))
+ifeq (apple,$(VENDOR))
 ifeq (,$(findstring running,$(shell HOMEBREW_NO_AUTO_UPDATE=1 $(BREW) autoupdate status)))
 	HOMEBREW_NO_AUTO_UPDATE=1 \
 		$(BREW) autoupdate start $(BREWFLAGS) --cleanup --upgrade > /dev/null
@@ -289,7 +291,7 @@ endif
 	PYENV_ROOT=$(PYENV_ROOT) $(PYENV) global $(PYENV_VERSION)
 
 konsole $(python-dependencies): FORCE
-ifeq (linux-gnu,$(shell print $$OSTYPE))
+ifeq (linux-gnu,$(OSTYPE))
 ifneq (,$(shell $(APT) show $@ 2> /dev/null))
 	sudo $(APT) install $@
 endif
@@ -302,9 +304,9 @@ $(extensions): $(CODE)
 		$(CODE) --install-extension $@\
 	)
 
-ifeq (apple,$(shell print $$VENDOR))
+ifeq (apple,$(VENDOR))
 $(CODE): $(visual-studio-code)
-else ifeq (linux-gnu,$(shell print $$OSTYPE))
+else ifeq (linux-gnu,$(OSTYPE))
 $(CODE): FORCE
 ifneq (,$(shell $(SNAP) list code $@ 2> /dev/null))
 	$(SNAP) remove code
