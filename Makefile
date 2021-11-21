@@ -64,7 +64,7 @@ datadir = $(datarootdir)
 
 BASH = /bin/bash
 ifeq (apple,$(VENDOR))
-CODE = /usr/local/bin/code
+CODE = $(bindir)/code
 else
 CODE = /usr/bin/code
 endif
@@ -79,10 +79,9 @@ GIO = /usr/bin/gio
 SNAP = /usr/bin/snap
 WGET = /usr/bin/wget
 
-ifeq (linux-gnu,$(OSTYPE))
-GIT = $(bindir)/git
-else
-GIT = /usr/bin/git
+GIT := $(bindir)/git
+ifeq (,$(wildcard $(GIT)))
+GIT := /usr/bin/git
 endif
 GITFLAGS = -q
 
