@@ -10,8 +10,9 @@ repos = aureliojargas/clitest zsh-users/zsh-completions
 extensions = \
 	bmalehorn.shell-syntax \
 	davidhewitt.shebang-language-associator \
-	dotjoshjohnson.xml \
-	github.vscode-pull-request-github \
+	DotJoshJohnson.xml \
+	GitHub.copilot \
+	GitHub.vscode-pull-request-github \
 	jeff-hykin.better-shellscript-syntax \
 	jock.svg \
 	kaiwood.center-editor-window \
