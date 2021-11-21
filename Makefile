@@ -159,7 +159,7 @@ phony += clean
 clean :
 ifneq (,$(backups))
 ifneq (,$(wildcard $(OSASCRIPT)))
-	$(OSASCRIPT) -e 'tell app "Finder" to delete every item of {$(backups)}' &> /dev/null || :
+	-$(OSASCRIPT) -e 'tell app "Finder" to delete every item of {$(backups)}' &> /dev/null
 else ifneq (,$(wildcard $(GIO)))
 	$(GIO) trash $(backups)
 endif
@@ -169,12 +169,13 @@ endif
 phony += install
 install : | installdirs dotfiles $(packages) brew $(casks) shell python $(extensions)
 ifeq (apple,$(VENDOR))
+	-$(OSASCRIPT) -e 'tell app "Terminal" to set current settings of windows to settings set "Basic"'
 	-$(OSASCRIPT) -e 'tell app "Terminal" to delete settings set "Dark Mode"'
 	$(OSASCRIPT) -e 'tell app "Terminal" to open POSIX file "$(CURDIR)/terminal-apple/Dark Mode.terminal"'
-	$(OSASCRIPT) -e $$'tell app "Terminal" to do script "\C-C\C-D" in window 1'
 	$(OSASCRIPT) -e 'tell app "Terminal" to set current settings of windows to settings set "Dark Mode"'
 	$(OSASCRIPT) -e 'tell app "Terminal" to set default settings to settings set "Dark Mode"'
 	$(OSASCRIPT) -e 'tell app "Terminal" to set startup settings to settings set "Dark Mode"'
+	$(OSASCRIPT) -e $$'tell app "Terminal" to do script "\C-C\C-D" in window 1'
 	sleep 1
 	$(OSASCRIPT) -e 'tell app "Terminal" to close window 1'
 else ifneq (,$(wildcard $(DCONF)))
