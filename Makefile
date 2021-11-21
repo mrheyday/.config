@@ -98,14 +98,17 @@ PYENV_ROOT = $(HOME)/.pyenv
 PYENV = $(bindir)/pyenv
 PYENV_VERSION = 3.7.10
 PYENVFLAGS =
+PYTHON = $(PYENV_ROOT)/versions/$(PYENV_VERSION)/bin/python
+ifeq (linux-gnu,$(OSTYPE))
+python-build = bzip2 sqlite3 zlib1g-dev
+endif
 PIP = $(PYENV_ROOT)/shims/pip
 PIPFLAGS = -q
-PIPX = $(HOME)/.local/bin/pipx
+
+PIPX_BIN_DIR = $(HOME)/.local/bin
+PIPX = $(PIPX_BIN_DIR)/pipx
 PIPXFLAGS =
 PIPENV = $(HOME)/.local/bin/pipenv
-ifeq (linux-gnu,$(OSTYPE))
-python-dependencies = bzip2 sqlite3 zlib1g-dev
-endif
 
 all: ibus terminal git git-config git-remote git-branch
 	$(GIT) fetch $(GITFLAGS) -t upstream
@@ -281,17 +284,17 @@ endif
 python-pipx-pip: python-pip
 	$(PIP) install $(PIPFLAGS) -U --user pipx
 
-python-pip: python-pyenv
+python-pip: $(PYTHON)
 	$(PIP) install $(PIPFLAGS) -U pip
 
-python-pyenv: $(HOMEBREW_CELLAR)/pyenv $(python-dependencies)
+$(PYTHON): $(HOMEBREW_CELLAR)/pyenv $(python-build)
 ifeq (,$(findstring $(PYENV_VERSION),$(shell $(PYENV) versions --bare)))
 	@print '\e[5;31;40mCompiling Python $(PYENV_VERSION). This might take a while! Please stand by...\e[0m'
 	PYENV_ROOT=$(PYENV_ROOT) $(PYENV) install $(PYENVFLAGS) -s $(PYENV_VERSION)
 endif
 	PYENV_ROOT=$(PYENV_ROOT) $(PYENV) global $(PYENV_VERSION)
 
-konsole $(python-dependencies): FORCE
+konsole $(python-build): FORCE
 ifeq (linux-gnu,$(OSTYPE))
 ifneq (,$(shell $(APT) show $@ 2> /dev/null))
 	sudo $(APT) install $@
