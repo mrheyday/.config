@@ -113,31 +113,15 @@ PIPENV = $(HOME)/.local/bin/pipenv
 
 phony :=
 
-phony += all
-all : | ibus terminal git
-	$(GIT) fetch $(GITFLAGS) -t upstream
-	$(GIT) branch $(GITFLAGS) -u upstream/main main
-	$(GIT) pull $(GITFLAGS) --autostash upstream > /dev/null
-	$(GIT) remote set-head upstream -a > /dev/null
-
-phony += ibus
-ibus :
-ifneq (,$(wildcard $(DCONF)))
-	$(DCONF) dump /desktop/ibus/ > $(CURDIR)/ibus/dconf.txt
-endif
-
-phony += terminal
-terminal :
 ifeq (apple,$(VENDOR))
-	-$(PLUTIL) -extract 'Window Settings.Dark Mode' xml1 \
-		-o '$(CURDIR)/terminal-apple/Dark Mode.terminal' \
-		$(HOME)/Library/Preferences/com.apple.Terminal.plist
+terminal = $(CURDIR)/terminal-apple/Dark\ Mode.terminal
 else ifneq (,$(wildcard $(DCONF)))
-	$(DCONF) dump /org/gnome/terminal/ > $(CURDIR)/terminal-gnome/dconf.txt
+terminal = $(CURDIR)/terminal-gnome/dconf.txt
+ibus = $(CURDIR)/ibus/dconf.txt
 endif
 
-phony += git
-git :
+phony += all
+all : | $(ibus) $(terminal)
 	$(GIT) config remote.pushdefault origin
 	$(GIT) config push.default current
 ifneq ($(upstream),$(shell $(GIT) remote get-url upstream 2> /dev/null))
@@ -146,6 +130,26 @@ ifneq ($(upstream),$(shell $(GIT) remote get-url upstream 2> /dev/null))
 endif
 ifeq (,$(shell $(GIT) branch -l main))
 	-$(GIT) branch $(GITFLAGS) -m master main
+endif
+	$(GIT) fetch $(GITFLAGS) -t upstream
+	$(GIT) branch $(GITFLAGS) -u upstream/main main
+	$(GIT) pull $(GITFLAGS) --autostash upstream > /dev/null
+	$(GIT) remote set-head upstream -a > /dev/null
+
+phony += $(terminal)
+ifeq (apple,$(VENDOR))
+$(terminal) :
+	-$(PLUTIL) -extract 'Window Settings.Dark Mode' xml1 \
+		-o '$@' $(HOME)/Library/Preferences/com.apple.Terminal.plist
+else ifneq (,$(wildcard $(DCONF)))
+$(terminal) :
+	$(DCONF) dump /org/gnome/terminal/ > $@
+endif
+
+ifneq (,$(wildcard $(DCONF)))
+phony += $(ibus)
+$(ibus) :
+	$(DCONF) dump /desktop/ibus/ > $@
 endif
 
 backups := $(wildcard $(dotfiles:%=%~))
@@ -167,15 +171,15 @@ endif
 
 # Calls to `defaults` fail when they're not in a top-level target.
 phony += install
-install : | installdirs dotfiles $(packages) brew $(casks) shell python $(extensions)
+install : | installdirs installconfig installapt installbrew installzsh installpython installcode
 ifeq (apple,$(VENDOR))
 	-$(OSASCRIPT) -e 'tell app "Terminal" to set current settings of windows to settings set "Basic"'
 	-$(OSASCRIPT) -e 'tell app "Terminal" to delete settings set "Dark Mode"'
-	$(OSASCRIPT) -e 'tell app "Terminal" to open POSIX file "$(CURDIR)/terminal-apple/Dark Mode.terminal"'
+	$(OSASCRIPT) -e 'tell app "Terminal" to open POSIX file "$(CURDIR)/terminal-apple/Dark Mode.terminal"' > /dev/null
 	$(OSASCRIPT) -e 'tell app "Terminal" to set current settings of windows to settings set "Dark Mode"'
 	$(OSASCRIPT) -e 'tell app "Terminal" to set default settings to settings set "Dark Mode"'
 	$(OSASCRIPT) -e 'tell app "Terminal" to set startup settings to settings set "Dark Mode"'
-	$(OSASCRIPT) -e $$'tell app "Terminal" to do script "\C-C\C-D" in window 1'
+	$(OSASCRIPT) -e $$'tell app "Terminal" to do script "\C-C\C-D" in window 1' > /dev/null
 	sleep 1
 	$(OSASCRIPT) -e 'tell app "Terminal" to close window 1'
 else ifneq (,$(wildcard $(DCONF)))
@@ -183,8 +187,8 @@ else ifneq (,$(wildcard $(DCONF)))
 	$(DCONF) load /org/gnome/terminal/ < $(CURDIR)/terminal-gnome/dconf.txt
 endif
 
-phony += dotfiles
-dotfiles : | $(dotfiles:%=%~)
+phony += installconfig
+installconfig : | $(dotfiles:%=%~)
 	ln -fns $(CURDIR)/zsh/env $(zshenv)
 ifeq (apple,$(VENDOR))
 	ln -fns $(CURDIR)/ssh/config $(sshconfig)
@@ -207,6 +211,7 @@ ifneq (,$(wildcard $(zsh-cdr-old)))
 endif
 endif
 
+phony += $(dotfiles:%=%~)
 $(dotfiles:%=%~) : | clean
 	$(if $(wildcard $(@:%~=%)), mv $(@:%~=%) $@,)
 
@@ -228,15 +233,21 @@ tapsdir = $(HOMEBREW_REPOSITORY)/Library/Taps/homebrew
 taps := $(taps:%=$(tapsdir)/homebrew-%)
 formulas := $(formulas:%=$(HOMEBREW_CELLAR)/%)
 
-phony += brew
-brew : | $(taps) $(formulas) $(tapsdir)/homebrew-autoupdate
+phony += installbrew
+installbrew : | $(taps) $(formulas) $(casks)
+
+phony += brewupdate
+brewupdate : | $(tapsdir)/homebrew-autoupdate
+	$(BREW) autoremove $(BREWFLAGS)
 ifeq (apple,$(VENDOR))
-ifeq (,$(findstring running,$(shell $(BREW) autoupdate status)))
+	-$(BREW) autoupdate stop $(BREWFLAGS) &> /dev/null
 	$(BREW) autoupdate start $(BREWFLAGS) --cleanup --upgrade > /dev/null
-endif
+else ifeq (linux-gnu,$(OSTYPE))
+	$(BREW) update $(BREWFLAGS)
+	$(BREW) upgrade $(BREWFLAGS)
 endif
 
-$(formulas) : | $(BREW)
+$(formulas) : | brewupdate $(taps)
 	$(BREW) install $(BREWFLAGS) --formula $(notdir $@)
 
 ifeq (apple,$(VENDOR))
@@ -253,8 +264,8 @@ $(BREW) :
 	$(BASH) -c "$$( $(CURL) -fsSL \
 		https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh )"
 
-phony += shell
-shell : | $(ZNAP)
+phony += installzsh
+installzsh : | $(ZNAP)
 	source $(ZNAP) && znap install $(repos) > /dev/null
 ifneq (,$(wildcard $(DSCL)))
 ifneq (UserShell: $(SHELL),$(shell $(DSCL) . -read ~/ UserShell))
@@ -271,23 +282,27 @@ $(ZNAP):
 	$(GIT) -C $(abspath $(dir $@)..) clone $(GITFLAGS) --depth=1 -- \
 		https://github.com/marlonrichert/zsh-snap.git
 
-phony += python
-python : | $(HOMEBREW_CELLAR)/pyenv $(PYTHON) $(PIPX) $(PIPENV)
-ifneq (,$(wildcard $(HOMEBREW_CELLAR)/pipenv))
-	-$(BREW) uninstall $(BREWFLAGS) --formula pipenv
-endif
-ifneq (,$(wildcard $(HOMEBREW_CELLAR)/pipx))
-	-$(BREW) uninstall $(BREWFLAGS) --formula pipx
-endif
-	PYENV_ROOT=$(PYENV_ROOT) $(PYENV) global $(PYENV_VERSION)
+phony += installpython
+installpython : | $(PIPENV)
+	$(if $(findstring $(PYENV_VERSION),$(shell PYENV_ROOT=$(PYENV_ROOT) $(PYENV) global)),,\
+	PYENV_ROOT=$(PYENV_ROOT) $(PYENV) global $(PYENV_VERSION))
 	$(PIP) install $(PIPFLAGS) -U pip
 	$(PIP) install $(PIPFLAGS) -U --user pipx
 	$(PIPX) upgrade pipenv &> /dev/null
 
-$(PIPENV) : | $(PIPX)
+phony += unbrew
+unbrew :
+ifneq (,$(wildcard $(HOMEBREW_CELLAR)/pipx))
+	-$(BREW) uninstall $(BREWFLAGS) --formula pipx
+endif
+ifneq (,$(wildcard $(HOMEBREW_CELLAR)/pipenv))
+	-$(BREW) uninstall $(BREWFLAGS) --formula pipenv
+endif
+
+$(PIPENV) : | unbrew $(PIPX)
 	$(PIPX) install $(PIPXFLAGS) pipenv > /dev/null
 
-$(PIPX) : | $(PYTHON)
+$(PIPX) : | unbrew $(PYTHON)
 	$(PIP) install $(PIPFLAGS) --user pipx
 
 $(PYTHON) : | $(HOMEBREW_CELLAR)/pyenv $(python-build)
@@ -298,6 +313,9 @@ ifeq (,$(findstring $(PYENV_VERSION),$(shell $(PYENV) versions --bare)))
 	PYENV_ROOT=$(PYENV_ROOT) $(PYENV) install $(PYENVFLAGS) -s $(PYENV_VERSION)
 endif
 
+phony += installapt
+installapt: $(packages)
+
 ifeq (linux-gnu,$(OSTYPE))
 phony += $(packages) $(python-build)
 $(packages) $(python-build) :
@@ -306,6 +324,9 @@ $(packages) $(python-build) :
 	)
 endif
 
+phony += installcode
+installcode: $(extensions)
+
 phony += $(extensions)
 $(extensions) : | $(CODE)
 	$(if $(findstring $@,$(shell $(CODE) --list-extensions)),,\
@@ -313,14 +334,15 @@ $(extensions) : | $(CODE)
 
 ifeq (apple,$(VENDOR))
 $(CODE) : | visual-studio-code
+
 else ifeq (linux-gnu,$(OSTYPE))
+phony += unsnap
+unsnap :
 ifneq (,$(shell $(SNAP) list code 2> /dev/null))
-phony += $(CODE)
-$(CODE) :
 	$(SNAP) remove code
-else
-$(CODE) :
 endif
+
+$(CODE) : unsnap
 	( TMPSUFFIX=.deb; sudo $(APT) install =( $(WGET) -ncv --show-progress -O - \
 		'https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64' ))
 endif
