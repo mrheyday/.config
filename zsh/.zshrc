@@ -5,10 +5,6 @@
 #
 
 
-# zmodload zsh/zprof
-# typeset -F SECONDS
-
-
 # Set these first, so history is preserved, no matter what happens.
 XDG_DATA_HOME=~/.local/share
 if [[ $VENDOR == apple ]]; then
@@ -24,17 +20,3 @@ for __file__ in $ZDOTDIR/zshrc.d/*.zsh; do
   . $__file__
 done
 unset __file__
-
-
-# zprof() {
-#   zprof() {
-#     unfunction zprof
-#     builtin zprof
-#     print $SECONDS
-#     echoti sc
-#     add-zle-hook-widget -d line-init zprof
-#   }
-#   add-zsh-hook -d precmd zprof
-#   add-zle-hook-widget line-init zprof
-# }
-# add-zsh-hook precmd zprof
