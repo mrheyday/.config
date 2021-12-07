@@ -38,6 +38,15 @@ bindkey \
 # Alt-V: Show the next key combo's terminal code and state what it does.
 bindkey '^[v' describe-key-briefly
 
+# Alt-Shift-S: Prefix current or previous command line with `sudo`.
+.sudo() {
+  [[ -z $BUFFER ]] &&
+      zle .up-history
+  LBUFFER="sudo $LBUFFER"
+}
+zle -N .sudo
+bindkey '^[S' .sudo
+
 # Alt-H: Open `man` page (or other help) for current command.
 unalias run-help 2> /dev/null
 autoload +X -Uz run-help
