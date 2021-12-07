@@ -28,7 +28,6 @@ brew_shellenv=~/.local/bin/brew-shellenv
 source $brew_shellenv
 unset brew_shellenv
 
-export ANDROID_SDK_ROOT=$HOMEBREW_PREFIX/share/android-commandlinetools
 export GRADLE_USER_HOME=$XDG_CONFIG_HOME/gradle
 
 export PYENV_ROOT=~/.pyenv PYENV_VERSION=3.7.10
@@ -44,7 +43,6 @@ export -TU INFOPATH infopath
 path=(
     $PIPX_BIN_DIR(N)
     $PYENV_ROOT/{bin,shims}(N)
-    $ANDROID_SDK_ROOT/{emulator,platform-tools}(N)
     $HOMEBREW_PREFIX/opt/{mariadb@10.3,ncurses,tomcat@9}/bin(N)
     /opt/local/{,s}bin(N) # MacPorts
     $path[@]
