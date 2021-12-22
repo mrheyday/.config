@@ -101,7 +101,24 @@ PYENV_VERSION = 3.7.10
 PYENVFLAGS =
 PYTHON = $(PYENV_ROOT)/versions/$(PYENV_VERSION)/bin/python
 ifeq (linux-gnu,$(OSTYPE))
-python-build = bzip2 sqlite3 zlib1g-dev
+python-build = \
+	build-essential \
+	curl \
+	libbz2-dev \
+	libffi-dev \
+	liblzma-dev \
+	libncursesw5-dev \
+	libreadline-dev \
+	libsqlite3-dev \
+	libssl-dev \
+	libxml2-dev \
+	libxmlsec1-dev \
+	llvm \
+	make \
+	tk-dev \
+	wget \
+	xz-utils \
+	zlib1g-dev
 endif
 PIP = $(PYENV_ROOT)/shims/pip
 PIPFLAGS = -q
