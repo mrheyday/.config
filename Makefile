@@ -8,6 +8,7 @@ OSTYPE = $(shell print $$OSTYPE)
 # Include only the software that we want on all machines.
 shell-commands = \
 	aureliojargas/clitest \
+	pyenv/pyenv \
 	zsh-users/zsh-completions
 vscode-extensions = \
 	bmalehorn.shell-syntax \
@@ -35,6 +36,7 @@ brew-formulas += grep
 packages = konsole
 endif
 
+XDG_DATA_HOME = $(HOME)/.local/share
 zshenv = $(HOME)/.zshenv
 sshconfig = $(HOME)/.ssh/config
 dotfiles := $(zshenv) $(sshconfig)
@@ -43,12 +45,10 @@ vscode-settings = $(HOME)/Library/ApplicationSupport/Code/User/settings.json
 vscode-keybindings = $(HOME)/Library/ApplicationSupport/Code/User/keybindings.json
 dotfiles += $(vscode-settings) $(vscode-keybindings)
 else ifeq (linux-gnu,$(OSTYPE))
-konsole = $(HOME)/.local/share/konsole
-kxmlgui5 = $(HOME)/.local/share/kxmlgui5
+konsole = $(XDG_DATA_HOME)/konsole
+kxmlgui5 = $(XDG_DATA_HOME)/kxmlgui5
 dotfiles += $(konsole) $(kxmlgui5)
 endif
-
-XDG_DATA_HOME = $(HOME)/.local/share
 zsh-datadir = $(XDG_DATA_HOME)/zsh/
 zsh-hist = $(zsh-datadir)history
 zsh-hist-old = $(HOME)/.zsh_history
@@ -87,9 +87,10 @@ ifeq (,$(wildcard $(GIT)))
 GIT := /usr/bin/git
 endif
 GITFLAGS = -q
+gitdir = $(HOME)/Git
 
 ZSH = /bin/zsh
-ZNAP = $(HOME)/Git/zsh-snap/znap.zsh
+ZNAP = $(gitdir)/zsh-snap/znap.zsh
 
 BREW = $(bindir)/brew
 BREWFLAGS = -q
@@ -97,8 +98,12 @@ HOMEBREW_PREFIX = $(exec_prefix)
 HOMEBREW_CELLAR = $(HOMEBREW_PREFIX)/Cellar
 HOMEBREW_REPOSITORY = $(HOMEBREW_PREFIX)/Homebrew
 
-PYENV_ROOT = $(HOME)/.pyenv
-PYENV = $(bindir)/pyenv
+PIPX_BIN_DIR = $(HOME)/.local/bin
+PIPX = $(PIPX_BIN_DIR)/pipx
+PIPXFLAGS =
+PIPENV = $(PIPX_BIN_DIR)/pipenv
+PYENV_ROOT = $(gitdir)/pyenv
+PYENV = $(PIPX_BIN_DIR)/pyenv
 PYENV_VERSION = 3.7.10
 PYENVFLAGS =
 PYTHON = $(PYENV_ROOT)/versions/$(PYENV_VERSION)/bin/python
@@ -124,11 +129,6 @@ python-build = \
 endif
 PIP = $(PYENV_ROOT)/shims/pip
 PIPFLAGS = -q
-
-PIPX_BIN_DIR = $(HOME)/.local/bin
-PIPX = $(PIPX_BIN_DIR)/pipx
-PIPXFLAGS =
-PIPENV = $(HOME)/.local/bin/pipenv
 
 phony :=
 
@@ -303,34 +303,27 @@ $(ZNAP):
 
 phony += installpython
 installpython : | $(PIPENV)
-	$(if $(findstring $(PYENV_VERSION),$(shell PYENV_ROOT=$(PYENV_ROOT) $(PYENV) global)),,\
-	PYENV_ROOT=$(PYENV_ROOT) $(PYENV) global $(PYENV_VERSION))
-	$(PIP) install $(PIPFLAGS) -U pip
-	$(PIP) install $(PIPFLAGS) -U --user pipx
-	$(PIPX) upgrade pipenv &> /dev/null
 
-phony += unbrew
-unbrew :
-ifneq (,$(wildcard $(HOMEBREW_CELLAR)/pipx))
-	-$(BREW) uninstall $(BREWFLAGS) --formula pipx
-endif
-ifneq (,$(wildcard $(HOMEBREW_CELLAR)/pipenv))
-	-$(BREW) uninstall $(BREWFLAGS) --formula pipenv
-endif
-
-$(PIPENV) : | unbrew $(PIPX)
+phony += $(PIPENV)
+$(PIPENV) : | $(PIPX)
+	-$(BREW) uninstall $(BREWFLAGS) --formula pipx 2> /dev/null
+	-$(PIPX) uninstall $(PIPXFLAGS) pipenv 2> /dev/null
 	$(PIPX) install $(PIPXFLAGS) pipenv > /dev/null
 
-$(PIPX) : | unbrew $(PYTHON)
+phony += $(PIPX)
+$(PIPX) : | $(PYTHON)
+	-$(BREW) uninstall $(BREWFLAGS) --formula pipenv 2> /dev/null
+	-$(PIP) uninstall $(PIPFLAGS) --user pipx 2> /dev/null
 	$(PIP) install $(PIPFLAGS) --user pipx
 
-$(PYTHON) : | $(HOMEBREW_CELLAR)/pyenv $(python-build)
-ifeq (,$(findstring $(PYENV_VERSION),$(shell $(PYENV) versions --bare)))
-	$(info $(shell print \
-	$$'\e[5;31;40mCompiling Python $(PYENV_VERSION). This might take a while! Please stand by...\e[0m'\
-	))
+phony += $(PYTHON)
+$(PYTHON) : | $(PYENV)
 	PYENV_ROOT=$(PYENV_ROOT) $(PYENV) install $(PYENVFLAGS) -s $(PYENV_VERSION)
-endif
+	PYENV_ROOT=$(PYENV_ROOT) $(PYENV) global $(PYENV_VERSION)
+	$(PIP) install $(PIPFLAGS) -U pip
+
+phony += $(PYENV)
+$(PYENV) : | $(python-build) installzsh
 
 phony += installapt
 installapt: $(packages)
@@ -338,8 +331,8 @@ installapt: $(packages)
 ifeq (linux-gnu,$(OSTYPE))
 phony += $(packages) $(python-build)
 $(packages) $(python-build) :
-	$(if $(shell $(APT) show $@ 2> /dev/null),,\
-	sudo $(APT) install $@\
+	$(if $(findstring $@,$(shell $(APT) list --installed $@ 2> /dev/null)),,\
+	sudo $(APT) install -y $@\
 	)
 endif
 

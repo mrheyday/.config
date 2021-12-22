@@ -30,7 +30,8 @@ unset brew_shellenv
 
 export GRADLE_USER_HOME=$XDG_CONFIG_HOME/gradle
 
-export PYENV_ROOT=~/.pyenv PYENV_VERSION=3.7.10
+export PYENV_ROOT=~/Git/pyenv
+export PYENV_VERSION=3.7.10
 export PIPX_BIN_DIR=~/.local/bin
 
 export CATALINA_BASE=~/Tomcat9 CATALINA_HOME=$HOMEBREW_PREFIX/opt/tomcat@9/libexec
