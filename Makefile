@@ -6,8 +6,10 @@ VENDOR = $(shell print $$VENDOR)
 OSTYPE = $(shell print $$OSTYPE)
 
 # Include only the software that we want on all machines.
-repos = aureliojargas/clitest zsh-users/zsh-completions
-extensions = \
+shell-commands = \
+	aureliojargas/clitest \
+	zsh-users/zsh-completions
+vscode-extensions = \
 	bmalehorn.shell-syntax \
 	davidhewitt.shebang-language-associator \
 	DotJoshJohnson.xml \
@@ -22,14 +24,14 @@ extensions = \
 	ms-vscode.cpptools \
 	ms-vsliveshare.vsliveshare \
 	stylelint.vscode-stylelint
-formulas := asciinema bat diffutils git less nano pyenv
-taps := services
+brew-taps := services
+brew-formulas := bat diffutils git less nano
 ifeq (apple,$(VENDOR))
-taps += autoupdate cask cask-fonts cask-versions
-formulas += bash coreutils
-casks = karabiner-elements rectangle visual-studio-code
+brew-taps += autoupdate cask cask-fonts cask-versions
+brew-formulas += bash coreutils
+brew-casks = karabiner-elements rectangle visual-studio-code
 else ifeq (linux-gnu,$(OSTYPE))
-formulas += grep
+brew-formulas += grep
 packages = konsole
 endif
 
@@ -247,11 +249,11 @@ endif
 phony += installdirs
 
 tapsdir = $(HOMEBREW_REPOSITORY)/Library/Taps/homebrew
-taps := $(taps:%=$(tapsdir)/homebrew-%)
-formulas := $(formulas:%=$(HOMEBREW_CELLAR)/%)
+brew-taps := $(brew-taps:%=$(tapsdir)/homebrew-%)
+brew-formulas := $(brew-formulas:%=$(HOMEBREW_CELLAR)/%)
 
 phony += installbrew
-installbrew : | $(taps) $(formulas) $(casks)
+installbrew : | $(brew-taps) $(brew-formulas) $(brew-casks)
 
 phony += brewupdate
 brewupdate : | $(tapsdir)/homebrew-autoupdate
@@ -264,17 +266,17 @@ else ifeq (linux-gnu,$(OSTYPE))
 	$(BREW) upgrade $(BREWFLAGS)
 endif
 
-$(formulas) : | brewupdate $(taps)
+$(brew-formulas) : | brewupdate $(brew-taps)
 	$(BREW) install $(BREWFLAGS) --formula $(notdir $@)
 
 ifeq (apple,$(VENDOR))
-phony += $(casks)
-$(casks) : | $(tapsdir)/homebrew-cask
+phony += $(brew-casks)
+$(brew-casks) : | $(tapsdir)/homebrew-cask
 	$(if $(findstring $@,$(shell $(BREW) list --cask)),,\
 	$(BREW) install $(BREWFLAGS) --cask $@ 2> /dev/null )
 endif
 
-$(taps) : | $(BREW)
+$(brew-taps) : | $(BREW)
 	$(BREW) tap $(BREWFLAGS) $(subst homebrew-,homebrew/,$(notdir $@))
 
 $(BREW) :
@@ -283,7 +285,7 @@ $(BREW) :
 
 phony += installzsh
 installzsh : | $(ZNAP)
-	source $(ZNAP) && znap install $(repos) > /dev/null
+	source $(ZNAP) && znap install $(shell-commands)
 ifneq (,$(wildcard $(DSCL)))
 ifneq (UserShell: $(SHELL),$(shell $(DSCL) . -read ~/ UserShell))
 	chsh -s $(SHELL)
@@ -342,10 +344,10 @@ $(packages) $(python-build) :
 endif
 
 phony += installcode
-installcode: $(extensions)
+installcode: $(vscode-extensions)
 
-phony += $(extensions)
-$(extensions) : | $(CODE)
+phony += $(vscode-extensions)
+$(vscode-extensions) : | $(CODE)
 	$(if $(findstring $@,$(shell $(CODE) --list-extensions)),,\
 	$(CODE) --install-extension $@)
 
@@ -353,16 +355,17 @@ ifeq (apple,$(VENDOR))
 $(CODE) : | visual-studio-code
 
 else ifeq (linux-gnu,$(OSTYPE))
-phony += unsnap
-unsnap :
+phony += $(CODE)
+$(CODE) :
 ifneq (,$(shell $(SNAP) list code 2> /dev/null))
 	$(SNAP) remove code
 endif
-
-$(CODE) : unsnap
-	( TMPSUFFIX=.deb; sudo $(APT) install =( $(WGET) -ncv --show-progress -O - \
-		'https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64' ))
+	$(if $(wildcard $(CODE)),,\
+	( TMPSUFFIX=.deb; sudo $(APT) install -y =( $(WGET) -ncv --show-progress -O - \
+		'https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64' ))\
+	)
 endif
 
+.NOTPARALLEL :
 .PHONY : $(phony)
 .SUFFIXES :
