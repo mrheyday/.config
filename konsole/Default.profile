@@ -1,6 +1,6 @@
 [Appearance]
 BoldIntense=true
-ColorScheme=Monokai-Flat
+ColorScheme=Monokai
 Font=Cascadia Code,11,-1,5,50,0,0,0,0,0
 
 [Cursor Options]
