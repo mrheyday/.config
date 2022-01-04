@@ -46,18 +46,10 @@ add-zsh-hook precmd .prompt.git-status.async
     gitdir="$( git rev-parse -q --git-dir 2> /dev/null )" ||
         return
 
-    # Capture the left-most group of non-blank characters on each line.
-    lines=( ${(f)"$( git status -sunormal )"} )
-    REPLY=${(SMj::)lines[@]##[^[:blank:]]##}
-
-    # Split on color reset escape code, discard duplicates and sort.
-    symbols=( ${(ps:\e[m:ui)REPLY//'??'/?} )
-
-    REPLY=${(pj:\e[m :)symbols}$'\e[m'  # Join with color resets.
-    REPLY+=" %F{12}${$( git rev-parse -q --show-toplevel ):t}%f:"  # Add repo root dir
+    REPLY="%F{12}${$( git rev-parse -q --show-toplevel ):t}%f"  # Add repo root dir
 
     if head=$( git branch --show-current 2> /dev/null ) && [[ -n $head ]]; then
-      REPLY+="%F{14}$head%f"
+      REPLY="%F{14}$head%f $REPLY"
 
       if upstream=$( git rev-parse -q --abbrev-ref @{u} 2> /dev/null ) && [[ -n $upstream ]]; then
         git config --local \
@@ -67,30 +59,37 @@ add-zsh-hook precmd .prompt.git-status.async
 
         upstream=${${upstream%/$head}#upstream/}
         behind=${$( git rev-list --count --right-only @...@{u} ):#0}
-        REPLY+=" %F{13}${behind:+%B$behind}%f<-"
+        REPLY="->%F{13}${behind:+%B$behind}%f $REPLY"
 
         if push=${${"$( git rev-parse -q --abbrev-ref @{push} 2> /dev/null )"%/$head}#origin/}
         then
           if [[ $push != $upstream ]]; then
             ahead=${$( git rev-list --count --left-only @...@{push} ):#0}
-            REPLY+="%F{13}$upstream%b%f %F{14}${ahead:+%B$ahead}%f->%F{13}$push%b%f"
+            REPLY="%F{13}$push%b%f<-%F{14}${ahead:+%B$ahead}%f %F{13}$upstream%b%f$REPLY"
           else
             ahead=${$( git rev-list --count --left-only @...@{u} ):#0}
             if [[ -z $ahead && -z $behind ]]; then
-              REPLY+="> %F{13}$upstream%b%f"
+              REPLY="%F{13}$upstream%b%f <$REPLY"
             else
-              REPLY+="%b%f %F{14}${ahead:+%B$ahead}%f-> %F{13}$upstream%b%f"
+              REPLY="%F{13}$upstream%b%f <-%F{14}${ahead:+%B$ahead}%f $REPLY"
             fi
           fi
         else
-          REPLY+="%F{13}$upstream%b%f"
+          REPLY="%F{13}$upstream%b%f$REPLY"
         fi
       fi
     elif head="$( git branch -q --no-color --points-at=@ 2> /dev/null )"; then
-      REPLY+="%F{1}${${head##*\((no branch, |)}%\)*}"
+      REPLY="%F{1}${${head##*\((no branch, |)}%\)*}@$REPLY"
     else
-      REPLY+="%F{14}${"$( < $gitdir/HEAD )":t}%f"
+      REPLY="%F{14}${"$( < $gitdir/HEAD )":t}%f@$REPLY"
     fi
+
+
+    # Capture the left-most group of non-blank characters on each line.
+    # Then split on color reset escape code, discard duplicates and sort.
+    lines=( ${(f)"$( git status -sunormal )"} )
+    symbols=( ${(ps:\e[m:ui)${(SMj::)lines[@]##[^[:blank:]]##}//'??'/?} )
+    REPLY=${(pj:\e[m :)symbols}$'\e[m '$REPLY  # Join with color resets.
 
     # Wrap ANSI codes in %{prompt escapes%}, so they're not counted as printable characters.
     REPLY="${REPLY//(#m)$'\e['[;[:digit:]]#m/%{${MATCH}%\}}"
