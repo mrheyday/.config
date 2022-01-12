@@ -52,31 +52,29 @@ add-zsh-hook precmd .prompt.git-status.async
       REPLY="%F{14}$head%f $REPLY"
 
       if upstream=$( git rev-parse -q --abbrev-ref @{u} 2> /dev/null ) && [[ -n $upstream ]]; then
-        git config --local \
-            remote.$upstream:h.fetch '+refs/heads/*:refs/remotes/'$upstream:h'/*'
+        git config --local remote.$upstream:h.fetch '+refs/heads/*:refs/remotes/'$upstream:h'/*'
         [[ -z $gitdir/FETCH_HEAD(Nmm-1) ]] &&
             git fetch -qt  # Fetch if there's no FETCH_HEAD or it is at least 1 minute old.
 
         upstream=${${upstream%/$head}#upstream/}
         behind=${$( git rev-list --count --right-only @...@{u} ):#0}
         REPLY="->%F{13}${behind:+%B$behind}%f $REPLY"
+      fi
 
-        if push=${${"$( git rev-parse -q --abbrev-ref @{push} 2> /dev/null )"%/$head}#origin/}
-        then
-          if [[ $push != $upstream ]]; then
-            ahead=${$( git rev-list --count --left-only @...@{push} ):#0}
-            REPLY="%F{13}$push%b%f<-%F{14}${ahead:+%B$ahead}%f %F{13}$upstream%b%f$REPLY"
-          else
-            ahead=${$( git rev-list --count --left-only @...@{u} ):#0}
-            if [[ -z $ahead && -z $behind ]]; then
-              REPLY="%F{13}$upstream%b%f <$REPLY"
-            else
-              REPLY="%F{13}$upstream%b%f <-%F{14}${ahead:+%B$ahead}%f $REPLY"
-            fi
-          fi
+      if push=${${"$( git rev-parse -q --abbrev-ref @{push} 2> /dev/null )"%/$head}#origin/} && [[ -n $push ]]; then
+        if [[ $push != $upstream ]]; then
+          ahead=${$( git rev-list --count --left-only @...@{push} ):#0}
+          REPLY="%F{13}$push%b%f<-%F{14}${ahead:+%B$ahead}%f %F{13}$upstream%b%f$REPLY"
         else
-          REPLY="%F{13}$upstream%b%f$REPLY"
+          ahead=${$( git rev-list --count --left-only @...@{u} ):#0}
+          if [[ -z $ahead && -z $behind ]]; then
+            REPLY="%F{13}$upstream%b%f <$REPLY"
+          else
+            REPLY="%F{13}$upstream%b%f <-%F{14}${ahead:+%B$ahead}%f $REPLY"
+          fi
         fi
+      else
+        REPLY="%F{13}$upstream%b%f$REPLY"
       fi
     elif head="$( git branch -q --no-color --points-at=@ 2> /dev/null )"; then
       REPLY="%F{1}${${head##*\((no branch, |)}%\)*}@$REPLY"
