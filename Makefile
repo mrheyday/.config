@@ -147,7 +147,7 @@ ifneq ($(upstream),$(shell $(GIT) remote get-url upstream 2> /dev/null))
 	-$(GIT) remote add upstream $(upstream)
 	$(GIT) remote set-url upstream $(upstream)
 endif
-ifeq (,$(shell $(GIT) branch -l main))
+ifeq (,$(shell $(GIT) branch --list main))
 	-$(GIT) branch $(GITFLAGS) -m master main
 endif
 	$(GIT) fetch $(GITFLAGS) -t upstream
@@ -256,12 +256,14 @@ phony += installbrew
 installbrew : | $(brew-taps) $(brew-formulas) $(brew-casks)
 
 phony += brewupdate
+ifeq (apple,$(VENDOR))
 brewupdate : | $(tapsdir)/homebrew-autoupdate
 	$(BREW) autoremove $(BREWFLAGS)
-ifeq (apple,$(VENDOR))
 	-$(BREW) autoupdate stop $(BREWFLAGS) &> /dev/null
 	$(BREW) autoupdate start $(BREWFLAGS) --cleanup --upgrade > /dev/null
 else ifeq (linux-gnu,$(OSTYPE))
+brewupdate :
+	$(BREW) autoremove $(BREWFLAGS)
 	$(BREW) update $(BREWFLAGS)
 	$(BREW) upgrade $(BREWFLAGS)
 endif
@@ -292,7 +294,7 @@ ifneq (UserShell: $(SHELL),$(shell $(DSCL) . -read ~/ UserShell))
 endif
 else ifneq (,$(wildcard $(GETENT)))
 ifneq ($(SHELL),$(findstring $(SHELL),$(shell $(GETENT) passwd $$LOGNAME)))
-	chsh -s $(SHELL)
+	-chsh -s $(SHELL)
 endif
 endif
 
