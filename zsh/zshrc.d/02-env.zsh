@@ -37,8 +37,11 @@ fpath=(
     $fpath[@]
 )
 
-export VISUAL=code EDITOR=nano PAGER=less MANPAGER='bat -l man' READNULLCMD=bat
+export VISUAL=nano EDITOR=nano
+[[ -v SSH_CONNECTION ]] ||
+    VISUAL=code
 
+export PAGER=less MANPAGER='bat -l man' READNULLCMD=bat
 export LESS='-FiMr -j.5 --incsearch' LESSHISTFILE=$XDG_DATA_HOME/less/lesshst
 mkdir -pm 0700 $LESSHISTFILE:h
 

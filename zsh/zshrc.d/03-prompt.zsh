@@ -11,7 +11,7 @@ add-zsh-hook precmd  .prompt.cursor.blinking-bar        # when the command line 
 .prompt.cursor.blinking-bar
 
 # Whenever we change dirs, prompt the new directory.
-setopt cdsilent pushdsilent  # Suppress built-in output of cd and pushd.
+setopt cdsilent pushdsilent 2> /dev/null  # Suppress built-in output of cd and pushd.
 .prompt.chpwd() {
   zle && zle -I                 # Prepare the line editor for our output.
   print -P -- '\n%F{12}%~%f/'   # -P expands prompt escape codes.
@@ -26,8 +26,9 @@ add-zsh-hook chpwd .prompt.chpwd
 PS1='%F{%(?,10,9)}%#%f '
 znap prompt               # Make the left side of the primary prompt visible immediately.
 
-ZLE_RPROMPT_INDENT=0     # Right prompt margin
-setopt transientrprompt  # Auto-remove the right side of each prompt.
+[[ -v SSH_CONNECTION ]] ||
+    ZLE_RPROMPT_INDENT=0  # Right prompt margin
+setopt transientrprompt   # Auto-remove the right side of each prompt.
 
 # Reduce prompt latency by fetching git status asynchronously.
 add-zsh-hook precmd .prompt.git-status.async

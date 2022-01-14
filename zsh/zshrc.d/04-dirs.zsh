@@ -11,7 +11,7 @@ cdr=$XDG_DATA_HOME/zsh/chpwd-recent-dirs
 unset cdr
 
 # Needed by VTE-based terminals (Gnome Terminal, Tilix) to propagate $PWD to new windows/tabs.
-[[ $VENDOR == ubuntu ]] &&
+[[ -v VTE_VERSION ]] &&
     source /etc/profile.d/vte-*.*.sh
 
 # Both Apple & VTE attach their function to the wrong hook!
