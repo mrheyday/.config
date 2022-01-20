@@ -10,16 +10,13 @@
 	"editor.minimap.enabled": false,
 	"editor.renderControlCharacters": true,
 	"editor.renderLineHighlight": "all",
-	"editor.rulers": [
-		79,
-		99
-	],
+	"editor.rulers": [ 80, 120 ],
 	"editor.scrollbar.horizontal": "visible",
 	"editor.semanticHighlighting.enabled": true,
 	"editor.suggestSelection": "first",
 	"editor.tabSize": 8,
 	"editor.wordSeparators": " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~",
-	"editor.wordWrapColumn": 99,
+	"editor.wordWrapColumn": 120,
 	"explorer.confirmDelete": false,
 	"explorer.confirmDragAndDrop": false,
 	"explorer.openEditors.sortOrder": "alphabetical",
