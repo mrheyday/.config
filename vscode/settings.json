@@ -22,14 +22,13 @@
 	"explorer.openEditors.sortOrder": "alphabetical",
 	"extensions.ignoreRecommendations": true,
 	"files.associations": {
-		"*.tcc": "c",
+		"_*": "shellscript",
 		"*.awk": "makefile",
 		"*.in": "makefile",
 		"*.mdd": "makefile",
-		"Make*": "makefile",
+		"*.tcc": "c",
 		"*.ztst": "plaintext",
-		"_*": "shellscript",
-		".*": "shellscript",
+		"Make*": "makefile",
 	},
 	"files.autoSave": "afterDelay",
 	"files.defaultLanguage": "shellscript",
@@ -38,7 +37,7 @@
 		"**/.hg": false,
 		"**/.svn": false,
 		"**/*.zwc": true,
-		"**/CVS": false
+		"**/CVS": false,
 	},
 	"files.trimTrailingWhitespace": true,
 	"git.autofetch": true,
@@ -91,9 +90,6 @@
 	"workbench.editor.limit.enabled": true,
 	"workbench.editor.showTabs": false,
 	"workbench.editor.untitled.hint": "hidden",
-	"workbench.editorAssociations": {
-		"*.ipynb": "jupyter.notebook.ipynb"
-	},
 	"workbench.fontAliasing": "antialiased",
 	"workbench.list.keyboardNavigation": "filter",
 	"workbench.startupEditor": "none",
