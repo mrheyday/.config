@@ -65,6 +65,10 @@
 	"reflowMarkdown.preferredLineLength": 99,
 	"scm.inputFontFamily": "editor",
 	"scm.inputFontSize": 11,
+	"search.exclude": {
+		"**/.git/objects/**": true,
+		"**/.git/subtree-cache/**": true
+	},
 	"search.sortOrder": "fileNames",
 	"search.useIgnoreFiles": false,
 	"search.useReplacePreview": false,
