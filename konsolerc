@@ -3,19 +3,22 @@ DefaultProfile=Default.profile
 
 [DownloadDialog Settings]
 Height 1200=498
+Height 1440=498
 Width 1920=700
+Width 2560=700
 
 [Favorite Profiles]
-Favorites=
+Favorites=Default.profile
 
 [MainWindow]
 Height 1080=1009
-Height 1200=1129
-Height 1440=1369
-State=AAAA/wAAAAD9AAAAAAAABNwAAAU/AAAABAAAAAQAAAAIAAAACPwAAAAA
+Height 1200=1136
+Height 1440=1376
+State=AAAA/wAAAAD9AAAAAAAABzgAAARaAAAABAAAAAQAAAAIAAAACPwAAAAA
 ToolBarsMovable=Disabled
 Width 1920=924
 Width 2560=1244
+Window-Maximized 1200x1920=true
 
 [SearchSettings]
 SearchReverseSearch=false

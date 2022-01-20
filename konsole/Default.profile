@@ -13,6 +13,8 @@ LocalTabTitleFormat=%D - %n
 Name=Default
 Parent=FALLBACK/
 RemoteTabTitleFormat=%U%h
+TerminalCenter=true
+TerminalMargin=11
 
 [Interaction Options]
 CopyTextAsHTML=false
