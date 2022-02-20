@@ -16,7 +16,7 @@ SAVEHIST=$(( 50 * 1000 ))       # For readability
 HISTSIZE=$(( 1.2 * SAVEHIST ))  # Zsh recommended value
 
 
-for __file__ in $ZDOTDIR/zshrc.d/*.zsh; do
+for __file__ in $ZDOTDIR/rc.d/*.zsh; do
   . $__file__
 done
 unset __file__
