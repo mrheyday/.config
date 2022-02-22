@@ -63,7 +63,8 @@
 	"scm.inputFontSize": 11,
 	"search.exclude": {
 		"**/.git/objects/**": true,
-		"**/.git/subtree-cache/**": true
+		"**/.git/subtree-cache/**": true,
+		"**/build/**": true
 	},
 	"search.sortOrder": "fileNames",
 	"search.useIgnoreFiles": false,
