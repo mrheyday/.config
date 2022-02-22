@@ -22,9 +22,9 @@
 [branch]
 	autoSetupRebase = always
 [rebase]
-	autoStash = true
+	autoStash = false	# autoStash can lead to loss of untracked files!
 [merge]
-	autoStash = true
+	autoStash = false	# autoStash can lead to loss of untracked files!
 	tool = opendiff
 [diff]
 	colorMoved = zebra
