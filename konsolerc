@@ -14,11 +14,12 @@ Favorites=Default.profile
 Height 1080=1009
 Height 1200=1136
 Height 1440=1376
-State=AAAA/wAAAAD9AAAAAAAABzgAAARaAAAABAAAAAQAAAAIAAAACPwAAAAA
+State=AAAA/wAAAAD9AAAAAAAABNwAAAVKAAAABAAAAAQAAAAIAAAACPwAAAAA
 ToolBarsMovable=Disabled
 Width 1920=924
 Width 2560=1244
 Window-Maximized 1200x1920=true
+Window-Maximized 2560x1440=true
 
 [SearchSettings]
 SearchReverseSearch=false
