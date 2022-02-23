@@ -21,9 +21,6 @@ code() {
 }
 
 if [[ $VENDOR == apple ]]; then
-  bindkey \
-      '^[[H' beginning-of-buffer  '^[OH' beginning-of-buffer \
-      '^[[F' end-of-buffer        '^[OF' end-of-buffer
   bind '^[o' 'open .'
 else
   bind '^[o' 'nautilus . &> /dev/null &|'
@@ -31,7 +28,6 @@ fi
 
 # Replace some default keybindings with better built-in widgets.
 bindkey \
-    '^[^_'  copy-prev-shell-word \
     '^[q'   push-line-or-edit \
     '^V'    vi-quoted-insert
 

@@ -38,7 +38,7 @@ alias \
 # Paging & colors for `ls`
 ls() {
   command ${${OSTYPE:#linux-gnu}:+g}ls --width=$COLUMNS "$@" | $PAGER
-  return $pipestatus[1]  # Return exit status of ls, not $PAGER
+  return $pipestatus[1]  # Return exit status of ls, not $PAGER.
 }
 zstyle ':completion:*:ls:*:options' ignored-patterns --width
 alias \
