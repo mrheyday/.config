@@ -1,13 +1,13 @@
 [user]
-	name = Marlon Richert
-	email = marlonrichert@users.noreply.github.com
+	name = Hubs
+	email = 51133323+mrheyday@users.noreply.github.com 
 [feature]
 	manyFiles = true
 	writeCommitGraph = true
 [core]
 	autocrlf = false
 	editor = code --wait
-	hooksPath = /Users/marlon/.config/git/hooks
+	hooksPath = /home/hubs/.config/git/hooks
 [column]
 	ui = row dense
 [checkout]
