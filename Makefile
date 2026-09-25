@@ -37,9 +37,10 @@ packages = konsole
 endif
 
 XDG_DATA_HOME = $(HOME)/.local/share
+claudesettings = $(HOME)/.claude/settings.json
 zshenv = $(HOME)/.zshenv
 sshconfig = $(HOME)/.ssh/config
-dotfiles := $(zshenv) $(sshconfig)
+dotfiles := $(claudesettings) $(zshenv) $(sshconfig)
 ifeq (apple,$(VENDOR))
 vscode-settings = $(HOME)/Library/ApplicationSupport/Code/User/settings.json
 vscode-keybindings = $(HOME)/Library/ApplicationSupport/Code/User/keybindings.json
@@ -208,6 +209,7 @@ endif
 
 phony += installconfig
 installconfig : | $(dotfiles:%=%~)
+	ln -fns $(CURDIR)/claude/settings.json $(claudesettings)
 	ln -fns $(CURDIR)/zsh/env $(zshenv)
 ifeq (apple,$(VENDOR))
 	ln -fns $(CURDIR)/ssh/config $(sshconfig)
